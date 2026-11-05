@@ -21,3 +21,9 @@ scripts/
 .vscode/
 .idea/
 node_modules/
+data/
+runs/
+website-clones/
+.beads/
+audit-*.json
+*.db

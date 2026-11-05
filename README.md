@@ -4,7 +4,7 @@
 
 # GEOSITION
 
-A developer toolkit for auditing websites for AI search readiness. Check crawler access, structured data, metadata, and content; then review practical suggestions for improving your site.
+A source-available developer toolkit for auditing websites for AI search readiness. Check crawler access, structured data, metadata, and content; then review practical suggestions for improving your site.
 
 [![CI](https://github.com/arnaudbellemare/geosition/actions/workflows/ci.yml/badge.svg)](https://github.com/arnaudbellemare/geosition/actions/workflows/ci.yml)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-303830)](https://www.python.org/)

@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
 const REQUIRED_FILES = [
-  "seo-changelog.md",
+  "seo/CHANGELOG.md",
   "seo/README.md",
   "seo/audit-issues.json",
   "seo/representative-urls.json",
@@ -63,8 +63,8 @@ function main(): void {
     if (raw.trim().length < 80) die(`${rel} is too short (expected substantive content)`);
   }
 
-  const changelog = readText("seo-changelog.md");
-  expectHeading(changelog, "seo-changelog.md", "##");
+  const changelog = readText("seo/CHANGELOG.md");
+  expectHeading(changelog, "seo/CHANGELOG.md", "##");
 
   let audit: AuditIssuesFile;
   try {

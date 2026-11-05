@@ -24,7 +24,7 @@ Primary user-facing surfaces:
 
 Top-level structure:
 - `apps/geo-aeo-tracker/`: vendored Next.js tracker app; after clone run `cd apps/geo-aeo-tracker && npm install` and copy `.env` from its README (Bright Data + OpenRouter keys)
-- `seo/` + `seo-changelog.md`: repository SEO program artifacts (issues JSON, FR/EN validation URLs, GSC handbook); validate with `npm run seo:verify`
+- `seo/`: repository SEO program artifacts (issues JSON, changelog, FR/EN validation URLs, GSC handbook); validate with `npm run seo:verify`
 - `src/geo_optimizer/cli/`: Click presentation layer and output formatters
 - `src/geo_optimizer/core/`: business logic, scoring, audit execution, fix generation
 - `src/geo_optimizer/models/`: dataclasses and centralized config/constants

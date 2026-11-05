@@ -6,7 +6,7 @@ Versioned artifacts that tie **live GEO analysis** (`geo full`, `geo orchestrate
 
 | Artifact | Path |
 |----------|------|
-| 13-phase map + deploy log + stale-tactics rejection | `../seo-changelog.md` |
+| 13-phase map + deploy log + stale-tactics rejection | `CHANGELOG.md` |
 | Prioritized issues + evidence + rollback + GEO scaled-content risk | `audit-issues.json` |
 | Minimal validation URL set (FR/EN) | `representative-urls.json` |
 | Decision cards (confidence + recheck 2026-08-01) | `decision-cards.md` |

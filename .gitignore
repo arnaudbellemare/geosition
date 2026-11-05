@@ -77,6 +77,11 @@ output/
 # Local run outputs
 out/
 tmp/
+/data/
+/runs/
+/website-clones/
+/.beads/
+/audit-*.json
 
 # Runtime databases
 *.db

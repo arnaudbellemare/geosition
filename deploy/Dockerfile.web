@@ -1,7 +1,7 @@
 # ─── GEO Optimizer Web — Docker image per Railway ──────────────────────────
 # Avvia il server FastAPI per servire l'API di audit
 #
-# Build:  docker build -f Dockerfile.web -t geo-optimizer-web .
+# Build:  docker build -f deploy/Dockerfile.web -t geo-optimizer-web .
 # Run:    docker run -p 8000:8000 geo-optimizer-web
 
 # ─── Stage 1: build ─────────────────────────────────────────────────────────

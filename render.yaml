@@ -9,7 +9,7 @@ services:
   - type: web
     name: geo-optimizer-web
     runtime: docker
-    dockerfilePath: ./Dockerfile.web
+    dockerfilePath: ./deploy/Dockerfile.web
     plan: free
     region: frankfurt  # EU — più vicino a noi
     healthCheckPath: /health

@@ -1,7 +1,7 @@
 # .geo-optimizer.yml — Configurazione per progetto
 #
 # Copia questo file nella root del progetto come .geo-optimizer.yml
-# Richiede: pip install geo-optimizer-skill[config]
+# Requires: pip install 'geosition[config]'
 
 # Defaults per il comando "geo audit"
 audit:

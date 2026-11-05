@@ -17,12 +17,13 @@ GEOSITION contains a Python toolkit, a web platform, and supporting documentatio
 | `docs/references/` | Research, crawler, and schema reference material |
 | `docs/plans/` | Implementation plans and their status |
 | `docs/marketing/` | Article drafts and publication notes |
-| `examples/` | Sample benchmark data and plugin |
+| `examples/` | Sample configuration, benchmark data, and plugin |
 | `apps/` | Additional applications, including the visibility tracker |
 | `seo/` | Repository SEO program and illustrative keyword estimates |
 | `scripts/` | Development and verification scripts |
 | `supabase/migrations/` | Production database migrations |
 | `assets/` | Repository branding |
+| `deploy/` | Additional deployment files, including the web Dockerfile |
 
 The root also contains configuration and entry points used by packaging, deployment, CI, and external integrations. Files such as `action.yml`, `main.py`, and `install.sh` are kept at their existing paths for compatibility. `SCORING_RUBRIC.md` is a compatibility pointer; the current rubric is in [`docs/scoring-rubric.md`](scoring-rubric.md).
 
