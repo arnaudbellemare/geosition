@@ -1,14 +1,14 @@
 title: GEOSITION
 description: "Make websites visible to AI search engines. Audit, fix, and optimize for ChatGPT, Perplexity, Claude, and Gemini."
 url: "https://arnaudbellemare.github.io"
-baseurl: "/geosition-clean"
+baseurl: "/geosition"
 lang: en
 
 author:
   name: "Arnaud Bellemare"
   url: "https://github.com/arnaudbellemare"
 
-repository: arnaudbellemare/geosition-clean
+repository: arnaudbellemare/geosition
 
 # SEO
 twitter:
