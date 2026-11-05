@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # GEO Optimizer — Update Script
-# Usage: bash update.sh
+# Usage: bash scripts/update.sh
 
 set -e
 

@@ -4,9 +4,11 @@
   "type": "module",
   "scripts": {
     "seo:verify": "node --experimental-strip-types scripts/verify-seo-artifacts.ts",
-    "test:dashboard": "npx --yes playwright test tests/playwright/platform-dashboard.spec.mjs"
+    "test:dashboard": "playwright test --config tests/playwright/playwright.config.mjs",
+    "typecheck": "tsc --project scripts/tsconfig.json"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/node": "^22.10.0",
     "typescript": "^5.7.2"
   },

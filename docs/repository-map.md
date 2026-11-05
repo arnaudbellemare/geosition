@@ -11,7 +11,7 @@ GEOSITION contains a Python toolkit, a web platform, and supporting documentatio
 | `src/geo_optimizer/web/` | FastAPI app, routes, and platform templates |
 | `src/geo_optimizer/saas/` | Workspace, storage, and platform services |
 | `src/geo_optimizer/mcp/` | MCP server |
-| `tests/` | Automated tests |
+| `tests/` | Automated tests and Playwright configuration |
 | `docs/` and `site/` | Documentation, research references, plans, and the published documentation site |
 | `docs/ai-context-files/` | Reusable instructions for AI tools |
 | `docs/references/` | Research, crawler, and schema reference material |
@@ -20,11 +20,11 @@ GEOSITION contains a Python toolkit, a web platform, and supporting documentatio
 | `examples/` | Sample configuration, benchmark data, and plugin |
 | `apps/` | Additional applications, including the visibility tracker |
 | `seo/` | Repository SEO program and illustrative keyword estimates |
-| `scripts/` | Development and verification scripts |
+| `scripts/` | Development and verification scripts, updater, and TypeScript configuration |
 | `supabase/migrations/` | Production database migrations |
 | `assets/` | Repository branding |
 | `deploy/` | Additional deployment files, including the web Dockerfile |
 
-The root also contains configuration and entry points used by packaging, deployment, CI, and external integrations. Files such as `action.yml`, `main.py`, and `install.sh` are kept at their existing paths for compatibility. `SCORING_RUBRIC.md` is a compatibility pointer; the current rubric is in [`docs/scoring-rubric.md`](scoring-rubric.md).
+The root contains configuration and entry points used by packaging, deployment, CI, and external integrations. Files such as `action.yml`, `main.py`, and `install.sh` remain at their existing paths for compatibility. `SCORING_RUBRIC.md` is a compatibility pointer; the current rubric is in [`docs/scoring-rubric.md`](scoring-rubric.md). Run `npm run typecheck` for the scripts and `npm run test:dashboard` for the dashboard browser tests.
 
 For architectural boundaries and security-sensitive code, read [`AGENTS.md`](../AGENTS.md). For development setup and submitting changes, see [`CONTRIBUTING.md`](../CONTRIBUTING.md).

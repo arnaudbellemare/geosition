@@ -56,7 +56,7 @@ jobs:
       - name: Test install script (bash check)
         run: |
           bash -n install.sh
-          bash -n update.sh
+          bash -n scripts/update.sh
 
   lint:
     name: Lint
