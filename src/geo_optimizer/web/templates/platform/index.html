@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GEOSITION Index · {{ORG_NAME}}</title>
+  <link rel="icon" href="/favicon.ico?v=geosition-icon-20260617" sizes="any" />
+  <link rel="stylesheet" href="/platform/assets/site.css" />
+</head>
+<body>
+  <div class="dash-shell">
+    <header class="dash-top">
+      <a class="brand" href="/platform/dashboard"><span class="brand-name">GEOSITION</span></a>
+      <div class="dash-top-meta"><strong>Index</strong> · {{EMAIL}}</div>
+      <a class="btn btn-ghost secondary" href="/platform/dashboard">Workspace</a>
+    </header>
+    <div class="dash-body">
+      <aside class="dash-sidebar">
+        <div class="ws-brand" style="padding:0 0.85rem 0.85rem;border-bottom:1px solid var(--border);margin-bottom:0.5rem">{{ORG_NAME}}</div>
+        <a class="ws-nav-item" href="/platform/dashboard">Workspace</a>
+        <a class="ws-nav-item active" href="/platform/index">GEOSITION Index</a>
+        <span class="ws-nav-item ws-nav-locked">Retrieval probes</span>
+        <span class="ws-nav-item ws-nav-locked">Value ledger</span>
+      </aside>
+      <main class="dash-main">
+        <div class="container index-workspace evidence-workspace">
+          <section class="evidence-hero">
+            <div>
+              <p class="auth-step">Evidence workspace</p>
+              <h1>{{DOMAIN}}</h1>
+              <p class="msg">Review AI answer evidence, citation position, source artifacts, and the next fix in the answer-engine loop.</p>
+            </div>
+            <div class="evidence-score-strip" aria-label="Index summary">
+              <div><span>Events</span><strong>{{INDEX_EVENTS}}</strong></div>
+              <div><span>Citation</span><strong>{{INDEX_CITATION_RATE}}</strong></div>
+              <div><span>Top</span><strong>{{INDEX_TOP_RATE}}</strong></div>
+              <div><span>Value</span><strong>{{INDEX_VALUE_UNITS}}</strong></div>
+            </div>
+          </section>
+
+          <section class="answer-loop" aria-label="Answer-engine loop">
+            <div class="answer-loop-step is-current"><span>1</span><strong>Query</strong><small>Commercial prompt</small></div>
+            <div class="answer-loop-step"><span>2</span><strong>Extract</strong><small>Citations and rank</small></div>
+            <div class="answer-loop-step"><span>3</span><strong>Decide</strong><small>Top, cited, or missed</small></div>
+            <div class="answer-loop-step"><span>4</span><strong>Fix</strong><small>Retrieval or gatekeepers</small></div>
+            <div class="answer-loop-step"><span>5</span><strong>Retest</strong><small>Track delta</small></div>
+          </section>
+
+          <div class="evidence-layout">
+            <section class="dash-panel evidence-main-panel">
+              <div class="panel-title-row">
+                <div>
+                  <p class="auth-step">Review queue</p>
+                  <h2>Answer evidence</h2>
+                </div>
+                <span class="run-status">artifact-linked</span>
+              </div>
+              <ul id="index-events-list" class="evidence-review-list">{{INDEX_RECENT_EVENTS}}</ul>
+            </section>
+
+            <aside class="evidence-side">
+              <section class="dash-panel">
+                <h2>Decision</h2>
+                {{ACTION_PLAN}}
+              </section>
+              <section class="dash-panel">
+                <h2>Trend delta</h2>
+                <div class="index-trend">{{TREND_BARS}}</div>
+              </section>
+            </aside>
+          </div>
+
+          <div class="index-grid evidence-grid">
+            <section class="dash-panel">
+              <h2>Evidence sources</h2>
+              <ul class="index-kv">{{SOURCE_COVERAGE}}</ul>
+            </section>
+            <section class="dash-panel">
+              <h2>Agents</h2>
+              <ul class="index-kv">{{AGENT_COVERAGE}}</ul>
+            </section>
+            <section class="dash-panel">
+              <h2>Queries</h2>
+              <ul class="index-kv">{{TOP_QUERIES}}</ul>
+            </section>
+            <section class="dash-panel">
+              <h2>Retrieval gaps</h2>
+              <ul class="index-kv">{{MISSED_QUERIES}}</ul>
+            </section>
+            <section class="dash-panel">
+              <h2>Surfaced pages</h2>
+              <ul class="index-kv">{{TOP_PAGES}}</ul>
+            </section>
+            <section class="dash-panel">
+              <h2>Cited pages</h2>
+              <ul class="index-kv">{{TOP_CITED_PAGES}}</ul>
+            </section>
+          </div>
+
+          <section class="dash-panel evidence-input-panel">
+            <div class="panel-title-row">
+              <div>
+                <p class="auth-step">Manual evidence</p>
+                <h2>Record AI answer evidence</h2>
+              </div>
+              <span class="run-status">human reviewed</span>
+            </div>
+            <div class="row">
+              <input id="index-agent" placeholder="Perplexity" />
+              <input id="index-query" placeholder="Best provider for ..." />
+            </div>
+            <div class="row">
+              <input id="index-cited-url" placeholder="https://{{DOMAIN}}/page" />
+              <input id="index-rank" placeholder="Citation rank" />
+              <button id="record-index-event" type="button">Record event</button>
+            </div>
+            <textarea id="index-answer" rows="4" placeholder="Paste answer excerpt"></textarea>
+          </section>
+
+          <section class="dash-panel">
+            <h2>Automated SERP check</h2>
+            <p class="msg">Check organic first-page position for a target query and record top-list-position evidence.</p>
+            <div class="row">
+              <input id="serp-keyword" placeholder="Best provider for ..." />
+              <button id="run-serp-check" type="button">Run SERP check</button>
+            </div>
+            <span id="serp-check-status" class="msg"></span>
+          </section>
+
+          <section class="dash-panel">
+            <h2>Import AI crawler log evidence</h2>
+            <textarea id="crawler-log" rows="7" placeholder='Paste Apache/Nginx or JSON lines containing GPTBot, ClaudeBot, PerplexityBot, Google-Extended, etc.'></textarea>
+            <div class="row" style="margin-top:0.75rem">
+              <button id="import-crawler-log" type="button">Import crawler log</button>
+              <span id="crawler-log-status" class="msg"></span>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script__NONCE_ATTR__>
+    function token() {
+      return '';
+    }
+    function cookieValue(name) {
+      return document.cookie.split(';').map(function (part) { return part.trim(); }).reduce(function (found, part) {
+        if (found) return found;
+        return part.indexOf(name + '=') === 0 ? decodeURIComponent(part.slice(name.length + 1)) : '';
+      }, '');
+    }
+    function authHeaders() {
+      return { 'Content-Type': 'application/json', 'X-CSRF-Token': cookieValue('geo_csrf') };
+    }
+    function domain() {
+      return '{{DOMAIN}}';
+    }
+    document.getElementById('record-index-event').addEventListener('click', async function () {
+      var rank = document.getElementById('index-rank').value.trim();
+      var payload = {
+        domain: domain(),
+        source_type: 'ai_answer',
+        agent: document.getElementById('index-agent').value.trim(),
+        query: document.getElementById('index-query').value.trim(),
+        cited_url: document.getElementById('index-cited-url').value.trim(),
+        cited_rank: rank ? Number(rank) : null,
+        answer_excerpt: document.getElementById('index-answer').value.trim()
+      };
+      var response = await fetch('/api/v1/index/events', { method: 'POST', headers: authHeaders(), body: JSON.stringify(payload) });
+      if (response.ok) window.location.reload();
+    });
+    document.getElementById('run-serp-check').addEventListener('click', async function () {
+      var status = document.getElementById('serp-check-status');
+      var keyword = document.getElementById('serp-keyword').value.trim();
+      if (!keyword) {
+        status.textContent = 'Enter a keyword first.';
+        return;
+      }
+      status.textContent = 'Checking SERP...';
+      var response = await fetch('/api/v1/index/serp-check', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ domain: domain(), keyword: keyword })
+      });
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        var data = await response.json().catch(function () { return { detail: 'SERP check failed' }; });
+        status.textContent = data.detail || 'SERP check failed';
+      }
+    });
+    document.getElementById('import-crawler-log').addEventListener('click', async function () {
+      var status = document.getElementById('crawler-log-status');
+      status.textContent = 'Importing...';
+      var response = await fetch('/api/v1/index/crawler-log', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ domain: domain(), log_text: document.getElementById('crawler-log').value })
+      });
+      if (response.ok) {
+        window.location.reload();
+      } else {
+        var data = await response.json().catch(function () { return { detail: 'Import failed' }; });
+        status.textContent = data.detail || 'Import failed';
+      }
+    });
+  </script>
+</body>
+</html>

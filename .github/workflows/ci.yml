@@ -1,0 +1,124 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Cancella run precedenti sullo stesso branch/PR per risparmiare minuti CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test Python ${{ matrix.python-version }}
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.11', '3.12', '3.13']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run tests
+        run: |
+          pytest tests/ -v --tb=short --cov=geo_optimizer --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v6
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+
+      - name: Verify CLI entry point
+        run: |
+          geo --version
+          geo --help
+
+      - name: Test install script (bash check)
+        run: |
+          bash -n install.sh
+          bash -n update.sh
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install linting tools
+        # Mypy 2.x no longer supports the project's Python 3.9 target.
+        run: pip install ruff pip-audit 'mypy==1.18.2'
+
+      - name: Run ruff
+        run: |
+          ruff check src/geo_optimizer/
+          ruff format --check src/geo_optimizer/
+
+      - name: Run mypy
+        run: mypy src/geo_optimizer/
+
+      - name: Audit dependencies
+        run: |
+          pip install .
+          pip-audit
+          pip-audit -r apps/ai-scraper-api/requirements.txt
+
+  geo-aeo-tracker:
+    name: GEO/AEO Tracker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/geo-aeo-tracker/package-lock.json
+
+      - name: Install and build tracker app
+        run: |
+          cd apps/geo-aeo-tracker
+          npm ci
+          npm audit --audit-level=moderate
+          npm run build
+
+  seo-artifacts:
+    name: SEO program artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install npm devdeps and verify SEO artifacts
+        run: |
+          npm ci
+          npm run seo:verify

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GEOSITION · Register</title>
+  <link rel="icon" href="/favicon.ico?v=geosition-icon-20260617" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/platform/assets/favicon-32.png?v=geosition-icon-20260617" />
+  <link rel="apple-touch-icon" href="/platform/assets/apple-touch-icon.png?v=geosition-icon-20260617" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@18..72,400;18..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/platform/assets/site.css?v=geosition-20260615website-field" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <a class="auth-brand" href="/platform">GEOSITION</a>
+      <div class="auth-tabs" aria-label="Authentication options">
+        <a href="/platform/login">Sign in</a>
+        <a class="active" href="/platform/register" aria-current="page">Get started</a>
+      </div>
+      <div class="auth-card-head">
+        <p class="auth-step">Step 2 of 4 · Account</p>
+        <h1>Create workspace</h1>
+        <p class="meta">Use any email you can access. GEOSITION verifies website ownership separately with DNS or HTTPS.</p>
+      </div>
+      <div class="auth-next-box">
+        <strong>Next:</strong> GEOSITION will add your domain, show DNS/HTTPS verification, then unlock benchmarks,
+        GEO/SEO/CRO audits, competitor charts, and value tracking.
+      </div>
+      <form id="reg-form">
+        <label for="domain">Domain to track first</label>
+        <input type="text" name="domain" id="domain" placeholder="www.yourcompany.com" autocomplete="url" />
+        <label for="email">Account email</label>
+        <input type="email" name="email" id="email" required autocomplete="email" placeholder="you@gmail.com" />
+        <label for="reg-password">Password</label>
+        <input id="reg-password" type="password" name="password" required minlength="8" autocomplete="new-password" />
+        <label for="org-name">Company name</label>
+        <input type="text" name="org_name" id="org-name" autocomplete="organization" />
+        <button type="submit">Create account and continue</button>
+        <div id="err" class="err" role="alert"></div>
+      </form>
+      <p class="links"><a href="/platform">← Back to platform</a></p>
+    </div>
+  </div>
+  <script__NONCE_ATTR__>
+    async function readApiResponse(res) {
+      const text = await res.text();
+      if (!text) return {};
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return { detail: text || res.statusText || 'Request failed' };
+      }
+    }
+
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var domain = params.get('domain');
+      if (domain) {
+        var el = document.getElementById('domain');
+        if (el) el.value = domain;
+        var org = document.getElementById('org-name');
+        if (org && !org.value) {
+          var base = domain.replace(/^www\./, '').split('.')[0];
+          if (base) org.value = base.charAt(0).toUpperCase() + base.slice(1);
+        }
+      }
+    })();
+
+    document.getElementById('reg-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const errorBox = document.getElementById('err');
+      let res;
+      try { res = await fetch('/api/v1/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: fd.get('email'),
+          password: fd.get('password'),
+          org_name: fd.get('org_name') || '',
+          domain: fd.get('domain') || '',
+        }),
+      }); } catch (error) {
+        errorBox.textContent = 'Could not connect. Please check your connection and try again.';
+        return;
+      }
+      const data = await readApiResponse(res);
+      if (!res.ok) { errorBox.textContent = data.detail || 'Registration failed'; return; }
+      if (data.domain_error) {
+        errorBox.textContent = 'Your account was created, but the website could not be added: ' + data.domain_error + ' ';
+        e.target.querySelector('button[type="submit"]').disabled = true;
+        const link = document.createElement('a');
+        link.href = '/platform/dashboard';
+        link.textContent = 'Continue to your workspace to add your website';
+        errorBox.appendChild(link);
+        return;
+      }
+      var domain = (fd.get('domain') || '').trim();
+      location.href = domain ? '/platform/dashboard?domain=' + encodeURIComponent(domain) : '/platform/dashboard';
+    });
+  </script>
+</body>
+</html>

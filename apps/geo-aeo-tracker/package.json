@@ -1,0 +1,40 @@
+{
+  "name": "llm-tracker",
+  "version": "1.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test:scraper": "node --env-file=.env scripts/test-scraper.js",
+    "test:pillar": "node scripts/test-pillar.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.44.0",
+    "@supabase/supabase-js": "^2.103.3",
+    "idb-keyval": "^6.2.2",
+    "next": "^16.4.5",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "recharts": "^3.7.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.9",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "8.5.32",
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.4"
+    },
+    "eslint-plugin-react-hooks": "7.0.1"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://geo-optimizer.dev/schemas/collected-answers-1.0.json",
+  "title": "GEO Optimizer Collected Answers",
+  "type": "object",
+  "required": ["schema_version", "answers"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "target_domain": { "type": "string" },
+    "collection_run_id": { "type": "string" },
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["query_text"],
+        "properties": {
+          "prompt_id": { "type": "string" },
+          "query_text": { "type": "string" },
+          "query_class": { "type": "string" },
+          "keyword_topic": { "type": "string" },
+          "persona": { "type": "string" },
+          "country": { "type": "string" },
+          "language": { "type": "string" }
+        }
+      }
+    },
+    "answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["query_text", "answer_text", "provider"],
+        "properties": {
+          "prompt_id": { "type": "string" },
+          "query_text": { "type": "string" },
+          "query_class": { "type": "string" },
+          "provider": { "type": "string" },
+          "surface": { "type": "string" },
+          "model": { "type": "string" },
+          "country": { "type": "string" },
+          "language": { "type": "string" },
+          "device": { "type": "string" },
+          "logged_in_state": { "type": "string" },
+          "answer_text": { "type": "string" },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": { "type": "string" },
+                "domain": { "type": "string" },
+                "title": { "type": "string" },
+                "position": { "type": "integer" },
+                "snippet": { "type": "string" }
+              }
+            }
+          },
+          "mentioned_domains": { "type": "array", "items": { "type": "string" } },
+          "mentioned_brands": { "type": "array", "items": { "type": "string" } },
+          "raw_response_path": { "type": "string" },
+          "rendered_html_path": { "type": "string" },
+          "screenshot_path": { "type": "string" },
+          "collection_mode": { "enum": ["api", "browser", "manual"] },
+          "parser_version": { "type": "string" },
+          "parse_confidence": { "type": "number" },
+          "collected_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

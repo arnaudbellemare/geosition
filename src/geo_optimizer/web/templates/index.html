@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GEOSITION — AI Search Visibility Audit</title>
+<meta name="description" content="Check your public website for crawlability, structured data, content, and other signals, with practical next steps.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06080f;--bg-card:#0d1117;--bg-card-hover:#111820;
+  --border:#1b2332;--border-hover:#2d3a4f;
+  --text:#e2e8f0;--text-dim:#a5b4c7;--text-muted:#94a3b8;
+  --accent:#3b82f6;--accent2:#8b5cf6;
+  --green:#22c55e;--cyan:#06b6d4;--yellow:#eab308;--red:#ef4444;
+  --radius:12px;--radius-sm:8px;
+  --font:'DM Sans',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent2)}
+code{font-family:var(--mono);font-size:.85em;background:#1e293b;padding:.15em .4em;border-radius:4px}
+
+/* Grain overlay */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  opacity:.03;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* Glow orbs */
+.glow-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+.glow-orb.blue{width:400px;height:400px;background:rgba(59,130,246,.08);top:-100px;left:-100px}
+.glow-orb.purple{width:350px;height:350px;background:rgba(139,92,246,.06);bottom:-50px;right:-50px}
+
+.wrapper{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:2rem 1.5rem}
+
+/* ─── Professional Nav ─── */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;margin-bottom:2.5rem;background:rgba(6,8,15,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);border-radius:0 0 var(--radius-sm) var(--radius-sm)}
+.nav-logo{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:.95rem;color:var(--text);white-space:nowrap;text-decoration:none}
+.nav-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px var(--green)}
+.nav-logo .ver{font-family:var(--mono);font-size:.65rem;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:.1rem .4rem;border-radius:20px;margin-left:.25rem}
+.nav-links{display:flex;align-items:center;gap:1.75rem}
+.nav-links a{color:var(--text-dim);font-size:.82rem;font-weight:500;letter-spacing:.02em;transition:color .2s;white-space:nowrap;text-decoration:none}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-sep{width:1px;height:16px;background:var(--border);flex-shrink:0}
+.nav-dropdown{position:relative}
+.nav-dropdown-toggle{display:flex;align-items:center;gap:.3rem;color:var(--text-dim);font-size:.82rem;font-weight:500;letter-spacing:.02em;cursor:pointer;transition:color .2s;white-space:nowrap;background:none;border:none;font-family:inherit;padding:0}
+.nav-dropdown-toggle:hover,.nav-dropdown.open .nav-dropdown-toggle{color:var(--text)}
+.nav-dropdown-toggle svg{width:10px;height:10px;fill:currentColor;transition:transform .2s}
+.nav-dropdown.open .nav-dropdown-toggle svg{transform:rotate(180deg)}
+.nav-dropdown-menu{display:none;position:absolute;top:calc(100% + .75rem);right:0;min-width:160px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.35rem;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.nav-dropdown.open .nav-dropdown-menu{display:block}
+.nav-dropdown-menu a{display:block;padding:.5rem .75rem;color:var(--text-dim);font-size:.82rem;font-weight:500;border-radius:6px;transition:all .15s;text-decoration:none}
+.nav-dropdown-menu a:hover{color:var(--text);background:var(--bg-card-hover)}
+.nav-dropdown-menu a.active{color:var(--text)}
+.nav-cta{display:flex;align-items:center;gap:.4rem;color:var(--text-dim);font-size:.82rem;font-weight:500;border:1px solid var(--border);padding:.35rem .75rem;border-radius:20px;transition:all .2s;white-space:nowrap;text-decoration:none}
+.nav-cta:hover{color:var(--text);border-color:var(--border-hover)}
+.nav-cta svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
+.nav-cta .star-count{font-family:var(--mono);font-size:.75rem}
+.nav-hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .5rem;border-radius:6px;cursor:pointer;font-size:1.1rem;line-height:1;transition:all .2s}
+.nav-hamburger:hover{border-color:var(--border-hover);color:var(--text)}
+@media(max-width:768px){
+  nav{flex-wrap:wrap;gap:.5rem;padding:.6rem .75rem}
+  .nav-links{display:none;width:100%;flex-direction:column;gap:0;border-top:1px solid var(--border);padding-top:.5rem;margin-top:.25rem}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:.55rem .25rem;border-bottom:1px solid var(--border);font-size:.9rem}
+  .nav-links a:last-child{border-bottom:none}
+  .nav-sep{display:none}
+  .nav-dropdown{width:100%}
+  .nav-dropdown-toggle{padding:.55rem .25rem;border-bottom:1px solid var(--border);font-size:.9rem;width:100%}
+  .nav-dropdown-menu{position:static;border:none;box-shadow:none;background:transparent;padding:0 0 0 1rem;display:none}
+  .nav-dropdown.open .nav-dropdown-menu{display:block}
+  .nav-dropdown-menu a{padding:.45rem .25rem;border-bottom:1px solid var(--border);border-radius:0}
+  .nav-hamburger{display:block}
+  .nav-logo .ver{display:none}
+  .nav-cta .star-count{display:none}
+}
+@media(max-width:480px){
+  .nav-cta span:not(.star-count){font-size:.8rem}
+}
+.version-badge{display:none}
+
+/* ─── Hero ─── */
+.hero{text-align:center;margin-bottom:2.5rem}
+.hero h1{font-size:2.8rem;font-weight:700;letter-spacing:-.03em;
+  background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 50%,#60a5fa 100%);
+  background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 4s ease infinite}
+@keyframes shimmer{0%,100%{background-position:0% center}50%{background-position:200% center}}
+.hero p{color:var(--text-dim);font-size:1.05rem;margin-top:.5rem;max-width:480px;margin-inline:auto}
+
+/* ─── Stats ─── */
+.stats-bar{display:flex;justify-content:center;gap:.75rem;margin-bottom:2rem;flex-wrap:wrap}
+.stat-chip{display:flex;align-items:center;gap:.35rem;
+  background:var(--bg-card);border:1px solid var(--border);
+  padding:.35rem .7rem;border-radius:20px;font-size:.78rem;color:var(--text-dim);
+  font-family:var(--mono);transition:border-color .2s}
+.stat-chip:hover{border-color:var(--border-hover)}
+.stat-chip .num{color:var(--text);font-weight:500}
+
+/* ─── Form ─── */
+.audit-form{display:flex;gap:.5rem;margin-bottom:1.5rem}
+.audit-form input{flex:1;padding:.8rem 1rem;border:1px solid var(--border);
+  border-radius:var(--radius-sm);background:var(--bg-card);color:var(--text);
+  font-family:var(--font);font-size:.95rem;outline:none;transition:border-color .25s,box-shadow .25s}
+.audit-form input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.audit-form input::placeholder{color:var(--text-muted)}
+.audit-form input:invalid:not(:placeholder-shown){border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.12)}
+.audit-form{flex-wrap:wrap}
+.input-hint{width:100%;font-size:.8rem;color:#ef4444;margin-top:-.5rem}
+.btn-primary{padding:.8rem 1.8rem;border:none;border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;font-family:var(--font);font-size:.95rem;font-weight:600;
+  cursor:pointer;transition:opacity .2s,transform .1s;white-space:nowrap}
+.btn-primary:hover{opacity:.9}
+.btn-primary:active{transform:scale(.97)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ─── Spinner ─── */
+.spinner{display:none;text-align:center;padding:1.5rem 0}
+.spinner.active{display:block}
+.spinner-ring{width:36px;height:36px;border:3px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto .75rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-text{color:var(--text-dim);font-size:.85rem;transition:opacity .3s}
+
+/* ─── Error ─── */
+.error{display:none;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);
+  border-radius:var(--radius-sm);padding:.75rem 1rem;color:var(--red);font-size:.9rem;margin-bottom:1rem}
+
+/* ─── Result Card ─── */
+.result-card{display:none;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;
+  animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Score Gauge */
+.gauge-wrap{text-align:center;padding:1.5rem 0}
+.gauge-svg{width:160px;height:160px}
+.gauge-bg{fill:none;stroke:var(--border);stroke-width:8}
+.gauge-fill{fill:none;stroke-width:8;stroke-linecap:round;
+  transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1),stroke 1s ease}
+.gauge-score{font-family:var(--mono);font-size:2.2rem;font-weight:700;fill:var(--text)}
+.gauge-label{font-size:.75rem;fill:var(--text-dim);text-transform:uppercase;letter-spacing:.1em}
+.band-tag{display:inline-block;font-size:.8rem;font-weight:600;letter-spacing:.05em;
+  padding:.25rem .75rem;border-radius:20px;margin-top:.5rem;text-transform:uppercase}
+
+/* Breakdown bars */
+.breakdown{margin-top:1.25rem}
+.bar-row{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;font-size:.82rem}
+.bar-label{width:110px;color:var(--text-dim);text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bar-val{width:32px;font-family:var(--mono);color:var(--text-dim);font-size:.78rem}
+
+/* Citability */
+.citability{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;
+  padding-top:1rem;border-top:1px solid var(--border)}
+.cit-score{font-family:var(--mono);font-size:1.5rem;font-weight:700}
+.cit-label{font-size:.82rem;color:var(--text-dim)}
+
+/* Trend */
+.trend-box{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)}
+.trend-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.trend-kicker{font-size:.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em}
+.trend-summary{font-size:.9rem;color:var(--text);font-weight:600;margin-top:.25rem}
+.trend-delta{font-family:var(--mono);font-size:1.1rem;font-weight:700}
+.trend-list{display:grid;gap:.6rem;margin-top:.85rem}
+.trend-row{display:grid;grid-template-columns:74px 82px 1fr;gap:.75rem;align-items:center}
+.trend-date{font-family:var(--mono);font-size:.75rem;color:var(--text-dim)}
+.trend-score{font-family:var(--mono);font-size:.78rem;color:var(--text)}
+.trend-bar{height:7px;background:var(--border);border-radius:999px;overflow:hidden}
+.trend-fill{display:block;height:100%;background:linear-gradient(90deg,#06b6d4,#22c55e)}
+
+/* Recommendations */
+.recs-section{margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)}
+.recs-toggle{background:none;border:none;color:var(--accent);cursor:pointer;
+  font-family:var(--font);font-size:.85rem;font-weight:500;padding:0;display:flex;align-items:center;gap:.35rem}
+.recs-toggle .arrow{transition:transform .2s;display:inline-block}
+.recs-toggle.open .arrow{transform:rotate(90deg)}
+.recs-list{list-style:none;margin-top:.75rem;display:none}
+.recs-list.open{display:block}
+.recs-list li{padding:.35rem 0;padding-left:1rem;position:relative;
+  color:var(--text-dim);font-size:.83rem;line-height:1.5}
+.recs-list li::before{content:'';position:absolute;left:0;top:.65rem;
+  width:5px;height:5px;border-radius:50%;background:var(--yellow)}
+
+/* Actions row */
+.actions{display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem;flex-wrap:wrap}
+.action-link{font-size:.82rem;color:var(--text-dim);border:1px solid var(--border);
+  padding:.4rem .8rem;border-radius:20px;transition:all .2s}
+.action-link:hover{color:var(--text);border-color:var(--border-hover)}
+
+/* ─── Manifesto Teaser ─── */
+.manifesto-teaser{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.manifesto-teaser h3{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.5rem}
+.manifesto-teaser p{color:var(--text-dim);font-size:.85rem;line-height:1.65;margin-bottom:.85rem}
+.manifesto-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.85rem}
+.manifesto-pill{font-size:.75rem;font-weight:500;padding:.25rem .6rem;border-radius:20px;border:1px solid var(--border);color:var(--text-dim)}
+.manifesto-link{font-size:.82rem;color:var(--accent);font-weight:500}
+.manifesto-link:hover{color:var(--accent2)}
+
+/* ─── Footer ─── */
+footer{text-align:center;padding:2rem 0 1rem;border-top:1px solid var(--border);
+  margin-top:2rem;color:var(--text-muted);font-size:.8rem}
+footer .install-row{display:flex;align-items:center;justify-content:center;gap:.5rem;
+  margin-bottom:1rem}
+footer .install-cmd{font-family:var(--mono);font-size:.8rem;background:var(--bg-card);
+  border:1px solid var(--border);padding:.4rem .8rem;border-radius:var(--radius-sm);color:var(--text-dim)}
+footer .copy-btn{background:none;border:1px solid var(--border);color:var(--text-dim);
+  padding:.3rem .5rem;border-radius:4px;cursor:pointer;font-size:.75rem;transition:all .2s}
+footer .copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+footer .links{display:flex;justify-content:center;gap:1.25rem;margin-bottom:.75rem}
+footer .links a{color:var(--text-muted);font-size:.8rem}
+footer .credit{font-size:.72rem;color:var(--text-muted)}
+
+/* ─── Responsive ─── */
+@media(max-width:600px){
+  .wrapper{padding:1.25rem 1rem}
+  .hero h1{font-size:2rem}
+  .audit-form{flex-direction:column}
+  .btn-primary{width:100%}
+  .bar-label{width:80px;font-size:.75rem}
+  nav{gap:.75rem;flex-wrap:wrap}
+}
+</style>
+
+<!-- GEO: Schema JSON-LD -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"GEOSITION","url":"https://geositionai.com","description":"Source-available toolkit to audit, fix, and optimize websites for AI search engine visibility. Score 0-100 based on 48 research-backed methods.","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Arnaud Bellemare","url":"https://github.com/arnaudbellemare","sameAs":["https://github.com/arnaudbellemare","https://pypi.org/project/geosition/","https://www.linkedin.com/company/arnaudbellemare","https://www.crunchbase.com/organization/arnaudbellemare"],"contactPoint":{"@type":"ContactPoint","contactType":"technical support","email":"asapbellemare@gmail.com","url":"https://github.com/arnaudbellemare/geosition/issues"},"address":{"@type":"PostalAddress","addressCountry":"IT"}}}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is GEOSITION?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is a source-available toolkit that audits websites for AI search engine visibility. It scores sites 0-100 based on 48 research-backed methods and generates fixes for robots.txt, llms.txt, JSON-LD schema, and meta tags."}},{"@type":"Question","name":"How does the GEO score work?","acceptedAnswer":{"@type":"Answer","text":"The score is calculated across 8 categories: robots.txt (18pt), llms.txt (18pt), JSON-LD schema (16pt), meta tags (14pt), content quality (12pt), signals (6pt), AI discovery (6pt), brand & entity (10pt). Bands: 86-100 excellent, 68-85 good, 36-67 foundation, 0-35 critical."}},{"@type":"Question","name":"Is GEOSITION free?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is available under the GEOSITION license. Install with: pip install geosition"}}]}
+</script>
+<link rel="alternate" type="application/rss+xml" title="GEOSITION Updates" href="https://github.com/arnaudbellemare/geosition/releases.atom">
+</head>
+<body>
+<div class="glow-orb blue"></div>
+<div class="glow-orb purple"></div>
+
+<div class="wrapper">
+  <nav>
+    <div class="nav-logo">
+      <span class="dot"></span>
+      <span>GEOSITION</span>
+      <span class="ver" id="nav-ver">v4.0.0</span>
+    </div>
+    <button class="nav-hamburger" id="nav-ham" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="/" class="active">Audit</a>
+      <a href="/compare">Compare</a>
+      <a href="/platform">Platform</a>
+      <a href="https://arnaudbellemare.github.io/geosition/">Docs</a>
+      <span class="nav-sep"></span>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-toggle" aria-expanded="false">More <svg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="nav-dropdown-menu">
+          <a href="/research">Research</a>
+          <a href="/roadmap">Roadmap</a>
+          <a href="/manifesto">Manifesto</a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-cta" href="https://github.com/arnaudbellemare/geosition" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" fill="currentColor"/></svg>
+      GitHub
+      <span class="star-count" id="nav-stars"></span>
+    </a>
+  </nav>
+
+  <div class="hero">
+    <h1>Check your website</h1>
+    <p>Start with a free check of your public page and get practical next steps. No account or technical setup needed.</p>
+    <p>This checks your page and public site signals. It does not measure rankings, AI mentions, or private analytics.</p>
+  </div>
+
+  <div class="audit-form">
+    <input type="url" id="url-input" placeholder="https://example.com" required autocomplete="url"
+      pattern="https?://.*\..*" title="Insert a valid URL (es. https://example.com)"
+      aria-label="Website URL to audit">
+    <button class="btn-primary" id="btn">Check my website</button>
+    <div class="input-hint" id="url-hint" style="display:none"></div>
+  </div>
+
+  <div class="spinner" id="spinner" aria-live="polite" role="status">
+    <div class="spinner-ring"></div>
+    <div class="spinner-text" id="spin-text">Connecting...</div>
+  </div>
+  <div class="error" id="error" role="alert"></div>
+
+  <div class="result-card" id="result">
+    <section aria-labelledby="first-actions-heading" style="margin-bottom:1.5rem">
+      <h2 id="first-actions-heading">Your first steps</h2>
+      <p style="color:var(--text-dim);margin:.5rem 0">These are suggestions based on the public page we checked. Review each change before applying it.</p>
+      <ol id="first-actions" style="padding-left:1.3rem;line-height:1.6"></ol>
+      <button type="button" class="btn-primary" id="copy-first-actions" hidden>Copy steps for my developer</button>
+      <span id="copy-first-actions-status" aria-live="polite"></span>
+      <p style="color:var(--text-dim);margin-top:.75rem">This score is a checklist-based estimate, not a search ranking or a measure of AI citations.</p>
+    </section>
+    <div class="gauge-wrap">
+      <svg class="gauge-svg" viewBox="0 0 120 120">
+        <circle class="gauge-bg" cx="60" cy="60" r="50"/>
+        <circle class="gauge-fill" id="gauge-fill" cx="60" cy="60" r="50"
+          stroke-dasharray="314.16" stroke-dashoffset="314.16"
+          transform="rotate(-90 60 60)"/>
+        <text class="gauge-score" id="gauge-score" x="60" y="58" text-anchor="middle" dominant-baseline="middle">0</text>
+        <text class="gauge-label" x="60" y="76" text-anchor="middle">/ 100</text>
+      </svg>
+      <div><span class="band-tag" id="band-tag">—</span></div>
+    </div>
+
+    <div class="breakdown" id="breakdown"></div>
+
+    <div class="citability" id="cit-wrap" style="display:none">
+      <div>
+        <div class="cit-score" id="cit-score">—</div>
+        <div class="cit-label">Citability Score</div>
+      </div>
+      <div class="cit-label" id="cit-grade" style="margin-left:auto"></div>
+    </div>
+
+    <div class="trend-box" id="trend-box">
+      <div class="trend-head">
+        <div>
+          <div class="trend-kicker">Trend</div>
+          <div class="trend-summary" id="trend-summary">Baseline snapshot saved for this URL.</div>
+        </div>
+        <div class="trend-delta" id="trend-delta">—</div>
+      </div>
+      <div class="trend-list" id="trend-list"></div>
+    </div>
+
+    <div class="recs-section">
+      <button class="recs-toggle" id="recs-toggle">
+        <span class="arrow">&#9654;</span> Recommendations <span id="recs-count"></span>
+      </button>
+      <ol class="recs-list" id="recs-list"></ol>
+    </div>
+
+    <div class="actions" id="actions"></div>
+  </div>
+
+  <div class="manifesto-teaser">
+    <h3 id="why-this-tool-exists">Why this tool exists</h3>
+    <p>AI search is already deciding which websites get cited and which don't. The signals are documented, the research is published — but most of the web has no idea. GEOSITION exists to make AI visibility auditable, transparent, and accessible to every developer, not just teams with enterprise budgets.</p>
+    <div class="manifesto-pills">
+      <span class="manifesto-pill">Auditability</span>
+      <span class="manifesto-pill">Scientific Foundation</span>
+      <span class="manifesto-pill">Source Available</span>
+      <span class="manifesto-pill">Precision</span>
+    </div>
+    <a class="manifesto-link" href="/manifesto">Read the full manifesto →</a>
+  </div>
+
+  <footer>
+    <div class="install-row">
+      <span class="install-cmd">pip install geosition</span>
+      <button class="copy-btn" id="copy-btn" title="Copy">&#128203;</button>
+    </div>
+    <div class="links">
+      <a href="https://github.com/arnaudbellemare/geosition">GitHub</a>
+      <a href="https://pypi.org/project/geosition/">PyPI</a>
+      <a href="https://arnaudbellemare.github.io/geosition/">Docs</a>
+      <a href="https://github.com/arnaudbellemare/geosition/issues">Issues</a>
+    </div>
+    <div class="credit">Built by Arnaud Bellemare &#183; Powered by Princeton KDD 2024 + AutoGEO ICLR 2026 research</div>
+  </footer>
+</div>
+
+<script__NONCE_ATTR__>
+/* ─── Constants ─── */
+const BANDS = {excellent:'#22c55e',good:'#06b6d4',foundation:'#eab308',critical:'#ef4444'};
+const CATEGORIES = [
+  {key:'robots',label:'Robots.txt',max:18},
+  {key:'llms',label:'llms.txt',max:18},
+  {key:'schema',label:'Schema JSON-LD',max:16},
+  {key:'meta',label:'Meta Tags',max:14},
+  {key:'content',label:'Content',max:12},
+  {key:'signals',label:'Signals',max:6},
+  {key:'ai_discovery',label:'AI Discovery',max:6},
+  {key:'brand_entity',label:'Brand & Entity',max:10},
+];
+const SPIN_MSGS = ['Checking robots.txt...','Analyzing llms.txt...','Parsing schema...','Evaluating content...','Scoring citability...','Compiling results...'];
+
+/* ─── Version + Stats ─── */
+(async function init(){
+  try{
+    const h = await fetch('/health');
+    if(h.ok){const d=await h.json();var vb=document.getElementById('nav-ver');if(vb)vb.textContent='v'+d.version;}
+  }catch(e){}
+})();
+
+/* ─── Audit ─── */
+const $=id=>document.getElementById(id);
+let spinInterval;
+
+function startSpin(){
+  $('spinner').classList.add('active');
+  let i=0;
+  $('spin-text').textContent=SPIN_MSGS[0];
+  spinInterval=setInterval(()=>{i=(i+1)%SPIN_MSGS.length;$('spin-text').textContent=SPIN_MSGS[i]},2200);
+}
+function stopSpin(){$('spinner').classList.remove('active');clearInterval(spinInterval)}
+
+function isValidUrl(str){
+  /* Accetta URL con protocollo, oppure dominio semplice (es. example.com) */
+  if(/^https?:\/\/.+\..+/.test(str))return true;
+  /* Dominio senza protocollo: almeno un punto, niente spazi */
+  if(/^[^\s]+\.[a-z]{2,}(\/.*)?$/i.test(str))return true;
+  return false;
+}
+
+async function runAudit(){
+  const input=$('url-input');
+  const hint=$('url-hint');
+  let url=input.value.trim();
+  if(!url){hint.textContent='Enter your website address to begin.';hint.style.display='block';input.focus();return}
+  /* Validazione lato client */
+  if(!isValidUrl(url)){
+    hint.textContent='Please enter a valid URL (e.g. https://example.com)';
+    hint.style.display='block';
+    input.focus();
+    return;
+  }
+  hint.style.display='none';
+  /* Aggiungi https:// se manca il protocollo */
+  if(!/^https?:\/\//i.test(url))url='https://'+url;
+  input.value=url;
+  $('btn').disabled=true;$('error').style.display='none';$('result').style.display='none';
+  startSpin();
+  try{
+    const res=await fetch('/api/audit?url='+encodeURIComponent(url));
+    const data=await res.json();
+    if(res.status===401)throw new Error('This audit currently requires access. Contact the site administrator to continue.');
+    if(!res.ok||data.error)throw new Error(data.detail||data.error||'Audit failed');
+    renderResult(data,url);
+  }catch(e){
+    $('error').textContent=e.message;$('error').style.display='block';
+  }finally{stopSpin();$('btn').disabled=false}
+}
+
+function renderResult(data,url){
+  const color=BANDS[data.band]||'#888';
+  const score=data.score||0;
+
+  /* Gauge */
+  const circ=314.16;
+  const offset=circ-(score/100*circ);
+  const fill=$('gauge-fill');
+  fill.style.stroke=color;
+  fill.style.strokeDashoffset=String(offset);
+  $('gauge-score').textContent=score;
+  $('gauge-score').style.fill=color;
+
+  const tag=$('band-tag');
+  tag.textContent=data.band?data.band.toUpperCase():'—';
+  tag.style.background=color+'1a';tag.style.color=color;
+
+  /* Breakdown */
+  const bd=$('breakdown');bd.textContent='';
+  const br=data.score_breakdown||{};
+  for(const cat of CATEGORIES){
+    const val=br[cat.key]||0;
+    const pct=Math.min(val/cat.max*100,100);
+    const row=document.createElement('div');row.className='bar-row';
+
+    const lbl=document.createElement('span');lbl.className='bar-label';lbl.textContent=cat.label;
+    const track=document.createElement('div');track.className='bar-track';
+    const barFill=document.createElement('div');barFill.className='bar-fill';
+    barFill.style.width='0%';barFill.style.background=color;
+    track.appendChild(barFill);
+    const valSpan=document.createElement('span');valSpan.className='bar-val';
+    valSpan.textContent=val+'/'+cat.max;
+
+    row.appendChild(lbl);row.appendChild(track);row.appendChild(valSpan);
+    bd.appendChild(row);
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>{barFill.style.width=pct+'%'})});
+  }
+
+  /* Citability */
+  const cit=data.citability;
+  if(cit&&cit.total_score!==undefined){
+    $('cit-wrap').style.display='flex';
+    const cs=$('cit-score');cs.textContent=cit.total_score+'/100';
+    const cc=cit.total_score>=86?BANDS.excellent:cit.total_score>=68?BANDS.good:cit.total_score>=36?BANDS.foundation:BANDS.critical;
+    cs.style.color=cc;
+    $('cit-grade').textContent=cit.grade?cit.grade.toUpperCase():'';
+    $('cit-grade').style.color=cc;
+  }else{$('cit-wrap').style.display='none'}
+
+  /* Recommendations */
+  const recs=data.recommendations||[];
+  const firstActions=$('first-actions');firstActions.textContent='';
+  const actions=recs.slice(0,3);
+  if(!actions.length){const li=document.createElement('li');li.textContent='No immediate recommendations were returned. Review the detailed checks below.';firstActions.appendChild(li)}
+  function whyItMatters(action){
+    const text=action.toLowerCase();
+    if(text.includes('robots')||text.includes('crawler')||text.includes('bot'))return 'This affects which crawlers can access your site; choose which services you want to allow.';
+    if(text.includes('llms.txt'))return 'This optional file can organize links for AI tools; it is not a proven ranking factor.';
+    if(text.includes('schema')||text.includes('structured'))return 'Structured data helps supported systems understand the information on your page.';
+    if(text.includes('title')||text.includes('meta'))return 'Clear page titles and descriptions help people and search engines understand the page.';
+    return 'Review this suggestion with whoever manages your website before making changes.';
+  }
+  for(const action of actions){
+    const li=document.createElement('li'),title=document.createElement('strong'),explanation=document.createElement('p');
+    title.textContent=action;explanation.textContent=whyItMatters(action);
+    explanation.style.cssText='color:var(--text-dim);margin:.2rem 0 .8rem';
+    li.appendChild(title);li.appendChild(explanation);firstActions.appendChild(li);
+  }
+  $('copy-first-actions').hidden=!actions.length;
+  $('copy-first-actions').onclick=async function(){
+    try{await navigator.clipboard.writeText(actions.map((action,index)=>(index+1)+'. '+action).join('\n'));$('copy-first-actions-status').textContent=' Copied.'}
+    catch(error){$('copy-first-actions-status').textContent=' Could not copy. You can select the steps above.'}
+  };
+  $('recs-count').textContent='('+recs.length+')';
+  const rl=$('recs-list');rl.textContent='';rl.classList.remove('open');
+  $('recs-toggle').classList.remove('open');
+  for(const r of recs){const li=document.createElement('li');li.textContent=r;rl.appendChild(li)}
+
+  /* Trend */
+  const history=data.history;
+  const trendBox=$('trend-box');
+  if(history && history.total_snapshots){
+    trendBox.style.display='block';
+    const scoreDelta=history.score_delta;
+    const latestBand=(history.latest_band||'critical').toUpperCase();
+    let summary=`Current baseline: ${history.latest_score}/100 (${latestBand}).`;
+    if(history.total_snapshots >= 2 && scoreDelta !== null && scoreDelta !== undefined){
+      if(scoreDelta > 0) summary=`Improved from ${history.previous_score} to ${history.latest_score} since the previous snapshot.`;
+      else if(scoreDelta < 0) summary=`Dropped from ${history.previous_score} to ${history.latest_score} since the previous snapshot.`;
+      else summary=`Stable at ${history.latest_score}/100 since the previous snapshot.`;
+    }
+    $('trend-summary').textContent=summary;
+    const deltaNode=$('trend-delta');
+    if(scoreDelta === null || scoreDelta === undefined){
+      deltaNode.textContent='BASE';
+      deltaNode.style.color='var(--text-dim)';
+    }else{
+      deltaNode.textContent=(scoreDelta > 0 ? '+' : '') + scoreDelta;
+      deltaNode.style.color=scoreDelta >= 0 ? BANDS.good : BANDS.critical;
+    }
+    const trendList=$('trend-list');trendList.textContent='';
+    (history.entries||[]).slice(0,5).forEach(item=>{
+      const row=document.createElement('div');row.className='trend-row';
+      const date=document.createElement('span');date.className='trend-date';date.textContent=(item.timestamp||'').slice(0,10);
+      const score=document.createElement('span');score.className='trend-score';
+      const delta=(item.delta === null || item.delta === undefined) ? '—' : ((item.delta > 0 ? '+' : '') + item.delta);
+      score.textContent=`${item.score}/100 · ${delta}`;
+      const bar=document.createElement('div');bar.className='trend-bar';
+      const fill=document.createElement('span');fill.className='trend-fill';
+      fill.style.width=Math.max(4, Math.min(100, item.score||0))+'%';
+      bar.appendChild(fill);
+      row.appendChild(date);row.appendChild(score);row.appendChild(bar);
+      trendList.appendChild(row);
+    });
+  }else{
+    trendBox.style.display='none';
+  }
+
+  /* Actions */
+  const acts=$('actions');acts.textContent='';
+  if(data.report_url){
+    const a=document.createElement('a');a.className='action-link';a.href=data.report_url;
+    a.target='_blank';a.rel='noopener';a.textContent='HTML Report';acts.appendChild(a);
+  }
+  const pdf=document.createElement('a');pdf.className='action-link';
+  pdf.href='/api/audit/pdf?url='+encodeURIComponent(url);
+  pdf.textContent='Download PDF';acts.appendChild(pdf);
+
+  $('result').style.display='block';
+}
+
+/* ─── Event listeners ─── */
+$('btn').addEventListener('click',runAudit);
+$('url-input').addEventListener('keypress',e=>{if(e.key==='Enter')runAudit()});
+const auditParams=new URLSearchParams(location.search);
+const auditUrl=auditParams.get('url');
+if(auditUrl){$('url-input').value=auditUrl;if(auditParams.get('start')==='1')runAudit()}
+$('recs-toggle').addEventListener('click',function(){
+  this.classList.toggle('open');$('recs-list').classList.toggle('open');
+});
+$('copy-btn').addEventListener('click',function(){
+  navigator.clipboard.writeText('pip install geosition').then(()=>{this.textContent='Done!'});
+  setTimeout(()=>{this.textContent='\u{1F4CB}'},1500);
+});
+document.getElementById('nav-ham').addEventListener('click',function(){
+  document.querySelector('.nav-links').classList.toggle('open');
+  this.textContent=this.textContent==='☰'?'✕':'☰';
+});
+document.querySelectorAll('.nav-dropdown-toggle').forEach(function(btn){
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var dd=this.closest('.nav-dropdown');
+    dd.classList.toggle('open');
+    this.setAttribute('aria-expanded',dd.classList.contains('open'));
+  });
+});
+document.addEventListener('click',function(){
+  document.querySelectorAll('.nav-dropdown.open').forEach(function(dd){
+    dd.classList.remove('open');
+    dd.querySelector('.nav-dropdown-toggle').setAttribute('aria-expanded','false');
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "prompts": [
+    {
+      "prompt_id": "vendor-montreal",
+      "query_text": "Which condo management provider is best in Montreal?",
+      "query_class": "vendor_selection",
+      "keyword_topic": "condo management",
+      "persona": "property manager",
+      "country": "CA"
+    },
+    {
+      "prompt_id": "pricing-compare",
+      "query_text": "Compare condo management pricing and monthly fees",
+      "query_class": "pricing",
+      "keyword_topic": "condo management pricing",
+      "country": "CA"
+    }
+  ]
+}

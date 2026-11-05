@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "notes": "Minimal FR/EN validation set after deploy; replace hostnames with production URLs.",
+  "locales": {
+    "en": [
+      "https://example.com/"
+    ],
+    "fr": [
+      "https://example.com/fr/"
+    ]
+  }
+}

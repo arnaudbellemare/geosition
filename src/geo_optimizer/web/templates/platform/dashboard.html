@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GEOSITION · {{ORG_NAME}}</title>
+  <link rel="icon" href="/favicon.ico?v=geosition-icon-20260617" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/platform/assets/favicon-32.png?v=geosition-icon-20260617" />
+  <link rel="apple-touch-icon" href="/platform/assets/apple-touch-icon.png?v=geosition-icon-20260617" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@18..72,400;18..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/platform/assets/site.css?v=geosition-20260702-clear-dns" />
+</head>
+<body{{BODY_ATTR}}>
+  <div class="dash-shell audit-console">
+    <header class="dash-top audit-topbar">
+      <a class="audit-search-brand" href="/platform" aria-label="GEOSITION platform">
+        <span class="audit-search-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" />
+            <path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+        </span>
+        <strong id="audit-domain-label">{{DISPLAY_DOMAIN}}</strong>
+        <em id="top-score-pill">--/100</em>
+      </a>
+      <nav class="audit-tabs" aria-label="Dashboard sections">
+        <a class="active" href="#overview">Overview</a>
+        <a href="#verify">Verification</a>
+        <a href="#content">Content</a>
+        <a href="#pages">Pages</a>
+        <a href="#links">Links</a>
+        <a href="#keywords">Keywords</a>
+        <a href="#schema">Schema</a>
+      </nav>
+      <div class="audit-actions">
+        <button class="audit-action audit-action-primary" id="copy-skill-files" type="button">Skill files</button>
+        <a class="audit-action" href="/platform/index">Export</a>
+        <button class="audit-action" id="new-audit" type="button">Audit</button>
+        <button class="audit-action muted" id="logout" type="button">Sign out</button>
+      </div>
+    </header>
+    <main class="dash-main audit-main">
+      <div class="container audit-canvas">
+        <section class="audit-hero dash-panel dash-welcome" id="overview">
+          <div class="audit-page-copy">
+            <p class="auth-step" id="onboarding-step-label">Step 3 of 4 · Verify domain</p>
+            <h1>{{ORG_NAME}} visibility audit</h1>
+            <p class="audit-url"><span aria-hidden="true">◎</span> https://{{DISPLAY_DOMAIN}}</p>
+            <div class="audit-chip-row" aria-label="Workspace setup">
+              <span data-onboarding-chip="domain">Domain entered</span>
+              <span data-onboarding-chip="account">Account created</span>
+              <span class="current" data-onboarding-chip="verify">Verify ownership</span>
+              <span data-onboarding-chip="benchmark">Benchmark and track value</span>
+            </div>
+          </div>
+          <div class="audit-score-ring" id="overall-score-ring" style="--score: 0">
+            <strong id="overall-score">--</strong>
+            <span>AI Benchmark</span>
+          </div>
+        </section>
+
+        <div class="audit-results-gate" id="results-gate">
+          <section class="audit-score-strip" data-requires-verify aria-label="Visibility score summary">
+            <div class="audit-score-tile">
+              <strong id="visibility-citation-rate">--</strong>
+              <span>Citation share</span>
+              <i style="--bar: 0%"></i>
+            </div>
+            <div class="audit-score-tile">
+              <strong id="visibility-score">--</strong>
+              <span>Benchmark</span>
+              <i style="--bar: 0%"></i>
+            </div>
+            <div class="audit-score-tile">
+              <strong id="visibility-sample">--</strong>
+              <span>Answers</span>
+              <i style="--bar: 0%"></i>
+            </div>
+            <div class="audit-score-tile">
+              <strong id="index-citation-rate">{{INDEX_CITATION_RATE}}</strong>
+              <span>Index rate</span>
+              <i style="--bar: 0%"></i>
+            </div>
+            <div class="audit-score-tile">
+              <strong id="top-value-units">{{INDEX_VALUE_UNITS}}</strong>
+              <span>Value units</span>
+              <i style="--bar: 0%"></i>
+            </div>
+          </section>
+
+          <div id="verify-banner" class="verify-banner audit-lock-card"{{VERIFY_BANNER_ATTR}}>
+            <small>Domain access required</small>
+            <strong>Verify ownership to unlock live GEOSITION metrics.</strong>
+            <span>Add the DNS TXT record or HTTPS verification file. Once verified, this area becomes your scores, page issues, AI visibility benchmarks, and before/after updates.</span>
+          </div>
+        </div>
+
+        <section class="locked-results-preview" id="locked-results-preview" aria-label="What unlocks after verification" hidden>
+          <article>
+            <span>1</span>
+            <strong>Live scores</strong>
+            <p>See citation share, benchmark score, page health, and crawler access in one glance.</p>
+          </article>
+          <article>
+            <span>2</span>
+            <strong>Fix list</strong>
+            <p>Get the specific pages, metadata, schema, and crawler issues that need work first.</p>
+          </article>
+          <article>
+            <span>3</span>
+            <strong>Weekly movement</strong>
+            <p>Track what improved by URL and prompt after fixes ship.</p>
+          </article>
+        </section>
+
+        <section class="agency-loop first-run-loop dash-panel" aria-labelledby="agency-loop-title">
+          <div class="agency-loop-main">
+            <div class="first-run-head agency-loop-head">
+              <div>
+                <span class="audit-status-pill">First run loop</span>
+                <h2 id="agency-loop-title">Agency command loop</h2>
+              </div>
+              <p data-agency-summary>Verify, measure, fix, then prove before/after by URL and prompt for every client domain.</p>
+            </div>
+            <div class="agency-loop-current" aria-live="polite">
+              <span>Next action</span>
+              <strong data-agency-next-action>Verify domain</strong>
+              <p data-agency-proof>Ownership proof is the gate before GEOSITION can store client evidence.</p>
+            </div>
+            <ol class="first-run-steps product-loop-steps">
+              <li data-product-step="verify">
+                <span>01</span>
+                <strong>Verify domain</strong>
+                <p>Add DNS TXT or HTTPS file ownership. This unlocks the workspace and ties all evidence to the client.</p>
+                <em>Current gate</em>
+              </li>
+              <li data-requires-verify data-product-step="pages">
+                <span>02</span>
+                <strong>Run page audit</strong>
+                <p>Pull sitemap URLs and capture title, meta, schema, crawler, content, and score issues per page.</p>
+                <em>Waiting</em>
+              </li>
+              <li data-requires-verify data-product-step="benchmark">
+                <span>03</span>
+                <strong>Run benchmark</strong>
+                <p>Test target prompts against competitors and record which AI answers cite the client URLs.</p>
+                <em>Waiting</em>
+              </li>
+              <li data-requires-verify data-product-step="skill">
+                <span>04</span>
+                <strong>Copy skill files</strong>
+                <p>Give Cursor, Claude, Codex, or the CLI the right GEOSITION context before it changes client code.</p>
+                <em>Waiting</em>
+              </li>
+              <li data-requires-verify data-product-step="fix">
+                <span>05</span>
+                <strong>Fix the pages</strong>
+                <p>Apply the highest-impact recommendations to URLs and prompts with visible gaps.</p>
+                <em>Manual</em>
+              </li>
+              <li data-requires-verify data-product-step="report">
+                <span>06</span>
+                <strong>Re-run and prove delta</strong>
+                <p>Repeat audits and benchmarks so weekly reports show before/after movement by URL and prompt.</p>
+                <em>Waiting</em>
+              </li>
+            </ol>
+            <div class="product-slice-actions agency-loop-actions" aria-label="GEOSITION workflow actions">
+              <button type="button" data-product-action="verify">Verify domain</button>
+              <button type="button" data-product-action="pages">Run page audit</button>
+              <button type="button" data-product-action="benchmark">Run benchmark</button>
+              <button type="button" data-product-action="skill">Copy Skill Files</button>
+              <button type="button" data-product-action="report">Weekly proof</button>
+            </div>
+          </div>
+          <aside class="product-access-card agency-loop-plan" aria-label="Free and paid access">
+            <div>
+              <span>Free workspace</span>
+              <strong>Manual audit-to-fix loop</strong>
+              <p>Verify one domain, run audits and benchmarks by hand, copy the core Skill Files bundle, then re-run for proof.</p>
+            </div>
+            <div>
+              <span>Paid automation</span>
+              <strong>Recurring agency operating system</strong>
+              <p data-agency-paid-boundary>Paid access is recurring automation: scheduled page audits, prompt benchmarks, GEOSITION AI extension skills, managed CLI runs, and client-ready weekly reports.</p>
+            </div>
+          </aside>
+        </section>
+
+        <div class="audit-dashboard-grid">
+          <section class="dash-panel audit-panel-large" id="verify">
+            <div class="audit-panel-head">
+              <div>
+                <h2>Your website</h2>
+                <p class="msg">Account email domain: <strong>{{EMAIL_DOMAIN}}</strong></p>
+              </div>
+              <span class="audit-status-pill">Verification</span>
+            </div>
+            <ul id="domains-list" class="audit-domain-list">{{DOMAINS}}</ul>
+            <div id="domain-status-note" class="domain-status-note" aria-live="polite">
+              <strong>What to do now</strong>
+              <ol>
+                <li>Choose DNS TXT or HTTPS file from the pending domain above.</li>
+                <li>Add that record or file in your website/DNS provider.</li>
+                <li>Click Check DNS or Check HTTPS file here. Once verified, audits and benchmarks unlock.</li>
+              </ol>
+            </div>
+            <details class="domain-add-details">
+              <summary>Add another domain</summary>
+              <div class="row">
+                <input id="domain-input" placeholder="www.yourcompany.com" value="{{DISPLAY_DOMAIN}}" />
+                <button id="add-domain" type="button">Add domain</button>
+              </div>
+              <div id="verify-panel"></div>
+            </details>
+          </section>
+
+          <section class="dash-panel audit-panel-large" data-requires-verify id="content">
+            <div class="audit-panel-head">
+              <div>
+                <h2>GEO site audit</h2>
+                <p class="msg">Runs a full GEO, SEO, CRO, schema, and AI crawler audit on your verified domain.</p>
+              </div>
+              <button id="run-audit" type="button">Run audit</button>
+            </div>
+            <div id="audit-out" class="audit-result audit-result-empty" aria-live="polite">
+              <p>Run an audit to turn crawler, schema, content, and AI-readiness checks into a fix list.</p>
+            </div>
+          </section>
+
+          <section class="dash-panel audit-panel-large" data-requires-verify id="pages">
+            <div class="audit-panel-head">
+              <div>
+                <h2>Pages from sitemap</h2>
+                <p class="msg">Audit sitemap URLs and review page-level title, meta, schema, crawler, and content fixes.</p>
+              </div>
+              <button id="run-sitemap-audit" type="button">Run page audit</button>
+            </div>
+            <div class="row">
+              <input id="sitemap-url" placeholder="https://{{DISPLAY_DOMAIN}}/sitemap.xml" />
+              <input id="sitemap-max-urls" inputmode="numeric" pattern="[0-9]*" value="10" aria-label="Maximum pages" />
+            </div>
+            <pre id="sitemap-audit-out" class="msg"></pre>
+            <ul id="sitemap-pages-list" class="page-audit-list">{{SITEMAP_PAGES}}</ul>
+          </section>
+
+          <section class="dash-panel audit-panel-side" data-requires-verify>
+            <h2>Growth over time</h2>
+            <p class="msg">Use repeat benchmarks and Index evidence to see whether visibility and citation value are increasing.</p>
+            <div class="visibility-metrics compact">
+              <div class="visibility-metric">
+                <span>Tracked value</span>
+                <strong id="growth-value">{{INDEX_VALUE_UNITS}}</strong>
+              </div>
+              <div class="visibility-metric">
+                <span>Evidence events</span>
+                <strong id="growth-events">{{INDEX_EVENTS}}</strong>
+              </div>
+              <div class="visibility-metric">
+                <span>Next action</span>
+                <strong id="growth-next-action">Verify</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="dash-panel audit-panel-side" data-requires-verify>
+            <h2>AI citation share</h2>
+            <p id="visibility-empty" class="msg">Run an AI benchmark to start monitoring citation share.</p>
+            <div id="visibility-detail" class="visibility-detail" hidden>
+              <p id="visibility-method" class="msg"></p>
+              <p class="msg" id="visibility-provider-coverage"></p>
+              <div class="visibility-columns">
+                <div>
+                  <h3>Competitor visibility</h3>
+                  <ul id="visibility-competitors"></ul>
+                </div>
+                <div>
+                  <h3>Top cited sources</h3>
+                  <ul id="visibility-sources"></ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="dash-panel audit-panel-large" data-requires-verify id="schema">
+            <div class="audit-panel-head">
+              <div>
+                <h2>GEOSITION Index</h2>
+                <p class="msg">Record observed AI answer usage and turn evidence into an action plan.</p>
+              </div>
+              <span class="audit-status-pill"><strong id="index-events">{{INDEX_EVENTS}}</strong> events</span>
+            </div>
+            <div class="visibility-metrics">
+              <div class="visibility-metric">
+                <span>Top rate</span>
+                <strong id="index-top-rate">{{INDEX_TOP_RATE}}</strong>
+              </div>
+              <div class="visibility-metric">
+                <span>Value units</span>
+                <strong id="index-value-units">{{INDEX_VALUE_UNITS}}</strong>
+              </div>
+            </div>
+            {{INDEX_ACTION_PLAN}}
+            <h3>Record observed answer</h3>
+            <div class="row">
+              <input id="index-agent" placeholder="Perplexity" />
+              <input id="index-query" placeholder="Best provider for ..." />
+            </div>
+            <div class="row">
+              <input id="index-cited-url" placeholder="https://{{DISPLAY_DOMAIN}}/page" />
+              <input id="index-rank" placeholder="Citation rank" />
+              <button id="record-index-event" type="button">Record event</button>
+            </div>
+            <textarea id="index-answer" rows="4" placeholder="Paste answer excerpt"></textarea>
+            <h3>Recent usage evidence</h3>
+            <ul id="index-events-list" class="platform-runs-list">{{INDEX_RECENT_EVENTS}}</ul>
+          </section>
+
+          <section class="dash-panel audit-panel-side" data-requires-verify id="links">
+            <h2>Competitors</h2>
+            <div class="row">
+              <input id="competitor-input" placeholder="rival.com" />
+              <button id="add-competitor" type="button">Add</button>
+            </div>
+            <ul id="competitors-list"></ul>
+          </section>
+
+          <section class="dash-panel audit-panel-side" data-requires-verify id="keywords">
+            <h2>Tracking prompts</h2>
+            <div class="row">
+              <input id="prompt-input" placeholder="Best provider for ...?" />
+              <button id="add-prompt" type="button">Add</button>
+            </div>
+            <ul id="prompts-list"></ul>
+          </section>
+
+          <section class="dash-panel audit-panel-large" data-requires-verify id="benchmark">
+            <div class="audit-panel-head">
+              <div>
+                <h2>AI benchmark</h2>
+                <p class="msg">Paste canonical <code>answers.json</code> from the collect pipeline or tracker export.</p>
+              </div>
+              <button id="run-benchmark" type="button">Run benchmark</button>
+            </div>
+            <textarea id="answers-json" rows="8" placeholder='{"answers":[{"query_text":"...","answer_text":"...","provider":"perplexity"}]}'></textarea>
+            <div id="benchmark-out" class="audit-result audit-result-empty" aria-live="polite"></div>
+            <h3>Recent runs</h3>
+            <ul>{{BENCHMARKS}}</ul>
+          </section>
+
+          <section class="dash-panel audit-panel-side" data-requires-verify id="collection">
+            <h2>Hosted collection</h2>
+            <p class="msg" id="collection-status-copy">Checking provider readiness...</p>
+            <div class="visibility-metrics compact">
+              <div class="visibility-metric">
+                <span>Provider state</span>
+                <strong id="collection-ready">--</strong>
+              </div>
+              <div class="visibility-metric">
+                <span>Providers</span>
+                <strong id="collection-providers">--</strong>
+              </div>
+              <div class="visibility-metric">
+                <span>Latest run</span>
+                <strong id="collection-latest">--</strong>
+              </div>
+            </div>
+            <div class="row">
+              <button id="queue-collection" type="button">Queue hosted collection</button>
+            </div>
+          </section>
+
+          <section class="dash-panel audit-panel-large" data-requires-verify id="reports">
+            <div class="audit-panel-head">
+              <div>
+                <h2>Weekly evidence reports</h2>
+                <p class="msg">A durable weekly snapshot for audit score, benchmark evidence, crawler access, and the next action plan.</p>
+              </div>
+              <button id="run-weekly-report" type="button">Run weekly report</button>
+            </div>
+            <pre id="weekly-report-out" class="msg"></pre>
+            <h3>Recent reports</h3>
+            <ul id="weekly-reports-list" class="platform-runs-list">{{WEEKLY_REPORTS}}</ul>
+          </section>
+
+          <section class="dash-panel audit-panel-side" data-requires-verify>
+            <h2>Recent platform runs</h2>
+            <p class="msg">Audit and benchmark jobs with status, score, and the latest result note.</p>
+            <ul class="platform-runs-list">{{RUNS}}</ul>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="skill-modal" id="skill-files-modal" role="dialog" aria-modal="true" aria-labelledby="skill-modal-title" hidden>
+    <div class="skill-modal-backdrop" data-skill-close></div>
+    <section class="skill-modal-panel">
+      <div class="skill-modal-head">
+        <span>CLIENT IMPLEMENTATION HANDOFF</span>
+        <button id="close-skill-modal" type="button" aria-label="Close skill file instructions">Close</button>
+      </div>
+      <h2 id="skill-modal-title">Copy Skill Files</h2>
+      <p>
+        Skill Files give an AI coding tool the GEOSITION context it needs to help implement fixes for this
+        workspace: the audit workflow, important code paths, CLI commands, docs, and the proof loop clients pay for.
+      </p>
+      <ol class="skill-modal-steps">
+        <li>
+          <strong>Copy the workspace bundle</strong>
+          <span>It includes the files and docs an AI tool should use as source-of-truth context.</span>
+        </li>
+        <li>
+          <strong>Paste it into Cursor, Claude, or any AI tool</strong>
+          <span>The AI can then help fix pages using GEOSITION evidence instead of guessing.</span>
+        </li>
+        <li>
+          <strong>Fix, re-run, and prove movement</strong>
+          <span>Free users get the manual bundle. Paid access is for recurring GEOSITION AI automation: extension skills, scheduled CLI runs, and weekly client proof reports.</span>
+        </li>
+      </ol>
+      <div class="skill-modal-actions">
+        <button id="copy-skill-files-modal" type="button">Copy Skill Files</button>
+        <a href="/docs/skill-files" target="_blank" rel="noreferrer">What are Skill Files?</a>
+      </div>
+      <textarea id="skill-files-manual" readonly aria-label="GEOSITION skill files context"></textarea>
+    </section>
+  </div>
+  <div class="skill-copy-toast" id="skill-copy-toast" role="status" aria-live="polite" hidden>Skill files copied.</div>
+  <script src="/platform/assets/dashboard-loop.js?v=geosition-20260713-flow"></script>
+  <script__NONCE_ATTR__>
+    var SKILL_FILES_CONTEXT = [
+      'GEOSITION AI SKILL FILES',
+      '',
+      'Use this as a handoff bundle for Cursor, Claude, Codex, or another AI implementation tool.',
+      '',
+      'Client value:',
+      '- Gives the AI the GEOSITION workflow, code paths, docs, and guardrails before it suggests changes.',
+      '- Helps turn audit findings into concrete fixes for crawler access, schema, metadata, content, and benchmarks.',
+      '- Keeps the loop measurable: verify -> audit -> page audit -> benchmark -> fix -> re-run -> report delta.',
+      '',
+      'Free vs paid:',
+      '- Free workspaces: copy this core bundle and run the workflow manually.',
+      '- Paid access: recurring GEOSITION AI automation, extension skills, scheduled CLI runs, and weekly before/after client reports.',
+      '',
+      'Core AI logic:',
+      '- src/geo_optimizer/core/audit.py',
+      '- src/geo_optimizer/core/batch_audit.py',
+      '- src/geo_optimizer/core/citability/',
+      '- src/geo_optimizer/core/benchmark/',
+      '- src/geo_optimizer/core/collection/',
+      '',
+      'Agent and tool definitions:',
+      '- src/geo_optimizer/mcp/server.py',
+      '- src/geo_optimizer/skills/catalog/',
+      '- src/geo_optimizer/cli/main.py',
+      '- src/geo_optimizer/cli/audit_cmd.py',
+      '- src/geo_optimizer/cli/geosition_cmd.py',
+      '',
+      'Platform and SaaS flow:',
+      '- src/geo_optimizer/saas/service.py',
+      '- src/geo_optimizer/saas/store.py',
+      '- src/geo_optimizer/saas/supabase_store.py',
+      '- src/geo_optimizer/web/platform_routes.py',
+      '- src/geo_optimizer/web/templates/platform/dashboard.html',
+      '',
+      'Docs to keep open:',
+      '- docs/geo-audit.md',
+      '- docs/scoring-rubric.md',
+      '- docs/mcp-server.md',
+      '- docs/PLATFORM.md',
+      '- src/geo_optimizer/web/docs/skill-files.md',
+      '',
+      'Suggested prompt:',
+      'Use this GEOSITION Skill Files bundle as source-of-truth context. Help improve this verified domain by reading audit evidence, prioritizing the highest-impact fixes, changing the right files, and telling me what to re-run to prove the before/after delta.'
+    ].join('\n');
+
+    function token() {
+      return '';
+    }
+    function cookieValue(name) {
+      return document.cookie.split(';').map(function (part) { return part.trim(); }).reduce(function (found, part) {
+        if (found) return found;
+        return part.indexOf(name + '=') === 0 ? decodeURIComponent(part.slice(name.length + 1)) : '';
+      }, '');
+    }
+    function authHeaders() {
+      return { 'Content-Type': 'application/json', 'X-CSRF-Token': cookieValue('geo_csrf') };
+    }
+    async function readApiResponse(res) {
+      const text = await res.text();
+      if (!text) return {};
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return { detail: text || res.statusText || 'Request failed' };
+      }
+    }
+    function setSkillModal(open) {
+      var modal = document.getElementById('skill-files-modal');
+      if (!modal) return;
+      var manual = document.getElementById('skill-files-manual');
+      if (manual && !manual.value) manual.value = SKILL_FILES_CONTEXT;
+      modal.hidden = !open;
+      document.body.classList.toggle('skill-modal-open', open);
+      if (open) {
+        var copyButton = document.getElementById('copy-skill-files-modal');
+        if (copyButton) copyButton.focus();
+      }
+    }
+    function showSkillToast(message) {
+      var toast = document.getElementById('skill-copy-toast');
+      if (!toast) return;
+      toast.textContent = message;
+      toast.hidden = false;
+      window.clearTimeout(showSkillToast._timer);
+      showSkillToast._timer = window.setTimeout(function () {
+        toast.hidden = true;
+      }, 2600);
+    }
+    function applySkillFileTransition(blocked) {
+      var locked = document.body.classList.contains('workspace-locked');
+      var transitions = window.GEOSITION_DASHBOARD_LOOP && window.GEOSITION_DASHBOARD_LOOP.skillCopyTransitions
+        ? window.GEOSITION_DASHBOARD_LOOP.skillCopyTransitions(locked, blocked)
+        : [
+            { step: 'skill', state: locked || !blocked ? 'done' : 'current', label: locked ? (blocked ? 'Selected' : 'Copied') : (blocked ? 'Select bundle' : 'Copied') },
+            { step: locked ? 'verify' : 'fix', state: 'current', label: locked ? 'Verify next' : 'Fix next' },
+          ];
+      transitions.forEach(function (transition) {
+        setProductStep(transition.step, transition.state, transition.label);
+      });
+    }
+    function markSkillFilesCopied() {
+      applySkillFileTransition(false);
+    }
+    function markSkillFilesBlocked() {
+      applySkillFileTransition(true);
+    }
+    async function copySkillFiles() {
+      try {
+        await navigator.clipboard.writeText(SKILL_FILES_CONTEXT);
+        showSkillToast('Skill files copied. Paste them into Cursor, Claude, or your AI tool.');
+        markSkillFilesCopied();
+      } catch (err) {
+        var manual = document.getElementById('skill-files-manual');
+        if (manual) {
+          manual.hidden = false;
+          manual.focus();
+          manual.select();
+        }
+        showSkillToast('Copy blocked. The skill bundle is selected in the modal.');
+        markSkillFilesBlocked();
+      }
+    }
+    function initSkillFilesPrompt() {
+      var toolbarButton = document.getElementById('copy-skill-files');
+      var modalButton = document.getElementById('copy-skill-files-modal');
+      var closeButton = document.getElementById('close-skill-modal');
+      if (toolbarButton) {
+        toolbarButton.onclick = async function () {
+          setSkillModal(true);
+          await copySkillFiles();
+        };
+      }
+      if (modalButton) modalButton.onclick = copySkillFiles;
+      if (closeButton) closeButton.onclick = function () { setSkillModal(false); };
+      document.querySelectorAll('[data-skill-close]').forEach(function (el) {
+        el.onclick = function () { setSkillModal(false); };
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') setSkillModal(false);
+      });
+      if (!window.sessionStorage.getItem('geositionSkillFilesPromptSeen')) {
+        window.sessionStorage.setItem('geositionSkillFilesPromptSeen', '1');
+        window.setTimeout(function () { setSkillModal(true); }, 550);
+      }
+    }
+    function focusWorkflowTarget(selector, focusSelector) {
+      var target = document.querySelector(selector);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      var control = focusSelector ? document.querySelector(focusSelector) : null;
+      if (control && !control.disabled) {
+        window.setTimeout(function () { control.focus(); }, 280);
+      }
+    }
+    function initProductSliceActions() {
+      var actionMap = {
+        verify: ['#verify', '.verify-btn'],
+        pages: ['#pages', '#run-sitemap-audit'],
+        benchmark: ['#benchmark', '#answers-json'],
+        skill: ['#overview', '#copy-skill-files'],
+        report: ['#reports', '#run-weekly-report'],
+      };
+      document.querySelectorAll('[data-product-action]').forEach(function (button) {
+        button.onclick = async function () {
+          var action = button.getAttribute('data-product-action') || 'verify';
+          var locked = document.body.classList.contains('workspace-locked');
+          if (locked && action !== 'verify' && action !== 'skill') {
+            showSkillToast('Verify the domain first. Audits, benchmarks, and reports unlock after DNS or HTTPS verification.');
+            focusWorkflowTarget('#verify', '.verify-btn');
+            return;
+          }
+          if (action === 'skill') {
+            setSkillModal(true);
+            await copySkillFiles();
+            return;
+          }
+          var target = actionMap[action] || actionMap.verify;
+          focusWorkflowTarget(target[0], target[1]);
+        };
+      });
+    }
+    function fillList(listEl, items, labelFn) {
+      while (listEl.firstChild) {
+        listEl.removeChild(listEl.firstChild);
+      }
+      if (!items || !items.length) {
+        var empty = document.createElement('li');
+        empty.textContent = 'None';
+        listEl.appendChild(empty);
+        return;
+      }
+      items.forEach(function (item) {
+        var li = document.createElement('li');
+        li.textContent = labelFn(item);
+        listEl.appendChild(li);
+      });
+    }
+    function pct(value) {
+      if (typeof value !== 'number' || !isFinite(value)) return '0%';
+      return Math.round(value * 100) + '%';
+    }
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+    function setMetricBar(id, pctValue) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var tile = el.closest('.audit-score-tile');
+      if (!tile) return;
+      var bar = tile.querySelector('i');
+      if (bar) bar.style.setProperty('--bar', pctValue);
+    }
+    function setOverallScore(score) {
+      var numeric = typeof score === 'number' && isFinite(score) ? Math.max(0, Math.min(100, Math.round(score))) : null;
+      setText('overall-score', numeric === null ? '--' : String(numeric));
+      setText('top-score-pill', numeric === null ? '--/100' : String(numeric) + '/100');
+      var ring = document.getElementById('overall-score-ring');
+      if (ring) ring.style.setProperty('--score', numeric === null ? 0 : numeric);
+    }
+    function scoreFromRate(rate) {
+      return typeof rate === 'number' && isFinite(rate) ? Math.round(rate * 100) : null;
+    }
+    function fillKeyValueList(listEl, values, valueFn) {
+      while (listEl.firstChild) {
+        listEl.removeChild(listEl.firstChild);
+      }
+      var entries = Object.entries(values || {});
+      if (!entries.length) {
+        var empty = document.createElement('li');
+        empty.textContent = 'None';
+        listEl.appendChild(empty);
+        return;
+      }
+      entries.forEach(function (entry) {
+        var li = document.createElement('li');
+        var label = document.createElement('span');
+        label.textContent = entry[0];
+        var value = document.createElement('strong');
+        value.textContent = valueFn(entry[1]);
+        li.appendChild(label);
+        li.appendChild(value);
+        listEl.appendChild(li);
+      });
+    }
+    function renderSitemapPages(pages) {
+      var list = document.getElementById('sitemap-pages-list');
+      if (!list) return;
+      while (list.firstChild) list.removeChild(list.firstChild);
+      if (!pages || !pages.length) {
+        var empty = document.createElement('li');
+        empty.className = 'page-audit-empty';
+        empty.textContent = 'Run a sitemap audit to review each page.';
+        list.appendChild(empty);
+        return;
+      }
+      pages.slice(0, 25).forEach(function (page) {
+        var li = document.createElement('li');
+        li.className = 'page-audit-row';
+        var head = document.createElement('div');
+        var url = document.createElement('strong');
+        url.textContent = page.page_url || page.url || '';
+        var band = document.createElement('span');
+        band.textContent = page.band || 'unknown';
+        head.appendChild(url);
+        head.appendChild(band);
+        var score = document.createElement('em');
+        var delta = page.score_delta;
+        score.textContent = String(page.score || 0) + '/100' + (delta === null || delta === undefined ? '' : ' (' + (delta > 0 ? '+' : '') + delta + ')');
+        var details = document.createElement('details');
+        var summary = document.createElement('summary');
+        summary.textContent = 'Review page fixes';
+        details.appendChild(summary);
+        var recs = []
+          .concat(Array.isArray(page.title_issues) ? page.title_issues : [])
+          .concat(Array.isArray(page.meta_issues) ? page.meta_issues : [])
+          .concat(Array.isArray(page.schema_issues) ? page.schema_issues : [])
+          .concat(Array.isArray(page.recommendations) ? page.recommendations : []);
+        if (recs.length) {
+          var ul = document.createElement('ul');
+          recs.slice(0, 8).forEach(function (rec) {
+            var item = document.createElement('li');
+            item.textContent = rec;
+            ul.appendChild(item);
+          });
+          details.appendChild(ul);
+        } else {
+          var p = document.createElement('p');
+          p.textContent = page.error || 'No priority recommendations returned for this page.';
+          details.appendChild(p);
+        }
+        li.appendChild(head);
+        li.appendChild(score);
+        li.appendChild(details);
+        list.appendChild(li);
+      });
+    }
+    async function refreshPageAudits(domain) {
+      if (!domain) {
+        renderSitemapPages([]);
+        return;
+      }
+      var res = await fetch('/api/v1/audit/pages?domain=' + encodeURIComponent(domain) + '&limit=100', { headers: authHeaders() });
+      var data = await readApiResponse(res);
+      renderSitemapPages(res.ok ? (data.pages || []) : []);
+    }
+    async function refreshSitemapAuditStatus(domain, opts) {
+      opts = opts || {};
+      var out = document.getElementById('sitemap-audit-out');
+      if (!domain) return null;
+      var res = await fetch('/api/v1/runs?kind=sitemap_audit', { headers: authHeaders() });
+      var data = await readApiResponse(res);
+      var run = res.ok && data.runs && data.runs.length ? data.runs[0] : null;
+      if (!run) {
+        if (!opts.quiet) out.textContent = 'No page audit runs yet.';
+        return null;
+      }
+      var score = run.score === null || run.score === undefined ? '--' : String(run.score) + '/100';
+      out.textContent = 'Page audit ' + run.status + ' · ' + score + (run.result_summary && run.result_summary[0] !== '{' ? ' · ' + run.result_summary : '');
+      if (run.status === 'completed') {
+        await refreshPageAudits(domain);
+      }
+      return run;
+    }
+    function renderVerifyPanel(panel, data) {
+      panel.textContent = '';
+      var title = document.createElement('strong');
+      title.textContent = 'Verify ' + data.domain.domain;
+      title.className = 'verify-title';
+      panel.appendChild(title);
+      var dnsRow = document.createElement('div');
+      dnsRow.className = 'verify-instruction';
+      dnsRow.appendChild(document.createTextNode('DNS TXT on '));
+      var dnsHost = document.createElement('code');
+      dnsHost.textContent = data.dns_host;
+      dnsRow.appendChild(dnsHost);
+      dnsRow.appendChild(document.createTextNode(' = '));
+      var dnsValue = document.createElement('code');
+      dnsValue.textContent = data.dns_value;
+      dnsRow.appendChild(dnsValue);
+      panel.appendChild(dnsRow);
+      var httpsRow = document.createElement('div');
+      httpsRow.className = 'verify-instruction';
+      httpsRow.appendChild(document.createTextNode('HTTPS file '));
+      var httpsUrl = document.createElement('code');
+      httpsUrl.textContent = data.https_url;
+      httpsRow.appendChild(httpsUrl);
+      httpsRow.appendChild(document.createTextNode(' containing '));
+      var httpsBody = document.createElement('code');
+      httpsBody.textContent = data.https_body;
+      httpsRow.appendChild(httpsBody);
+      panel.appendChild(httpsRow);
+      var actions = document.createElement('div');
+      actions.className = 'verify-actions';
+      panel.appendChild(actions);
+      function makeVerifyButton(method, label) {
+        var btn = document.createElement('button');
+        btn.className = 'verify-btn';
+        btn.type = 'button';
+        btn.setAttribute('data-id', String(data.domain.domain_id));
+        btn.setAttribute('data-method', method);
+        btn.textContent = label;
+        btn.onclick = verifyButtonClick;
+        actions.appendChild(btn);
+      }
+      makeVerifyButton('dns', 'Check DNS');
+      makeVerifyButton('https', 'Check HTTPS file');
+    }
+    async function verifyButtonClick(ev) {
+      var button = ev.currentTarget;
+      var id = button.getAttribute('data-id') || button.getAttribute('data-domain-id');
+      var method = button.getAttribute('data-method') || 'dns';
+      var idleText = method === 'https' ? 'Check HTTPS file' : 'Check DNS';
+      button.disabled = true;
+      button.textContent = method === 'https' ? 'Checking HTTPS...' : 'Checking DNS...';
+      try {
+        var vr = await fetch('/api/v1/domains/' + encodeURIComponent(id) + '/verify', {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ method: method }),
+        });
+        var vd = await readApiResponse(vr);
+        alert(vd.message || vd.detail || 'Verification failed');
+        if (vd.verified) location.reload();
+      } catch (err) {
+        alert('Verification check failed. Try again in a moment.');
+      } finally {
+        button.disabled = false;
+        button.textContent = idleText;
+      }
+    }
+    var initialDomainFromUrl = '';
+    (function () {
+      var params = new URLSearchParams(location.search);
+      var domain = params.get('domain');
+      if (domain) {
+        initialDomainFromUrl = domain;
+        var el = document.getElementById('domain-input');
+        if (el) el.value = domain;
+        var note = document.getElementById('domain-status-note');
+        if (note && document.getElementById('domains-list').textContent.indexOf(domain) !== -1) {
+          note.querySelector('strong').textContent = domain + ' is added. Verify it next.';
+        }
+      }
+    })();
+    document.getElementById('logout').onclick = async () => {
+      await fetch('/api/v1/auth/logout', { method: 'POST', headers: authHeaders() });
+      location.href = '/platform/login';
+    };
+    document.getElementById('new-audit').onclick = () => {
+      var auditPanel = document.getElementById('content');
+      if (auditPanel) auditPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      var button = document.getElementById('run-audit');
+      if (button && !button.disabled) button.focus();
+    };
+    function setWorkspaceLocked(locked) {
+      document.body.classList.toggle('workspace-locked', locked);
+      var banner = document.getElementById('verify-banner');
+      if (banner) banner.hidden = !locked;
+      var preview = document.getElementById('locked-results-preview');
+      if (preview) preview.hidden = !locked;
+      var nextAction = document.getElementById('growth-next-action');
+      if (nextAction) nextAction.textContent = locked ? 'Verify' : 'Benchmark';
+      resetProductLoop(locked);
+      var stepLabel = document.getElementById('onboarding-step-label');
+      if (stepLabel) stepLabel.textContent = locked ? 'Step 3 of 4 · Verify domain' : 'Step 4 of 4 · Benchmark and track value';
+      document.querySelectorAll('[data-onboarding-chip]').forEach(function (chip) {
+        var key = chip.getAttribute('data-onboarding-chip');
+        chip.classList.toggle('current', locked ? key === 'verify' : key === 'benchmark');
+        chip.classList.toggle('complete', locked ? key === 'domain' || key === 'account' : key !== 'benchmark');
+      });
+      document.querySelectorAll('[data-requires-verify]').forEach(function (el) {
+        el.classList.toggle('is-locked', locked);
+        el.querySelectorAll('button, input, textarea, select').forEach(function (ctrl) {
+          ctrl.disabled = locked;
+        });
+      });
+      document.querySelectorAll('.ws-nav-locked').forEach(function (el) {
+        el.classList.toggle('is-disabled', locked);
+      });
+    }
+    function updateDomainStatusNote(domain, verified) {
+      var note = document.getElementById('domain-status-note');
+      if (!note || !domain) return;
+      var title = note.querySelector('strong');
+      var items = note.querySelectorAll('li');
+      if (verified) {
+        if (title) title.textContent = domain + ' is verified.';
+        if (items[0]) items[0].textContent = 'Run a GEO site audit to capture the current score and fix queue.';
+        if (items[1]) items[1].textContent = 'Run page audits from the sitemap to collect URL-level issues.';
+        if (items[2]) items[2].textContent = 'Run benchmarks weekly to prove before/after movement by URL and prompt.';
+      } else {
+        if (title) title.textContent = domain + ' is added. Verify it next.';
+        if (items[0]) items[0].textContent = 'Choose DNS TXT or HTTPS file from the pending domain above.';
+        if (items[1]) items[1].textContent = 'Add that record or file in your website/DNS provider.';
+        if (items[2]) items[2].textContent = 'Click Check DNS or Check HTTPS file here. Once verified, audits and benchmarks unlock.';
+      }
+    }
+
+    async function refreshVisibilitySummary(domain) {
+      var empty = document.getElementById('visibility-empty');
+      var detail = document.getElementById('visibility-detail');
+      setText('visibility-citation-rate', '--');
+      setText('visibility-score', '--');
+      setText('visibility-sample', '--');
+      setMetricBar('visibility-citation-rate', '0%');
+      setMetricBar('visibility-score', '0%');
+      setMetricBar('visibility-sample', '0%');
+      setOverallScore(null);
+      if (!domain) {
+        empty.textContent = 'Verify a domain to start monitoring citation share.';
+        empty.hidden = false;
+        detail.hidden = true;
+        return;
+      }
+      var res = await fetch('/api/v1/visibility/summary?domain=' + encodeURIComponent(domain), { headers: authHeaders() });
+      var data = await readApiResponse(res);
+      if (!res.ok || !data.has_data) {
+        empty.textContent = data.message || data.detail || 'Run an AI benchmark to start monitoring citation share.';
+        empty.hidden = false;
+        detail.hidden = true;
+        return;
+      }
+      var summary = data.summary || {};
+      setText('visibility-method', summary.scoring_version === 'evidence-v2'
+        ? 'Sampled answers: ' + summary.sample_size + '. Measured score components: '
+          + Math.round(summary.evidence_coverage * 100) + '%. This score is a heuristic, not a ranking.'
+        : 'This earlier score used the legacy model and may include unavailable measurements. Run a new benchmark to compare.');
+      var benchmarkScore = Number(summary.benchmark_score || 0);
+      var citationPct = pct(summary.target_citation_rate);
+      setText('visibility-citation-rate', citationPct);
+      setText('visibility-score', String(benchmarkScore) + '/100');
+      setText('visibility-sample', String(summary.sample_size || 0));
+      setMetricBar('visibility-citation-rate', citationPct);
+      setMetricBar('visibility-score', String(Math.max(0, Math.min(100, benchmarkScore))) + '%');
+      setMetricBar('visibility-sample', summary.sample_size ? '100%' : '0%');
+      setOverallScore(benchmarkScore);
+      fillKeyValueList(
+        document.getElementById('visibility-competitors'),
+        summary.competitor_citation_rates,
+        pct
+      );
+      fillKeyValueList(
+        document.getElementById('visibility-sources'),
+        summary.top_cited_sources,
+        function (count) { return String(count); }
+      );
+      var providerText = Object.entries(summary.provider_coverage || {})
+        .map(function (entry) { return entry[0] + ': ' + entry[1]; })
+        .join(' · ');
+      document.getElementById('visibility-provider-coverage').textContent = providerText
+        ? 'Provider coverage: ' + providerText
+        : 'Provider coverage will appear after benchmark collection.';
+      empty.hidden = true;
+      detail.hidden = false;
+    }
+
+    function renderIndexEvents(events) {
+      var list = document.getElementById('index-events-list');
+      while (list.firstChild) list.removeChild(list.firstChild);
+      if (!events || !events.length) {
+        var empty = document.createElement('li');
+        empty.textContent = 'No agent usage events yet.';
+        list.appendChild(empty);
+        return;
+      }
+      events.forEach(function (event) {
+        var li = document.createElement('li');
+        li.className = 'platform-run-row index-event-row';
+        var title = document.createElement('span');
+        title.textContent = (event.agent || 'unknown') + ' · ' + (event.query || event.cited_url || event.source_type);
+        var badge = document.createElement('span');
+        badge.className = 'run-status';
+        badge.textContent = event.top_recommendation ? 'top' : (event.cited ? 'cited' : (event.surfaced ? 'surfaced' : 'missed'));
+        var rank = document.createElement('span');
+        rank.textContent = event.cited_rank ? '#' + event.cited_rank : '--';
+        var detail = document.createElement('small');
+        detail.textContent = event.source_type + ' · ' + Number(event.value_units || 0).toFixed(2) + ' value units';
+        li.appendChild(title);
+        li.appendChild(badge);
+        li.appendChild(rank);
+        li.appendChild(detail);
+        list.appendChild(li);
+      });
+    }
+
+    function renderIndexSummary(summary) {
+      summary = summary || {};
+      var citationRate = pct(summary.citation_rate || 0);
+      var totalValue = Number(summary.total_value_units || 0).toFixed(2);
+      setText('index-events', String(summary.total_events || 0));
+      setText('index-citation-rate', citationRate);
+      setText('index-top-rate', pct(summary.top_recommendation_rate || 0));
+      setText('index-value-units', totalValue);
+      setText('top-value-units', totalValue);
+      setText('growth-events', String(summary.total_events || 0));
+      setText('growth-value', totalValue);
+      setMetricBar('index-citation-rate', citationRate);
+      setMetricBar('top-value-units', summary.total_value_units ? '100%' : '0%');
+      var plan = summary.action_plan || {};
+      var planBox = document.getElementById('index-action-plan-live');
+      if (planBox) {
+        planBox.querySelector('[data-plan-priority]').textContent = plan.priority || 'Collect AI answer evidence';
+        planBox.querySelector('[data-plan-next]').textContent = plan.next_step || 'Run a benchmark or paste an AI answer for target queries.';
+        var chips = planBox.querySelector('[data-plan-chips]');
+        while (chips.firstChild) chips.removeChild(chips.firstChild);
+        (plan.fix_order || []).slice(0, 8).forEach(function (item) {
+          var chip = document.createElement('span');
+          chip.textContent = item;
+          chips.appendChild(chip);
+        });
+      }
+      renderIndexEvents(summary.recent_events || []);
+    }
+
+    async function refreshIndexSummary(domain) {
+      if (!domain) {
+        renderIndexSummary({});
+        return;
+      }
+      var res = await fetch('/api/v1/index/summary?domain=' + encodeURIComponent(domain), { headers: authHeaders() });
+      var data = await readApiResponse(res);
+      renderIndexSummary(res.ok ? data.summary : {});
+    }
+
+    function renderWeeklyReports(reports) {
+      fillList(
+        document.getElementById('weekly-reports-list'),
+        reports || [],
+        function (report) {
+          var score = report.score === null || report.score === undefined ? '--' : String(report.score) + '/100';
+          return score + ' · ' + (report.band || report.status || 'report') + ' · ' + (report.summary || report.domain || '') + ' · before/after by URL and prompt when audits and benchmarks exist';
+        }
+      );
+    }
+
+    async function refreshCollectionStatus(domain) {
+      var copy = document.getElementById('collection-status-copy');
+      var ready = document.getElementById('collection-ready');
+      var providers = document.getElementById('collection-providers');
+      var latest = document.getElementById('collection-latest');
+      if (!domain) {
+        copy.textContent = 'Verify a domain before hosted answer collection can run.';
+        ready.textContent = '--';
+        providers.textContent = '--';
+        latest.textContent = '--';
+        return;
+      }
+      var res = await fetch('/api/v1/collection/status?domain=' + encodeURIComponent(domain), { headers: authHeaders() });
+      var data = await readApiResponse(res);
+      if (!res.ok) {
+        copy.textContent = data.detail || 'Collection status is unavailable.';
+        ready.textContent = 'blocked';
+        providers.textContent = '--';
+        latest.textContent = '--';
+        return;
+      }
+      var latestRun = (data.latest_collection_runs || [])[0];
+      ready.textContent = data.ready ? 'ready' : 'blocked';
+      providers.textContent = (data.available_providers || []).join(', ') || 'none';
+      latest.textContent = latestRun ? latestRun.status : 'none';
+      copy.textContent = data.ready
+        ? 'Provider credentials are configured. Queue collection to gather AI answer evidence in the background.'
+        : 'Hosted collection needs provider credentials: ' + (data.missing || []).join(', ') + '. You can still paste answers.json manually.';
+    }
+
+    async function refreshLists() {
+      const res = await fetch('/api/v1/dashboard', { headers: authHeaders() });
+      if (!res.ok) { location.href = '/platform/login'; return; }
+      const d = await readApiResponse(res);
+      var hasVerified = (d.domains || []).some(function (dom) { return dom.status === 'verified'; });
+      setWorkspaceLocked(!hasVerified);
+      renderAgencyLoop(d.agency_loop, !hasVerified);
+      var activeDomain = hasVerified ? d.primary_verified_domain : '';
+      updateDomainStatusNote(activeDomain || initialDomainFromUrl || (d.domains && d.domains[0] ? d.domains[0].domain : ''), hasVerified);
+      refreshVisibilitySummary(activeDomain);
+      refreshCollectionStatus(activeDomain);
+      refreshPageAudits(activeDomain);
+      refreshSitemapAuditStatus(activeDomain, { quiet: true });
+      renderIndexSummary(hasVerified ? d.index_summary : {});
+      renderWeeklyReports(hasVerified ? d.recent_weekly_reports : []);
+      fillList(
+        document.getElementById('competitors-list'),
+        d.competitors,
+        function (c) { return c.domain; }
+      );
+      fillList(
+        document.getElementById('prompts-list'),
+        d.prompts,
+        function (p) { return p.query_text; }
+      );
+    }
+    async function addDomain(domain, opts) {
+      opts = opts || {};
+      const res = await fetch('/api/v1/domains', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ domain }) });
+      const data = await readApiResponse(res);
+      if (!res.ok) { if (!opts.silent) alert(data.detail || 'Failed'); return false; }
+      const panel = document.getElementById('verify-panel');
+      panel.style.display = 'block';
+      renderVerifyPanel(panel, data);
+      return true;
+    }
+    document.getElementById('add-domain').onclick = async () => {
+      const domain = document.getElementById('domain-input').value.trim();
+      await addDomain(domain);
+    };
+    document.querySelectorAll('.verify-btn').forEach(btn => {
+      btn.onclick = verifyButtonClick;
+    });
+    document.getElementById('add-competitor').onclick = async () => {
+      const domain = document.getElementById('competitor-input').value.trim();
+      await fetch('/api/v1/competitors', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ domain }) });
+      refreshLists();
+    };
+    document.getElementById('add-prompt').onclick = async () => {
+      const query_text = document.getElementById('prompt-input').value.trim();
+      await fetch('/api/v1/prompts', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ query_text }) });
+      refreshLists();
+    };
+    document.getElementById('record-index-event').onclick = async () => {
+      const domain = document.getElementById('domain-input').value.trim();
+      const citedRankRaw = document.getElementById('index-rank').value.trim();
+      const payload = {
+        domain: domain,
+        source_type: 'manual_ai_answer',
+        agent: document.getElementById('index-agent').value.trim(),
+        query: document.getElementById('index-query').value.trim(),
+        cited_url: document.getElementById('index-cited-url').value.trim(),
+        cited_rank: citedRankRaw ? Number(citedRankRaw) : null,
+        answer_excerpt: document.getElementById('index-answer').value.trim(),
+      };
+      const res = await fetch('/api/v1/index/events', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(payload),
+      });
+      const data = await readApiResponse(res);
+      if (!res.ok) { alert(data.detail || 'Failed to record event'); return; }
+      renderIndexSummary(data.summary);
+      document.getElementById('index-answer').value = '';
+    };
+    document.getElementById('queue-collection').onclick = async () => {
+      const domain = document.getElementById('domain-input').value.trim();
+      const res = await fetch('/api/v1/collection/start', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ domain }),
+      });
+      const data = await readApiResponse(res);
+      if (!res.ok) { alert(data.detail || 'Failed to queue collection'); return; }
+      var run = data.run || {};
+      document.getElementById('collection-status-copy').textContent = data.status === 'queued'
+        ? 'Collection queued. A hosted worker will collect answer evidence and write Index events.'
+        : (run.result_summary || data.reason || 'Collection status updated.');
+      refreshCollectionStatus(domain);
+    };
+    function renderReportText(value) {
+      return String(value || '')
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n')
+        .replace(/\\t/g, '\t');
+    }
+    function appendText(parent, tagName, text, className) {
+      var el = document.createElement(tagName);
+      if (className) el.className = className;
+      el.textContent = renderReportText(text);
+      parent.appendChild(el);
+      return el;
+    }
+    function scoreTone(score, band, hasError) {
+      if (hasError || band === 'failed') return 'failed';
+      if (score >= 86 || band === 'excellent') return 'excellent';
+      if (score >= 68 || band === 'good') return 'good';
+      if (score >= 36 || band === 'foundation') return 'foundation';
+      return 'critical';
+    }
+    function clearElement(root) {
+      while (root.firstChild) root.removeChild(root.firstChild);
+    }
+    function setProductStep(step, state, label) {
+      var item = document.querySelector('[data-product-step="' + step + '"]');
+      if (!item) return;
+      if (state === 'current') {
+        document.querySelectorAll('[data-product-step]').forEach(function (other) {
+          other.classList.remove('is-current');
+        });
+      }
+      item.classList.remove('is-current', 'is-done', 'is-waiting');
+      item.classList.add('is-' + state);
+      var status = item.querySelector('em');
+      if (status && label) status.textContent = label;
+    }
+    function resetProductLoop(locked) {
+      setProductStep('verify', locked ? 'current' : 'done', locked ? 'Current gate' : 'Verified');
+      setProductStep('pages', locked ? 'waiting' : 'current', locked ? 'Waiting' : 'Run next');
+      setProductStep('benchmark', 'waiting', locked ? 'Waiting' : 'After pages');
+      setProductStep('skill', 'waiting', locked ? 'Waiting' : 'After benchmark');
+      setProductStep('fix', 'waiting', locked ? 'Waiting' : 'Manual');
+      setProductStep('report', 'waiting', locked ? 'Waiting' : 'After fixes');
+    }
+    function renderAgencyLoop(loopState, locked) {
+      if (!window.GEOSITION_DASHBOARD_LOOP || !window.GEOSITION_DASHBOARD_LOOP.deriveAgencyLoop) {
+        resetProductLoop(locked);
+        return;
+      }
+      var loop = window.GEOSITION_DASHBOARD_LOOP.deriveAgencyLoop(loopState || { locked: locked });
+      var summary = document.querySelector('[data-agency-summary]');
+      var nextAction = document.querySelector('[data-agency-next-action]');
+      var proof = document.querySelector('[data-agency-proof]');
+      var paidBoundary = document.querySelector('[data-agency-paid-boundary]');
+      if (summary) summary.textContent = loop.summary;
+      if (nextAction) nextAction.textContent = loop.next_action;
+      if (proof) proof.textContent = loop.proof_focus;
+      if (paidBoundary) paidBoundary.textContent = loop.paid_boundary;
+      (loop.steps || []).forEach(function (step) {
+        setProductStep(step.step_id, step.state, step.label);
+      });
+    }
+    function renderRunError(rootId, title, detail) {
+      var root = document.getElementById(rootId);
+      clearElement(root);
+      root.className = 'audit-result';
+      root.classList.add('audit-result-error');
+      appendText(root, 'strong', title);
+      appendText(root, 'p', detail, 'audit-result-muted');
+    }
+    function renderRunResult(rootId, config) {
+      var root = document.getElementById(rootId);
+      clearElement(root);
+      root.className = 'audit-result';
+
+      var score = Number(config.score || 0);
+      var band = config.band || 'pending';
+      root.classList.add('audit-result-' + scoreTone(score, band, Boolean(config.hasError)));
+
+      var header = document.createElement('div');
+      header.className = 'audit-result-header';
+      root.appendChild(header);
+
+      var scoreBox = document.createElement('div');
+      scoreBox.className = 'audit-score-stamp';
+      appendText(scoreBox, 'span', config.scoreLabel || 'Score');
+      appendText(scoreBox, 'strong', String(score));
+      appendText(scoreBox, 'em', '/100 · ' + band);
+      header.appendChild(scoreBox);
+
+      var copy = document.createElement('div');
+      copy.className = 'audit-result-copy';
+      appendText(copy, 'h3', config.title);
+      appendText(copy, 'p', config.summary);
+      header.appendChild(copy);
+
+      var proof = document.createElement('div');
+      proof.className = 'audit-proof-ledger';
+      var before = document.createElement('div');
+      appendText(before, 'span', config.beforeLabel || 'Before');
+      appendText(before, 'strong', config.beforeValue || (score + '/100 ' + band));
+      appendText(before, 'p', config.beforeCopy || 'Verified domain baseline');
+      proof.appendChild(before);
+      var after = document.createElement('div');
+      appendText(after, 'span', config.afterLabel || 'After');
+      appendText(after, 'strong', config.afterValue || 'Re-run to prove delta');
+      appendText(after, 'p', config.afterCopy || 'Repeat the same checks after fixes to prove movement.');
+      proof.appendChild(after);
+      root.appendChild(proof);
+
+      var listBlock = document.createElement('div');
+      listBlock.className = 'audit-recommendations';
+      var actions = (config.actions || []).slice(0, config.maxActions || 6);
+      appendText(listBlock, 'h4', actions.length ? (config.actionsTitle || 'Fix queue') : (config.emptyTitle || 'Next action'));
+      if (actions.length) {
+        var list = document.createElement('ul');
+        actions.forEach(function (action, index) {
+          var item = document.createElement('li');
+          var marker = document.createElement('span');
+          marker.textContent = String(index + 1);
+          item.appendChild(marker);
+          appendText(item, 'p', action);
+          list.appendChild(item);
+        });
+        listBlock.appendChild(list);
+      } else {
+        appendText(listBlock, 'p', config.emptyCopy, 'audit-result-muted');
+      }
+      root.appendChild(listBlock);
+    }
+    function renderAuditResult(data, ok) {
+      if (!ok || data.error || data.band === 'failed') {
+        renderRunError('audit-out', 'Audit could not run', data.detail || data.error || 'Please try again.');
+        return;
+      }
+      var score = Number(data.score || 0);
+      var band = data.band || (data.error ? 'failed' : 'pending');
+      renderRunResult('audit-out', {
+        score: score,
+        band: band,
+        hasError: Boolean(data.error),
+        scoreLabel: data.error ? 'Audit blocked' : 'GEO audit',
+        title: data.error ? 'Scanner needs access before GEOSITION can score this site.' : 'Visibility baseline captured.',
+        summary: data.error
+          ? data.error
+          : 'GEOSITION saved this run as the before state. Apply the fixes below, then re-run audits and benchmarks to prove movement by URL and prompt.',
+        beforeLabel: 'Before',
+        beforeValue: data.error ? 'No reachable baseline' : score + '/100 ' + band,
+        beforeCopy: data.url || 'Verified homepage audit',
+        afterLabel: 'After',
+        afterValue: 'Re-run to prove delta',
+        afterCopy: 'Page audits and AI benchmarks will show which URLs and prompts improved.',
+        actionsTitle: 'Fix queue',
+        emptyTitle: 'No immediate fixes returned',
+        emptyCopy: 'Run a benchmark next so GEOSITION can compare prompt visibility against competitors.',
+        actions: data.recommendations || [],
+      });
+    }
+    function renderBenchmarkResult(data, ok) {
+      if (!ok) {
+        renderRunError('benchmark-out', 'Benchmark could not run', data.detail || JSON.stringify(data));
+        return;
+      }
+
+      var benchmark = data.benchmark || {};
+      var score = Number(benchmark.score || 0);
+      var band = benchmark.band || 'benchmark';
+      var gaps = benchmark.task_gaps || [];
+      renderRunResult('benchmark-out', {
+        score: score,
+        band: band,
+        scoreLabel: 'Benchmark',
+        title: 'AI visibility baseline captured.',
+        summary: (benchmark.executive_summary || 'GEOSITION saved prompt evidence for this domain.')
+          + (benchmark.evidence_coverage === undefined ? '' : ' Measured score components: '
+            + Math.round(benchmark.evidence_coverage * 100) + '%. Answers included: '
+            + benchmark.answers_included + ' of ' + benchmark.answers_attempted + '.'),
+        beforeLabel: 'Prompt proof',
+        beforeValue: 'Run #' + (benchmark.run_id || '--'),
+        beforeCopy: 'Stored benchmark evidence and Index events are now tied to this domain.',
+        afterLabel: 'Next delta',
+        afterValue: 'Re-run after fixes',
+        afterCopy: 'Compare citation share, competitor position, and task gaps against this baseline.',
+        actionsTitle: 'Benchmark fix queue',
+        emptyTitle: 'Next action',
+        emptyCopy: 'Copy Skill Files, fix the highest-value pages, then run the same benchmark answers again for before/after proof.',
+        actions: gaps.map(function (gap) {
+          return gap.recommendation || gap.task || 'Improve this prompt/page match and re-run.';
+        }),
+        maxActions: 5,
+      });
+    }
+    document.getElementById('run-audit').onclick = async () => {
+      const domain = document.getElementById('domain-input').value.trim();
+      var auditOut = document.getElementById('audit-out');
+      auditOut.className = 'audit-result audit-result-empty';
+      auditOut.textContent = 'Running live GEO audit...';
+      const res = await fetch('/api/v1/audit', { method: 'POST', headers: authHeaders(), body: JSON.stringify({ domain }) });
+      const data = await readApiResponse(res);
+      renderAuditResult(data, res.ok);
+      if (res.ok && !data.error && data.band !== 'failed') {
+        setProductStep('fix', 'current', 'Fix queue ready');
+      }
+    };
+    document.getElementById('run-sitemap-audit').onclick = async () => {
+      const domain = document.getElementById('domain-input').value.trim();
+      const sitemapUrl = document.getElementById('sitemap-url').value.trim();
+      const maxUrls = Number(document.getElementById('sitemap-max-urls').value || 10);
+      var out = document.getElementById('sitemap-audit-out');
+      out.textContent = 'Running page audit...';
+      const res = await fetch('/api/v1/audit/sitemap', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          domain: domain,
+          sitemap_url: sitemapUrl,
+          max_urls: Math.max(1, Math.min(25, maxUrls || 10)),
+          run_now: true,
+        }),
+      });
+      const data = await readApiResponse(res);
+      if (!res.ok) {
+        out.textContent = renderReportText(data.detail || JSON.stringify(data));
+        return;
+      }
+      out.textContent = renderReportText(data.error
+        ? data.error
+        : (
+            data.status === 'queued'
+              ? 'Page audit queued for ' + data.sitemap_url + '. A GEOSITION worker will update this list.'
+              : 'Average score: ' + data.average_score + '/100 (' + data.average_band + ') · ' + data.audited_urls + ' pages audited.'
+          ));
+      if (data.storage_warning) out.textContent += '\n' + data.storage_warning;
+      renderSitemapPages(data.pages || []);
+      if (data.average_score !== undefined) {
+        setProductStep('pages', 'done', 'Pages audited');
+        setProductStep('benchmark', 'current', 'Benchmark next');
+      }
+      if (data.status === 'queued') {
+        var attempts = 0;
+        var timer = window.setInterval(async function () {
+          attempts += 1;
+          var run = await refreshSitemapAuditStatus(domain, { quiet: true });
+          if (!run || run.status === 'completed' || run.status === 'failed' || attempts >= 30) {
+            window.clearInterval(timer);
+          }
+        }, 4000);
+      }
+    };
+    document.getElementById('run-weekly-report').onclick = async () => {
+      const domain = document.getElementById('domain-input').value.trim();
+      let answers = null;
+      const rawAnswers = document.getElementById('answers-json').value.trim();
+      if (rawAnswers) {
+        try { answers = JSON.parse(rawAnswers); } catch (e) {
+          document.getElementById('weekly-report-out').textContent = 'Invalid answers JSON. Weekly reports can run without answers, or you can paste canonical answers JSON from hosted collection.';
+          return;
+        }
+      }
+      const res = await fetch('/api/v1/reports/weekly/run', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ domain, answers, lighthouse_provider: 'none' }),
+      });
+      const data = await readApiResponse(res);
+      var weeklyText = res.ok
+        ? 'Score: ' + data.score + '/100 (' + data.band + ')\\n' + data.summary
+          + '\\nBefore/after proof: URL deltas from page audits and prompt deltas from benchmark or Index evidence.'
+          + (data.collection_mode === 'stored_evidence_fallback' ? '\\nUsing stored evidence because live collection was unavailable.' : '')
+          + (data.persistence_warning ? '\\n' + data.persistence_warning : '')
+        : (data.detail || JSON.stringify(data));
+      document.getElementById('weekly-report-out').textContent = renderReportText(weeklyText);
+      if (res.ok) {
+        setProductStep('report', 'done', 'Report ready');
+        refreshLists();
+      }
+    };
+    document.getElementById('run-benchmark').onclick = async () => {
+      const domain = document.getElementById('domain-input').value.trim();
+      let answers;
+      const rawAnswers = document.getElementById('answers-json').value.trim();
+      if (!rawAnswers) {
+        var missing = document.getElementById('benchmark-out');
+        missing.className = 'audit-result audit-result-empty';
+        missing.textContent = 'Benchmark needs answers.json from hosted collection or the tracker export. Queue hosted collection first, or paste canonical answers JSON here.';
+        return;
+      }
+      try { answers = JSON.parse(rawAnswers); } catch (e) {
+        var invalid = document.getElementById('benchmark-out');
+        invalid.className = 'audit-result audit-result-empty';
+        invalid.textContent = 'Invalid answers JSON. Paste an object like {\"answers\":[{\"query_text\":\"...\",\"answer_text\":\"...\",\"provider\":\"perplexity\"}]}.';
+        return;
+      }
+      var benchmarkOut = document.getElementById('benchmark-out');
+      benchmarkOut.className = 'audit-result audit-result-empty';
+      benchmarkOut.textContent = 'Running AI visibility benchmark...';
+      const res = await fetch('/api/v1/benchmark/run', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ domain, answers }),
+      });
+      const data = await readApiResponse(res);
+      renderBenchmarkResult(data, res.ok);
+      if (res.ok) {
+        var score = data.benchmark && data.benchmark.score !== undefined ? Number(data.benchmark.score) : null;
+        if (score !== null && isFinite(score)) setOverallScore(score);
+        setProductStep('benchmark', 'done', 'Baseline saved');
+        setProductStep('skill', 'current', 'Copy next');
+        refreshVisibilitySummary(domain);
+        refreshIndexSummary(domain);
+        refreshLists();
+      }
+    };
+    initSkillFilesPrompt();
+    initProductSliceActions();
+    refreshLists();
+  </script>
+</body>
+</html>

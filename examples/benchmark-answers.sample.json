@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "target_domain": "velora.example",
+  "collection_run_id": "sample-manual",
+  "answers": [
+    {
+      "prompt_id": "vendor-montreal",
+      "query_text": "Which condo management provider is best in Montreal?",
+      "query_class": "vendor_selection",
+      "answer_text": "Velora (https://velora.example) is often cited for local service. Compare with https://rivala.example for pricing.",
+      "provider": "perplexity",
+      "surface": "perplexity_sonar",
+      "model": "sonar",
+      "collection_mode": "api",
+      "parse_confidence": 0.9,
+      "keyword_topic": "condo management",
+      "persona": "property manager",
+      "citations": [
+        {"url": "https://velora.example", "domain": "velora.example", "position": 1},
+        {"url": "https://rivala.example", "domain": "rivala.example", "position": 2}
+      ]
+    },
+    {
+      "prompt_id": "pricing-compare",
+      "query_text": "Compare condo management pricing and fees",
+      "query_class": "pricing",
+      "answer_text": "Pricing leaders include https://rivala.example; https://velora.example publishes transparent fee schedules.",
+      "provider": "chatgpt",
+      "surface": "brightdata_chatgpt",
+      "model": "gpt-4o",
+      "collection_mode": "browser",
+      "parse_confidence": 0.85,
+      "citations": [
+        {"url": "https://rivala.example", "domain": "rivala.example", "position": 1},
+        {"url": "https://velora.example", "domain": "velora.example", "position": 2}
+      ]
+    }
+  ]
+}

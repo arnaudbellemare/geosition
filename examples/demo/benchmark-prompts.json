@@ -1,0 +1,16 @@
+{
+  "prompts": [
+    {
+      "prompt_id": "vendor-selection",
+      "query_text": "Which example provider should I compare?",
+      "query_class": "vendor_selection",
+      "keyword_topic": "example services"
+    },
+    {
+      "prompt_id": "pricing-comparison",
+      "query_text": "How do example service plans compare?",
+      "query_class": "pricing",
+      "keyword_topic": "example pricing"
+    }
+  ]
+}

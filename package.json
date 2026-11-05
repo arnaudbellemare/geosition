@@ -1,0 +1,19 @@
+{
+  "name": "geosition-repo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seo:verify": "node --experimental-strip-types scripts/verify-seo-artifacts.ts",
+    "test:dashboard": "npx --yes playwright test tests/playwright/platform-dashboard.spec.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "cobe": "^2.0.1"
+  }
+}

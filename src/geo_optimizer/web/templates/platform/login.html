@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GEOSITION · Sign in</title>
+  <link rel="icon" href="/favicon.ico?v=geosition-icon-20260617" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/platform/assets/favicon-32.png?v=geosition-icon-20260617" />
+  <link rel="apple-touch-icon" href="/platform/assets/apple-touch-icon.png?v=geosition-icon-20260617" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@18..72,400;18..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/platform/assets/site.css?v=geosition-20260615website-field" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-card">
+      <a class="auth-brand" href="/platform">GEOSITION</a>
+      <div class="auth-tabs" aria-label="Authentication options">
+        <a class="active" href="/platform/login" aria-current="page">Sign in</a>
+        <a href="/platform/register">Get started</a>
+      </div>
+      <div class="auth-card-head">
+        <h1>Sign in</h1>
+        <p class="meta">Return to your workspace to verify domains and review citation benchmarks.</p>
+      </div>
+      <form id="login-form">
+        <label for="login-email">Account email</label>
+        <input id="login-email" type="email" name="email" required autocomplete="email" />
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" name="password" required autocomplete="current-password" />
+        <button type="submit">Open workspace</button>
+        <div id="err" class="err" aria-live="polite"></div>
+      </form>
+      <p class="links"><a href="/platform/forgot-password">Forgot password?</a></p>
+      <p class="links"><a href="/platform">← Back to platform</a></p>
+    </div>
+  </div>
+  <script__NONCE_ATTR__>
+    async function readApiResponse(res) {
+      const text = await res.text();
+      if (!text) return {};
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return { detail: text || res.statusText || 'Request failed' };
+      }
+    }
+
+    const form = document.getElementById('login-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const res = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: fd.get('email'), password: fd.get('password') }),
+      });
+      const data = await readApiResponse(res);
+      if (!res.ok) { document.getElementById('err').textContent = data.detail || 'Login failed'; return; }
+      location.href = '/platform/dashboard';
+    });
+  </script>
+</body>
+</html>

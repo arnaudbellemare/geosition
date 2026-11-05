@@ -1,0 +1,47 @@
+# ─── GEO Optimizer Web — Docker image per Railway ──────────────────────────
+# Avvia il server FastAPI per servire l'API di audit
+#
+# Build:  docker build -f Dockerfile.web -t geo-optimizer-web .
+# Run:    docker run -p 8000:8000 geo-optimizer-web
+
+# ─── Stage 1: build ─────────────────────────────────────────────────────────
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+COPY pyproject.toml README.md ./
+COPY src/ src/
+
+# Installa con le dipendenze web + pdf (FastAPI + uvicorn + weasyprint)
+RUN pip install --no-cache-dir --prefix=/install ".[web,pdf]"
+
+# ─── Stage 2: runtime ───────────────────────────────────────────────────────
+FROM python:3.12-slim
+
+LABEL org.opencontainers.image.title="GEO Optimizer Web API" \
+      org.opencontainers.image.description="FastAPI audit service for GEO Score" \
+      org.opencontainers.image.source="https://github.com/arnaudbellemare/geosition"
+
+COPY --from=builder /install /usr/local
+
+# Certificati SSL + dipendenze di sistema per weasyprint (libpango, libcairo)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Utente non-root
+RUN useradd --create-home --shell /bin/bash geo
+USER geo
+WORKDIR /home/geo
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+ENV PORT=8000
+EXPOSE 8000
+
+# Avvia il server FastAPI — usa $PORT da variabile d'ambiente
+# per compatibilità con Render, Railway e altri PaaS che iniettano la porta
+# Shell form necessaria per espansione variabile $PORT
+CMD ["sh", "-c", "uvicorn geo_optimizer.web.app:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Rebuild trigger: v3.17.14

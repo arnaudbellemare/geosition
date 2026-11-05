@@ -1,0 +1,230 @@
+"""
+GEO scoring engine — computes the 0-100 score from SCORING weights.
+
+Separated from audit.py to enable extensibility, scoring override
+and per-category breakdown (v4.0).
+"""
+
+from __future__ import annotations
+
+import logging
+
+from geo_optimizer.models.config import (
+    CONTENT_MIN_WORDS,
+    LLMS_DEPTH_HIGH_WORDS,
+    LLMS_DEPTH_WORDS,
+    META_DESC_MAX_LEN,
+    META_DESC_MIN_LEN,
+    META_TITLE_MAX_LEN,
+    META_TITLE_MIN_LEN,
+    ROBOTS_PARTIAL_SCORE,
+    SCORE_BANDS,
+    SCORING,
+)
+
+_logger = logging.getLogger(__name__)
+
+
+def category_max_score(category: str) -> int:
+    """Return the configured maximum score for an audit category."""
+    if category == "brand_entity":
+        prefix = "brand_"
+    else:
+        prefix = f"{category}_"
+    return sum(value for key, value in SCORING.items() if key.startswith(prefix))
+
+
+CATEGORY_MAX_SCORES: dict[str, int] = {
+    "robots": category_max_score("robots"),
+    "llms": category_max_score("llms"),
+    "schema": category_max_score("schema"),
+    "meta": category_max_score("meta"),
+    "content": category_max_score("content"),
+    "signals": category_max_score("signals"),
+    "ai_discovery": category_max_score("ai_discovery"),
+    "brand_entity": category_max_score("brand_entity"),
+}
+
+
+def compute_geo_score(robots, llms, schema, meta, content, signals=None, ai_discovery=None, brand_entity=None) -> int:
+    """Compute the GEO score 0-100 from SCORING weights (v4.0)."""
+    breakdown = compute_score_breakdown(robots, llms, schema, meta, content, signals, ai_discovery, brand_entity)
+    total = sum(breakdown.values())
+    # Fix #316: report overflow to detect misalignments in SCORING weights
+    if total > 100:
+        _logger.warning("Score overflow: %d > 100 (check SCORING weights)", total)
+    # Fix M-5: floor guard — score can never go negative
+    return max(0, min(total, 100))
+
+
+def compute_score_breakdown(
+    robots, llms, schema, meta, content, signals=None, ai_discovery=None, brand_entity=None
+) -> dict[str, int]:
+    """Return the score breakdown by category."""
+    return {
+        "robots": _score_robots(robots),
+        "llms": _score_llms(llms),
+        "schema": _score_schema(schema),
+        "meta": _score_meta(meta),
+        "content": _score_content(content),
+        "signals": _score_signals(signals) if signals is not None else 0,
+        "ai_discovery": _score_ai_discovery(ai_discovery) if ai_discovery is not None else 0,
+        "brand_entity": _score_brand_entity(brand_entity) if brand_entity is not None else 0,
+    }
+
+
+def get_score_band(score: int) -> str:
+    """Return the score band name from SCORE_BANDS."""
+    for band_name, (low, high) in SCORE_BANDS.items():
+        if low <= score <= high:
+            return band_name
+    return "critical"
+
+
+def _score_robots(robots) -> int:
+    """Compute the robots.txt score."""
+    if not robots.found:
+        return 0
+    s = SCORING["robots_found"]
+    if robots.citation_bots_ok:
+        if robots.citation_bots_explicit:
+            # Full score: citation bots explicitly allowed
+            s += SCORING["robots_citation_ok"]
+        else:
+            # Allowed only via wildcard: partial score
+            s += ROBOTS_PARTIAL_SCORE
+    elif robots.bots_allowed:
+        s += ROBOTS_PARTIAL_SCORE
+    return s
+
+
+def _score_llms(llms) -> int:
+    """Compute the llms.txt score with graduated quality."""
+    if not llms.found:
+        return 0
+    s = SCORING["llms_found"]
+    s += SCORING["llms_h1"] if llms.has_h1 else 0
+    s += SCORING.get("llms_blockquote", 1) if getattr(llms, "has_blockquote", False) else 0
+    s += SCORING["llms_sections"] if llms.has_sections else 0
+    s += SCORING["llms_links"] if llms.has_links else 0
+    s += SCORING["llms_depth"] if llms.word_count >= LLMS_DEPTH_WORDS else 0
+    s += SCORING["llms_depth_high"] if llms.word_count >= LLMS_DEPTH_HIGH_WORDS else 0
+    s += SCORING["llms_full"] if llms.has_full else 0
+    # v4.14: coverage quality — at least 3 of 5 important page types linked
+    if getattr(llms, "coverage_score", 0) >= 60:
+        s += SCORING.get("llms_coverage", 0)
+    return s
+
+
+def _score_schema(schema) -> int:
+    """Compute the JSON-LD schema score.
+
+    Schema richness (Growth Marshal Feb 2026): a schema with only @type + name + url
+    is generic and unhelpful. A schema with 5+ relevant attributes → full points.
+    """
+    s = SCORING["schema_any_valid"] if schema.any_schema_found else 0
+    # Schema richness: rewards rich attribute schemas, penalizes generic ones
+    # Fix #394: intermediate step for richness (avg >= 4 → 2pt)
+    # Fix M-5: floor guard on richness score
+    s += max(0, min(schema.schema_richness_score, SCORING["schema_richness"]))
+    s += SCORING["schema_faq"] if schema.has_faq else 0
+    s += SCORING["schema_article"] if schema.has_article else 0
+    s += SCORING["schema_organization"] if schema.has_organization else 0
+    s += SCORING["schema_website"] if schema.has_website else 0
+    s += SCORING["schema_sameas"] if schema.has_sameas else 0
+    return int(s)
+
+
+def _score_meta(meta) -> int:
+    """Compute the meta tag score."""
+    s = SCORING["meta_title"] if meta.has_title else 0
+    s += SCORING["meta_description"] if meta.has_description else 0
+    s += SCORING["meta_canonical"] if meta.has_canonical else 0
+    s += SCORING["meta_og"] if (meta.has_og_title and meta.has_og_description) else 0
+    # Twitter Card: both twitter:card and twitter:title present
+    if getattr(meta, "has_twitter_card", False) and getattr(meta, "has_twitter_title", False):
+        s += SCORING.get("meta_twitter", 0)
+    # Title length penalty: deduct 1pt when outside 40–60 char sweet-spot
+    tl = meta.title_length
+    if meta.has_title and not (META_TITLE_MIN_LEN <= tl <= META_TITLE_MAX_LEN):
+        s = max(0, s - 1)
+    # Description length penalty: deduct 1pt when outside 120–160 char sweet-spot
+    dl = meta.description_length
+    if meta.has_description and not (META_DESC_MIN_LEN <= dl <= META_DESC_MAX_LEN):
+        s = max(0, s - 1)
+    return s
+
+
+def _score_content(content) -> int:
+    """Compute the content quality score."""
+    s = SCORING["content_h1"] if content.has_h1 else 0
+    # H1 uniqueness: multiple H1 tags is an SEO defect — deduct the H1 point
+    if getattr(content, "h1_count", 1) > 1:
+        s = max(0, s - SCORING["content_h1"])
+    s += SCORING["content_numbers"] if content.has_numbers else 0
+    s += SCORING["content_links"] if content.has_links else 0
+    s += SCORING["content_word_count"] if content.word_count >= CONTENT_MIN_WORDS else 0
+    s += SCORING["content_heading_hierarchy"] if content.has_heading_hierarchy else 0
+    s += SCORING["content_lists_or_tables"] if content.has_lists_or_tables else 0
+    s += SCORING["content_front_loading"] if content.has_front_loading else 0
+    # v4.14: stable anchors (≥50% of h2/h3 have id=)
+    if getattr(content, "heading_id_ratio", 0.0) >= 0.5:
+        s += SCORING.get("content_heading_ids", 0)
+    # v4.14: definition-first opening paragraph
+    if getattr(content, "has_definition_first", False):
+        s += SCORING.get("content_definition_first", 0)
+    return s
+
+
+def _score_signals(signals) -> int:
+    """Compute the technical signals score (v4.0)."""
+    if signals is None:
+        return 0
+    s = SCORING["signals_lang"] if signals.has_lang else 0
+    s += SCORING["signals_rss"] if signals.has_rss else 0
+    s += SCORING["signals_freshness"] if signals.has_freshness else 0
+    return s
+
+
+def _score_ai_discovery(ai_discovery) -> int:
+    """Compute the AI discovery score (geo-checklist.dev standard)."""
+    if ai_discovery is None:
+        return 0
+    s = SCORING["ai_discovery_well_known"] if ai_discovery.has_well_known_ai else 0
+    s += SCORING["ai_discovery_summary"] if ai_discovery.has_summary and ai_discovery.summary_valid else 0
+    s += SCORING["ai_discovery_faq"] if ai_discovery.has_faq else 0
+    s += SCORING["ai_discovery_service"] if ai_discovery.has_service else 0
+    return s
+
+
+def _score_brand_entity(brand_entity) -> int:
+    """Compute the Brand & Entity score (v4.3)."""
+    if brand_entity is None:
+        return 0
+    s = 0
+    # Entity Coherence (3 points total = 2pt name + 1pt description)
+    # Fix #410: use explicit values instead of SCORING[key] - 1
+    if brand_entity.brand_name_consistent:
+        s += 2
+    if brand_entity.schema_desc_matches_meta:
+        s += 1
+    # Knowledge Graph Readiness (3 points)
+    pillars = brand_entity.kg_pillar_count
+    if pillars >= 3:
+        s += SCORING["brand_kg_readiness"]  # 3pt
+    elif pillars >= 2:
+        s += 2
+    elif pillars >= 1:
+        s += 1
+    # About/Contact (2 points)
+    if brand_entity.has_about_link:
+        s += 1
+    if brand_entity.has_contact_info:
+        s += 1
+    # Geographic Identity (1 point)
+    if brand_entity.has_geo_schema or brand_entity.has_hreflang:
+        s += SCORING["brand_geo_identity"]
+    # Topic Authority (1 point)
+    if brand_entity.faq_depth >= 3 or brand_entity.has_recent_articles:
+        s += SCORING["brand_topic_authority"]
+    return s

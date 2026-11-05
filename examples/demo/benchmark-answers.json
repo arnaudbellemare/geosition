@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "target_domain": "example.com",
+  "collection_run_id": "fictional-demo",
+  "answers": [
+    {
+      "prompt_id": "vendor-selection",
+      "query_text": "Which example provider should I compare?",
+      "query_class": "vendor_selection",
+      "answer_text": "Fictional demo answer: compare Example at https://example.com/services with other providers.",
+      "provider": "perplexity",
+      "surface": "perplexity_sonar",
+      "model": "demo",
+      "collection_mode": "manual",
+      "parse_confidence": 1.0,
+      "keyword_topic": "example services",
+      "citations": [
+        {"url": "https://example.com/services", "domain": "example.com", "position": 1}
+      ]
+    },
+    {
+      "prompt_id": "pricing-comparison",
+      "query_text": "How do example service plans compare?",
+      "query_class": "pricing",
+      "answer_text": "Fictional demo answer: see https://example.com/pricing for an example pricing page.",
+      "provider": "chatgpt",
+      "surface": "brightdata_chatgpt",
+      "model": "demo",
+      "collection_mode": "manual",
+      "parse_confidence": 1.0,
+      "citations": [
+        {"url": "https://example.com/pricing", "domain": "example.com", "position": 1}
+      ]
+    }
+  ]
+}

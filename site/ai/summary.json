@@ -1,0 +1,20 @@
+{
+  "name": "GEOSITION Documentation",
+  "description": "Complete documentation for GEOSITION \u2014 the source-available toolkit to audit, fix, and optimize websites for AI search engine visibility. Covers CLI commands, MCP server, CI/CD integration, 47 citability methods, and 27 AI bot configurations across 8 scoring categories.",
+  "url": "https://arnaudbellemare.github.io/geosition/",
+  "lastModified": "2026-04-03",
+  "category": "Developer Documentation",
+  "topics": [
+    "Generative Engine Optimization",
+    "AI search visibility",
+    "robots.txt for AI bots",
+    "llms.txt specification",
+    "JSON-LD schema markup",
+    "MCP server integration",
+    "CI/CD pipeline integration"
+  ],
+  "author": {
+    "name": "Arnaud Bellemare",
+    "url": "https://github.com/arnaudbellemare"
+  }
+}

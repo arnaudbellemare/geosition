@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "meta": {
+    "description": "Prioritized issues with evidence, rollback, and explicit GEO/scaled-content risk for humans and CI."
+  },
+  "issues": [
+    {
+      "id": "AUDIT-001",
+      "priority": "P2",
+      "title": "Replace this row with the first real prioritized issue from your site audit",
+      "evidence": "Point to GSC URL inspection, log snippet, or HTML fragment — never fabricated numbers.",
+      "rollback": "Revert Git deploy SHA or toggle documented in PR — specify.",
+      "geo_scaled_content_risk": "low"
+    }
+  ]
+}

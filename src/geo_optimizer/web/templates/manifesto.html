@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The GEOSITION Manifesto — Why AI Search Visibility Should Be Open</title>
+<meta name="description" content="Why AI search visibility should be auditable, open, and accessible to every website on the internet. The GEOSITION Manifesto.">
+<link rel="canonical" href="https://geositionai.com/manifesto">
+<meta property="og:title" content="The GEOSITION Manifesto">
+<meta property="og:description" content="Why AI search visibility should be auditable, open, and accessible to every website on the internet.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://geositionai.com/manifesto">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06080f;--bg-card:#0d1117;--bg-card-hover:#111820;
+  --border:#1b2332;--border-hover:#2d3a4f;
+  --text:#e2e8f0;--text-dim:#64748b;--text-muted:#475569;
+  --accent:#3b82f6;--accent2:#8b5cf6;
+  --green:#22c55e;--cyan:#06b6d4;--yellow:#eab308;--red:#ef4444;
+  --radius:12px;--radius-sm:8px;
+  --font:'DM Sans',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+a{color:var(--accent);text-decoration:none;transition:color .2s}
+a:hover{color:var(--accent2)}
+code{font-family:var(--mono);font-size:.85em;background:#1e293b;padding:.15em .4em;border-radius:4px}
+
+/* Grain overlay */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  opacity:.03;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* Glow orbs */
+.glow-orb{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+.glow-orb.blue{width:500px;height:500px;background:rgba(59,130,246,.07);top:-150px;left:-150px}
+.glow-orb.purple{width:400px;height:400px;background:rgba(139,92,246,.06);bottom:-50px;right:-100px}
+
+/* ─── Layout ─── */
+.wrapper{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:2rem 1.5rem}
+
+/* ─── Professional Nav ─── */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;margin-bottom:2.5rem;background:rgba(6,8,15,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);border-radius:0 0 var(--radius-sm) var(--radius-sm)}
+.nav-logo{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:.95rem;color:var(--text);white-space:nowrap;text-decoration:none}
+.nav-logo .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 6px var(--green)}
+.nav-logo .ver{font-family:var(--mono);font-size:.65rem;color:var(--accent);background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);padding:.1rem .4rem;border-radius:20px;margin-left:.25rem}
+.nav-links{display:flex;align-items:center;gap:1.75rem}
+.nav-links a{color:var(--text-dim);font-size:.82rem;font-weight:500;letter-spacing:.02em;transition:color .2s;white-space:nowrap;text-decoration:none}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-sep{width:1px;height:16px;background:var(--border);flex-shrink:0}
+.nav-dropdown{position:relative}
+.nav-dropdown-toggle{display:flex;align-items:center;gap:.3rem;color:var(--text-dim);font-size:.82rem;font-weight:500;letter-spacing:.02em;cursor:pointer;transition:color .2s;white-space:nowrap;background:none;border:none;font-family:inherit;padding:0}
+.nav-dropdown-toggle:hover,.nav-dropdown.open .nav-dropdown-toggle{color:var(--text)}
+.nav-dropdown-toggle svg{width:10px;height:10px;fill:currentColor;transition:transform .2s}
+.nav-dropdown.open .nav-dropdown-toggle svg{transform:rotate(180deg)}
+.nav-dropdown-menu{display:none;position:absolute;top:calc(100% + .75rem);right:0;min-width:160px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.35rem;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.nav-dropdown.open .nav-dropdown-menu{display:block}
+.nav-dropdown-menu a{display:block;padding:.5rem .75rem;color:var(--text-dim);font-size:.82rem;font-weight:500;border-radius:6px;transition:all .15s;text-decoration:none}
+.nav-dropdown-menu a:hover{color:var(--text);background:var(--bg-card-hover)}
+.nav-dropdown-menu a.active{color:var(--text)}
+.nav-cta{display:flex;align-items:center;gap:.4rem;color:var(--text-dim);font-size:.82rem;font-weight:500;border:1px solid var(--border);padding:.35rem .75rem;border-radius:20px;transition:all .2s;white-space:nowrap;text-decoration:none}
+.nav-cta:hover{color:var(--text);border-color:var(--border-hover)}
+.nav-cta svg{width:14px;height:14px;fill:currentColor;flex-shrink:0}
+.nav-cta .star-count{font-family:var(--mono);font-size:.75rem}
+.nav-hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .5rem;border-radius:6px;cursor:pointer;font-size:1.1rem;line-height:1;transition:all .2s}
+.nav-hamburger:hover{border-color:var(--border-hover);color:var(--text)}
+@media(max-width:768px){
+  nav{flex-wrap:wrap;gap:.5rem;padding:.6rem .75rem}
+  .nav-links{display:none;width:100%;flex-direction:column;gap:0;border-top:1px solid var(--border);padding-top:.5rem;margin-top:.25rem}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:.55rem .25rem;border-bottom:1px solid var(--border);font-size:.9rem}
+  .nav-links a:last-child{border-bottom:none}
+  .nav-sep{display:none}
+  .nav-dropdown{width:100%}
+  .nav-dropdown-toggle{padding:.55rem .25rem;border-bottom:1px solid var(--border);font-size:.9rem;width:100%}
+  .nav-dropdown-menu{position:static;border:none;box-shadow:none;background:transparent;padding:0 0 0 1rem;display:none}
+  .nav-dropdown.open .nav-dropdown-menu{display:block}
+  .nav-dropdown-menu a{padding:.45rem .25rem;border-bottom:1px solid var(--border);border-radius:0}
+  .nav-hamburger{display:block}
+  .nav-logo .ver{display:none}
+  .nav-cta .star-count{display:none}
+}
+@media(max-width:480px){
+  .nav-cta span:not(.star-count){font-size:.8rem}
+}
+
+/* ─── Hero ─── */
+.hero{text-align:center;margin-bottom:4rem;padding:2rem 0}
+.hero-eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;opacity:.8}
+.hero h1{font-size:3.2rem;font-weight:700;letter-spacing:-.04em;line-height:1.1;
+  background:linear-gradient(135deg,#60a5fa 0%,#a78bfa 50%,#60a5fa 100%);
+  background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 5s ease infinite;margin-bottom:1.25rem}
+@keyframes shimmer{0%,100%{background-position:0% center}50%{background-position:200% center}}
+.hero-sub{color:var(--text-dim);font-size:1.15rem;line-height:1.65;max-width:560px;margin:0 auto}
+
+/* ─── Table of contents ─── */
+.toc{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:3rem}
+.toc-title{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.75rem}
+.toc ol{padding-left:1.25rem;color:var(--text-dim);font-size:.85rem;line-height:2}
+.toc a{color:var(--text-dim);transition:color .2s}
+.toc a:hover{color:var(--accent)}
+
+/* ─── Sections ─── */
+section{margin-bottom:4rem}
+section h2{font-size:1.6rem;font-weight:700;letter-spacing:-.025em;margin-bottom:1.5rem;
+  padding-bottom:.75rem;border-bottom:1px solid var(--border);color:var(--text)}
+.section-num{font-family:var(--mono);font-size:.75rem;color:var(--accent);display:block;margin-bottom:.25rem;letter-spacing:.08em}
+section p{color:var(--text-dim);line-height:1.75;margin-bottom:1.1rem;font-size:.97rem}
+section p:last-child{margin-bottom:0}
+
+/* ─── Blockquote ─── */
+blockquote{border-left:3px solid var(--accent);padding:.75rem 1.25rem;margin:1.5rem 0;background:rgba(59,130,246,.04);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+blockquote p{color:var(--text);font-size:1rem;font-style:italic;margin-bottom:0}
+
+/* ─── Principle Cards ─── */
+.principles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;margin-top:1.5rem}
+.principle-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:border-color .2s}
+.principle-card:hover{border-color:var(--border-hover)}
+.principle-card h3{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem}
+.principle-card h3::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.principle-card p{color:var(--text-dim);font-size:.87rem;line-height:1.65;margin-bottom:0}
+
+/* ─── Signals Table ─── */
+.signals-grid{display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem}
+.signal-row{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;display:grid;grid-template-columns:180px 1fr;gap:1rem;align-items:start;transition:border-color .2s}
+.signal-row:hover{border-color:var(--border-hover)}
+.signal-meta{display:flex;flex-direction:column;gap:.35rem}
+.signal-name{font-weight:700;font-size:.95rem;color:var(--text)}
+.signal-pts{font-family:var(--mono);font-size:.75rem;padding:.2rem .5rem;border-radius:20px;display:inline-block;width:fit-content}
+.signal-pts.high{color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)}
+.signal-pts.med{color:var(--yellow);background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.2)}
+.signal-pts.low{color:var(--cyan);background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2)}
+.signal-desc{color:var(--text-dim);font-size:.87rem;line-height:1.65}
+
+/* ─── Audience List ─── */
+.audience-list{list-style:none;display:flex;flex-direction:column;gap:.85rem;margin-top:1rem}
+.audience-list li{display:flex;align-items:flex-start;gap:.75rem;color:var(--text-dim);font-size:.95rem;line-height:1.65}
+.audience-list li::before{content:'→';color:var(--accent);font-family:var(--mono);flex-shrink:0;margin-top:.05em}
+
+/* ─── Commitments ─── */
+.commitments{display:flex;flex-direction:column;gap:1rem;margin-top:1rem}
+.commitment{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:0 var(--radius) var(--radius) 0;padding:1.1rem 1.25rem}
+.commitment strong{color:var(--text);font-size:.95rem;display:block;margin-bottom:.35rem}
+.commitment p{color:var(--text-dim);font-size:.87rem;line-height:1.65;margin-bottom:0}
+
+/* ─── Bottom Line ─── */
+.bottom-line{background:linear-gradient(135deg,rgba(59,130,246,.06),rgba(139,92,246,.06));border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem 2rem;text-align:center;margin-bottom:3rem}
+.bottom-line p{color:var(--text-dim);line-height:1.75;margin-bottom:1rem;font-size:.97rem;max-width:600px;margin-inline:auto}
+.bottom-line p:last-of-type{margin-bottom:0}
+.bottom-line .conclusion{font-size:1.05rem;color:var(--text);font-style:italic;margin-top:1.5rem}
+
+/* ─── Footer ─── */
+footer{text-align:center;padding:2rem 0 1rem;border-top:1px solid var(--border);
+  margin-top:2rem;color:var(--text-muted);font-size:.8rem}
+footer .links{display:flex;justify-content:center;gap:1.25rem;margin-bottom:.75rem;flex-wrap:wrap}
+footer .links a{color:var(--text-muted);font-size:.8rem}
+footer .credit{font-size:.72rem;color:var(--text-muted)}
+
+/* ─── Responsive ─── */
+@media(max-width:600px){
+  .wrapper{padding:1.25rem 1rem}
+  .hero h1{font-size:2.2rem}
+  .hero-sub{font-size:1rem}
+  .principles-grid{grid-template-columns:1fr}
+  .signal-row{grid-template-columns:1fr;gap:.5rem}
+  section h2{font-size:1.3rem}
+  .bottom-line{padding:1.5rem 1rem}
+}
+</style>
+
+<!-- Schema JSON-LD: WebSite (root entity) -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"GEOSITION","url":"https://geositionai.com","description":"Source-available toolkit to audit and optimize websites for AI search engine visibility.","author":{"@type":"Organization","name":"Arnaud Bellemare","url":"https://github.com/arnaudbellemare","sameAs":["https://github.com/arnaudbellemare","https://pypi.org/project/geosition/","https://www.linkedin.com/in/arnaudbellemare/","https://www.linkedin.com/company/arnaudbellemare","https://www.crunchbase.com/organization/arnaudbellemare"],"contactPoint":{"@type":"ContactPoint","contactType":"technical support","email":"asapbellemare@gmail.com","url":"https://github.com/arnaudbellemare/geosition/issues"},"address":{"@type":"PostalAddress","addressCountry":"IT"}},"potentialAction":{"@type":"SearchAction","target":"https://geositionai.com/?url={url}","query-input":"required name=url"}}
+</script>
+<!-- Schema JSON-LD: WebPage -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"The GEOSITION Manifesto","url":"https://geositionai.com/manifesto","description":"Why AI search visibility should be auditable, open, and accessible to every website on the internet.","isPartOf":{"@type":"WebSite","name":"GEOSITION","url":"https://geositionai.com"},"author":{"@type":"Organization","name":"Arnaud Bellemare","url":"https://github.com/arnaudbellemare"},"datePublished":"2026-03-28","dateModified":"2026-03-30","inLanguage":"en"}
+</script>
+<!-- Schema JSON-LD: FAQPage -->
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is GEOSITION?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is a source-available toolkit that audits websites for AI search engine visibility. It scores sites 0-100 based on 8 categories and 48 research-backed methods, covering robots.txt, llms.txt, Schema JSON-LD, meta tags, content quality, technical signals, AI discovery, and brand entity signals."}},{"@type":"Question","name":"Why does AI search visibility matter?","acceptedAnswer":{"@type":"Answer","text":"AI search engines like ChatGPT, Perplexity, and Claude synthesize answers from cited sources. Sites not optimized for AI visibility are invisible in these answers. Princeton KDD 2024 research shows source citations increase AI visibility by 27-115%, statistics by 33%, and authoritative tone by 29%."}},{"@type":"Question","name":"How is GEOSITION licensed?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is source available under the GEOSITION license. Install with: pip install geosition. The scoring rubric, algorithms, and all weights are publicly documented."}},{"@type":"Question","name":"What websites does GEOSITION work with?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION works with any publicly accessible URL regardless of the underlying technology. It audits the HTTP response that AI engines see, so it works with static sites, WordPress, Next.js, custom backends, headless architectures, and anything else that responds to HTTP requests."}}]}
+</script>
+<!-- GEO: RSS feed discovery -->
+<link rel="alternate" type="application/rss+xml" title="GEOSITION Releases" href="https://github.com/arnaudbellemare/geosition/releases.atom">
+</head>
+<body>
+<div class="glow-orb blue"></div>
+<div class="glow-orb purple"></div>
+
+<div class="wrapper">
+  <nav>
+    <div class="nav-logo">
+      <span class="dot"></span>
+      <span>GEOSITION</span>
+      <span class="ver" id="nav-ver">v4.0.0</span>
+    </div>
+    <button class="nav-hamburger" id="nav-ham" aria-label="Menu">&#9776;</button>
+    <div class="nav-links">
+      <a href="/">Audit</a>
+      <a href="/compare">Compare</a>
+      <a href="https://arnaudbellemare.github.io/geosition/">Docs</a>
+      <span class="nav-sep"></span>
+      <div class="nav-dropdown">
+        <button class="nav-dropdown-toggle" aria-expanded="false">More <svg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="nav-dropdown-menu">
+          <a href="/research">Research</a>
+          <a href="/roadmap">Roadmap</a>
+          <a href="/manifesto" class="active">Manifesto</a>
+        </div>
+      </div>
+    </div>
+    <a class="nav-cta" href="https://github.com/arnaudbellemare/geosition" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" fill="currentColor"/></svg>
+      GitHub
+      <span class="star-count" id="nav-stars"></span>
+    </a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">Source Available · Research-Backed · Developer-First</div>
+    <h1>The GEOSITION<br>Manifesto</h1>
+    <p class="hero-sub">Why AI search visibility should be auditable, open, and accessible to every website on the internet.</p>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <ol>
+      <li><a href="#s1">The web changed. Most websites don't know it yet.</a></li>
+      <li><a href="#s2">The visibility gap is a tooling problem.</a></li>
+      <li><a href="#s3">What GEOSITION stands for.</a></li>
+      <li><a href="#s4">The eight signals that determine AI visibility.</a></li>
+      <li><a href="#s4b">Beyond the score: what no competitor tells you.</a></li>
+      <li><a href="#s5">Who this is for.</a></li>
+      <li><a href="#s6">What we commit to.</a></li>
+      <li><a href="#s7">The bottom line.</a></li>
+    </ol>
+  </div>
+
+  <!-- Section 1 -->
+  <section id="s1">
+    <span class="section-num">01 —</span>
+    <h2 id="the-web-changed-most-websites-don-t-know-it-yet">The web changed. Most websites don't know it yet.</h2>
+    <p>For two decades, search worked the same way. You published content. A crawler indexed it. Users clicked links. The cycle was legible, auditable, understood. An entire ecosystem of tools, agencies, and expertise grew around it — because it was a system you could study and improve.</p>
+    <blockquote><p>That cycle is breaking.</p></blockquote>
+    <p>When someone asks ChatGPT which project management tool to use, they don't see ten blue links. They get a synthesized answer. One or two sources get cited. The rest don't exist. When Perplexity answers a question about the best Python libraries for data science, it doesn't return a SERP — it returns a verdict. When Claude summarizes "the leading GEO optimization tools," it draws from a training corpus and live retrieval that most websites have never been optimized for.</p>
+    <p>This is Generative Engine Optimization. And right now, most of the web is invisible to it.</p>
+    <p>The shift isn't hypothetical. ChatGPT reached 500 million weekly active users in early 2025. Perplexity processes hundreds of millions of queries per month. AI Overviews appear in a significant fraction of Google searches. The number of users receiving their first contact with information through a synthesized AI answer is growing every quarter. Gartner projects that by 2026, traditional search engine volume will drop 25% as AI chatbots capture informational queries.</p>
+    <p>Most websites have never accounted for this.</p>
+  </section>
+
+  <!-- Section 2 -->
+  <section id="s2">
+    <span class="section-num">02 —</span>
+    <h2 id="the-visibility-gap-is-a-tooling-problem">The visibility gap is a tooling problem.</h2>
+    <p>The problem isn't that the signals are unknown. Research from Princeton's NLP group (KDD 2024) was the first to quantify what actually increases AI citation rates: source citations boost visibility by 27–115%. Quotation inclusion adds 41%. Statistical claims add 33%. Fluent, authoritative prose adds 29%. These are measurable effects from a peer-reviewed study on 10,000 queries validated on real Perplexity.ai responses.</p>
+    <p>AutoGEO (ICLR 2026, Carnegie Mellon) went further — using LLM-based rule extraction and reinforcement learning to improve on Princeton's baseline by 50.99%. The research is there. The signals are documented. The <code>llms.txt</code> specification from Answer.AI is published. The <code>geo-checklist.dev</code> standard exists. The path from "invisible" to "cited" is not a mystery.</p>
+    <p>The problem is that most website owners have no idea any of this exists.</p>
+    <p>Enterprise SEO platforms are adding "AI visibility" dashboards. They cost hundreds or thousands of dollars per month. They're built for large marketing teams, not independent developers or small agencies. They're walled gardens: black boxes that produce scores without explaining exactly what signal is missing or what fixing it is worth.</p>
+    <p>Meanwhile, every piece of data these platforms analyze is public. The <code>robots.txt</code> file is accessible to anyone. The JSON-LD schema is in the HTML source. Whether a site allows GPTBot, ClaudeBot, or PerplexityBot can be checked in seconds. Whether a site has a properly structured <code>llms.txt</code>, an <code>/ai/summary.json</code>, a <code>FAQPage</code> schema — all of this is inspectable without a subscription.</p>
+    <blockquote><p>The visibility gap isn't a data problem. It's an access problem. It's a tooling problem.</p></blockquote>
+  </section>
+
+  <!-- Section 3 -->
+  <section id="s3">
+    <span class="section-num">03 —</span>
+    <h2 id="what-geosition-stands-for">What GEOSITION stands for.</h2>
+    <div class="principles-grid">
+      <div class="principle-card">
+        <h3 id="auditability-over-opacity">Auditability over opacity</h3>
+        <p>A score means nothing if you can't verify how it was calculated. Every check in our scoring engine is documented, tied to published research, and open for inspection. When we say Schema JSON-LD is worth 16 points, you can read exactly which signals we measure and why. When we say a site scores 47/100, we tell you exactly which 53 points are missing and precisely what it would take to earn them back.</p>
+      </div>
+      <div class="principle-card">
+        <h3 id="scientific-foundation-over-marketing-claims">Scientific foundation over marketing claims</h3>
+        <p>We don't invent signals. Every check in our engine traces back to empirical research or documented specifications: Princeton KDD 2024, AutoGEO ICLR 2026, the <code>llms.txt</code> spec by Answer.AI, the <code>geo-checklist.dev</code> emerging standard, the established schema.org vocabulary. When we say a signal statistically increases AI citation rates, we cite the paper. When research updates, we update the weights.</p>
+      </div>
+      <div class="principle-card">
+        <h3 id="universality-over-platform-bias">Universality over platform bias</h3>
+        <p>GEOSITION works on any publicly accessible URL, regardless of what technology powers it. It doesn't care if your site runs on a custom Rust backend, a static site generator, a PHP monolith, a headless architecture, or anything in between. The HTTP response is what AI engines see. That's what we audit. The tool has no concept of "supported platforms" — if it responds to an HTTP request, we can audit it.</p>
+      </div>
+      <div class="principle-card">
+        <h3 id="open-source-over-gatekeeping">Transparent tools over gatekeeping</h3>
+        <p>The algorithms are public. The weights are in the source code. The scoring rubric is in the documentation. Every architectural decision, every weight change, every new check is visible in the git history with a commit message explaining the rationale. You can fork this, extend it, integrate it into your CI pipeline, run it against your own infrastructure, and contribute improvements back, subject to the GEOSITION license. Visibility shouldn't require a subscription.</p>
+      </div>
+      <div class="principle-card">
+        <h3 id="precision-over-noise">Precision over noise</h3>
+        <p>An audit that returns 50 vague recommendations helps no one. Every recommendation we surface is concrete, actionable, and tied to a specific score impact. "Add a FAQPage schema: +3 points." "Allow OAI-SearchBot in robots.txt: +13 points." "Create /llms.txt with at least 1,000 words: +4 points." You know exactly what you're getting for the work you do, and you can prioritize by return on effort.</p>
+      </div>
+      <div class="principle-card">
+        <h3 id="developer-experience-as-a-first-class-concern">Developer experience as a first-class concern</h3>
+        <p>The web interface is for discovery. The CLI is where real work happens. JSON output that pipes into other tools. CI integration via <code>geo-action</code>. An MCP server for AI agent workflows. A Python API for custom integrations and monitoring scripts. GEOSITION is built by developers, for developers, with the assumption that a tool only gets used if it fits naturally into an existing workflow.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4 -->
+  <section id="s4">
+    <span class="section-num">04 —</span>
+    <h2 id="the-eight-signals-that-determine-ai-visibility">The eight signals that determine AI visibility.</h2>
+    <div class="signals-grid">
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">robots.txt</span>
+          <span class="signal-pts high">max 18 pts</span>
+        </div>
+        <p class="signal-desc">Are you letting the right crawlers in? OAI-SearchBot, ClaudeBot, Claude-SearchBot, and PerplexityBot are the crawlers that power real-time citations in ChatGPT, Claude, and Perplexity. If they're blocked — explicitly or via an overly restrictive wildcard — you're invisible by default, regardless of how good your content is. This is the most commonly misconfigured signal and the one with the most immediate fix.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">llms.txt</span>
+          <span class="signal-pts high">max 18 pts</span>
+        </div>
+        <p class="signal-desc">The emerging standard for machine-readable site context. Proposed by Answer.AI, <code>llms.txt</code> gives AI agents a structured index of your content, capabilities, and documentation — without requiring them to crawl and parse hundreds of pages. Think of it as <code>sitemap.xml</code> written for language models. Depth matters: a minimal file scores 5 points; a comprehensive, well-structured companion with <code>llms-full.txt</code> earns all 18.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Schema JSON-LD</span>
+          <span class="signal-pts high">max 16 pts</span>
+        </div>
+        <p class="signal-desc">Structured data has always helped search engines. For AI engines, it's how entities, relationships, and facts become machine-readable. FAQPage schema answers questions directly. Article schema signals freshness and authorship. Organization schema establishes legal identity. WebSite schema provides canonical context. The richness of the schema — number of relevant attributes, presence of sameAs knowledge graph links — matters as much as which types are present.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Meta Tags</span>
+          <span class="signal-pts med">max 14 pts</span>
+        </div>
+        <p class="signal-desc">The fundamentals: a descriptive title, a meta description that accurately summarizes the page, a canonical URL to prevent duplicate content confusion, and Open Graph tags so AI agents and social platforms have structured context. These signals have mattered for traditional search for decades. They matter for AI search for the same reason: they're the clearest, most explicit signals of what a page is about.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Content Quality</span>
+          <span class="signal-pts med">max 12 pts</span>
+        </div>
+        <p class="signal-desc">Concrete numbers. External citations. Proper heading hierarchy with H2 and H3. Key information front-loaded in the first 30% of the content. Lists and tables that break up dense prose. Minimum word count that signals substance. The Princeton research is unambiguous: specific, well-structured, citation-ready content gets cited more. Vague, jargon-heavy, poorly organized content gets ignored.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Technical Signals</span>
+          <span class="signal-pts low">max 6 pts</span>
+        </div>
+        <p class="signal-desc">Language declaration on the <code>&lt;html&gt;</code> element. A discoverable RSS or Atom feed. Freshness indicators via <code>dateModified</code> in schema or <code>Last-Modified</code> HTTP headers. Small signals, individually. But they establish context, recency, and trustworthiness — the baseline credibility that AI engines use to decide whether your content is worth referencing.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">AI Discovery</span>
+          <span class="signal-pts low">max 6 pts</span>
+        </div>
+        <p class="signal-desc">The new standard for machine-readable service context: <code>/.well-known/ai.txt</code> for crawler permissions, <code>/ai/summary.json</code> for structured capability descriptions, <code>/ai/faq.json</code> for pre-answered common queries, <code>/ai/service.json</code> for endpoint and feature discovery. These files are to AI agents what <code>robots.txt</code> was to traditional crawlers — a structured handshake between your site and the systems that will reference it.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Brand &amp; Entity Signals</span>
+          <span class="signal-pts med">max 10 pts</span>
+        </div>
+        <p class="signal-desc">AI engines don't just index pages. They build models of entities. Brand name coherence across H1, title, og:title, and schema Organization name is the foundation. Knowledge graph connections via <code>sameAs</code> to Wikipedia, Wikidata, LinkedIn, and Crunchbase establish that your brand is a known, recognized entity, not an unknown string of text. About and contact pages signal that a real organization stands behind the content. Geographic identity and topic authority round out the entity model that AI engines use to decide how much to trust and cite your content.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4b: Beyond the Score -->
+  <section id="s4b">
+    <span class="section-num">04b —</span>
+    <h2 id="beyond-the-score-what-no-competitor-tells-you">Beyond the score: what no competitor tells you.</h2>
+    <p>The 0-100 score is one dimension. But real-world AI visibility depends on factors that aren't easily reducible to points. GEOSITION runs six additional informational checks that surface risks and signals no competitor currently detects:</p>
+    <div class="signals-grid">
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Prompt Injection Detection</span>
+          <span class="signal-pts high">security</span>
+        </div>
+        <p class="signal-desc">Eight patterns of AI manipulation: hidden text via CSS, invisible Unicode characters, direct LLM instructions embedded in content, prompt injection in HTML comments, monochrome cloaking text, micro-font injection, data attribute abuse, and aria-hidden exploitation. Based on UC Berkeley EMNLP 2024 research. Severity: clean, suspicious, or critical.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Trust Stack Score</span>
+          <span class="signal-pts med">5 layers</span>
+        </div>
+        <p class="signal-desc">A composite trust assessment across five dimensions: technical trust (HTTPS, security headers), identity trust (authorship, organization, about page), social trust (sameAs links, testimonials, social profiles), academic trust (citations, statistics, authoritative sources), and consistency trust (no contradictions between title, H1, schema, and meta). Grade A through F.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">Negative Signals</span>
+          <span class="signal-pts high">anti-citation</span>
+        </div>
+        <p class="signal-desc">Eight signals that actively reduce your chances of being cited: excessive CTAs, popup/modal interference, thin content, broken links, keyword stuffing, missing author attribution, high boilerplate ratio, and mixed signals between promise and delivery. Based on UC Berkeley research on what AI engines actively avoid citing.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">CDN Crawler Access</span>
+          <span class="signal-pts low">access</span>
+        </div>
+        <p class="signal-desc">Tests whether Cloudflare, Akamai, Vercel, or other CDN/WAF configurations are silently blocking AI crawlers. Many sites think they allow GPTBot because their robots.txt says so — but their CDN serves a 403 or CAPTCHA to the actual crawler. This check sends requests with real bot User-Agents and compares the responses.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">JS Rendering</span>
+          <span class="signal-pts low">access</span>
+        </div>
+        <p class="signal-desc">Detects whether critical content is only available after JavaScript execution. SPA frameworks (React, Vue, Angular) often render content client-side — invisible to crawlers that don't execute JS. This check compares the raw HTML response against expected content signals and flags framework-specific patterns that indicate JS-dependent rendering.</p>
+      </div>
+      <div class="signal-row">
+        <div class="signal-meta">
+          <span class="signal-name">WebMCP Readiness</span>
+          <span class="signal-pts low">future</span>
+        </div>
+        <p class="signal-desc">Measures how well a site exposes machine-readable context for MCP-compatible AI agents. Checks for <code>registerTool()</code> patterns, <code>toolname</code> attributes, and <code>potentialAction</code> schema. Four readiness levels: none, basic, ready, advanced. This signal anticipates the next generation of AI agents that consume structured context — not just crawled content — before generating responses.</p>
+      </div>
+    </div>
+    <p>These six checks don't add to the score. They surface problems that the score alone can't capture — and that your competitors' tools don't look for at all.</p>
+  </section>
+
+  <!-- Section 5 -->
+  <section id="s5">
+    <span class="section-num">05 —</span>
+    <h2 id="who-this-is-for">Who this is for.</h2>
+    <ul class="audience-list">
+      <li>Every developer who has ever deployed a project and wondered why it doesn't appear in AI-generated answers about the problem it solves.</li>
+      <li>Every agency managing client sites that need to maintain visibility as search behavior fundamentally shifts.</li>
+      <li>Every indie founder who can't afford enterprise SEO tools but understands that organic visibility is existential — and that the rules are changing faster than most people realize.</li>
+      <li>Every technical writer, documentation team, and open source maintainer who wants their work to be cited when AI assistants answer questions their content directly addresses.</li>
+      <li>Every DevOps engineer who wants GEO checks in their CI pipeline — the same way they have linting, security scans, and performance budgets.</li>
+      <li>Every researcher who wants to understand, empirically, what the current state of AI citation mechanics actually is.</li>
+    </ul>
+  </section>
+
+  <!-- Section 6 -->
+  <section id="s6">
+    <span class="section-num">06 —</span>
+    <h2 id="what-we-commit-to">What we commit to.</h2>
+    <div class="commitments">
+      <div class="commitment">
+        <strong>The core tool will remain source available under its license.</strong>
+        <p>Every scoring decision will be documented. Every change to the rubric will appear in the changelog with a rationale. If we're wrong about a signal, we'll say so and update the weights.</p>
+      </div>
+      <div class="commitment">
+        <strong>We'll build for developers first.</strong>
+        <p>That means a CLI that behaves the way CLIs should, JSON output that pipes cleanly, and an API that doesn't require authentication for a basic audit. Complexity lives in the options, not in the defaults.</p>
+      </div>
+      <div class="commitment">
+        <strong>We'll be honest about uncertainty.</strong>
+        <p>GEO is a young field. Some signals that matter today may matter less as AI architectures evolve. Some signals we're not measuring yet may turn out to be critical. We'll update the rubric when the evidence changes, and we'll document why — not quietly recalibrate and hope no one notices.</p>
+      </div>
+      <div class="commitment">
+        <strong>We won't sell audit credits or put core functionality behind a paywall.</strong>
+        <p>The score you see is the real score. The recommendations you see are the real recommendations. Every feature in the paid tier of a competitor should be a feature in the source-available tool.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 7 -->
+  <section id="s7">
+    <span class="section-num">07 —</span>
+    <h2 id="the-bottom-line">The bottom line.</h2>
+    <div class="bottom-line">
+      <p>AI search is the next major shift in how people find, evaluate, and trust information online. The signals that determine visibility in that shift are measurable, documented, and optimizable today.</p>
+      <p>Most of the web doesn't know this yet. That gap won't stay open forever.</p>
+      <p>The sites that act now — that structure their content for citability, make themselves discoverable to AI agents, establish entity coherence and knowledge graph presence — will have a durable advantage when AI search becomes the dominant channel and everyone else starts scrambling.</p>
+      <p>GEOSITION exists to make that preparation practical, transparent, and accessible. Not just to teams with enterprise budgets. To every developer, every agency, every indie founder, every open source maintainer who wants to be visible in the systems that are increasingly mediating how the world finds information.</p>
+      <p>You shouldn't need a subscription to know if your site is being seen.</p>
+      <p class="conclusion"><em>That's why this tool exists. That's what it will keep doing.</em></p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="links">
+      <a href="https://github.com/arnaudbellemare/geosition">GitHub</a>
+      <a href="https://pypi.org/project/geosition/">PyPI</a>
+      <a href="https://arnaudbellemare.github.io/geosition/">Docs</a>
+      <a href="https://github.com/arnaudbellemare">About Arnaud Bellemare</a>
+      <a href="https://github.com/arnaudbellemare/geosition/issues">Issues</a>
+      <a href="/">Run an Audit</a>
+    </div>
+    <div class="credit">GEOSITION is source-available software under the GEOSITION license &middot; Built by Arnaud Bellemare &middot; Powered by Princeton KDD 2024 + AutoGEO ICLR 2026 research</div>
+  </footer>
+</div>
+
+<script__NONCE_ATTR__>
+(function(){
+  fetch('/api/stats').then(function(r){return r.json()}).then(function(d){
+    var el=document.getElementById('nav-stars');
+    if(el&&d.github_stars){el.textContent='★ '+d.github_stars}
+  }).catch(function(){});
+})();
+document.getElementById('nav-ham').addEventListener('click',function(){
+  document.querySelector('.nav-links').classList.toggle('open');
+  this.textContent=this.textContent==='☰'?'✕':'☰';
+});
+document.querySelectorAll('.nav-dropdown-toggle').forEach(function(btn){
+  btn.addEventListener('click',function(e){
+    e.stopPropagation();
+    var dd=this.closest('.nav-dropdown');
+    dd.classList.toggle('open');
+    this.setAttribute('aria-expanded',dd.classList.contains('open'));
+  });
+});
+document.addEventListener('click',function(){
+  document.querySelectorAll('.nav-dropdown.open').forEach(function(dd){
+    dd.classList.remove('open');
+    dd.querySelector('.nav-dropdown-toggle').setAttribute('aria-expanded','false');
+  });
+});
+</script>
+</body>
+</html>
