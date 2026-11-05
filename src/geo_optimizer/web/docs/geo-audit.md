@@ -1,3 +1,5 @@
+> **Scoring update:** Examples and point totals below reflect the previous scoring model. See the [current scoring rubric](scoring-rubric.md). Scores from the two models are not directly comparable.
+
 # GEO Audit
 
 `geo audit` scores your website from 0 to 100 across **8 GEO categories** and tells you exactly what to fix.

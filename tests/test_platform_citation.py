@@ -42,8 +42,8 @@ class TestPlatformCitation:
         for p in result.platforms:
             assert 0 <= p.score <= 100
 
-    def test_gptbot_allowed_boosts_chatgpt(self):
-        robots_with = RobotsResult(bots_allowed=["GPTBot"])
+    def test_searchbot_allowed_boosts_chatgpt(self):
+        robots_with = RobotsResult(bots_allowed=["OAI-SearchBot"])
         robots_without = RobotsResult(bots_allowed=[])
         r_with = audit_platform_citation(**_defaults(robots=robots_with))
         r_without = audit_platform_citation(**_defaults(robots=robots_without))
@@ -51,14 +51,19 @@ class TestPlatformCitation:
         chatgpt_without = next(p for p in r_without.platforms if p.platform == "chatgpt")
         assert chatgpt_with.score > chatgpt_without.score
 
-    def test_llms_txt_boosts_perplexity(self):
+    def test_training_bot_alone_does_not_boost_chatgpt_search(self):
+        with_training = audit_platform_citation(**_defaults(robots=RobotsResult(bots_allowed=["GPTBot"])))
+        without = audit_platform_citation(**_defaults(robots=RobotsResult(bots_allowed=[])))
+        assert with_training.platforms[0].score == without.platforms[0].score
+
+    def test_llms_txt_does_not_change_perplexity_readiness(self):
         llms_with = LlmsTxtResult(found=True, has_links=True)
         llms_without = LlmsTxtResult(found=False)
         r_with = audit_platform_citation(**_defaults(llms=llms_with))
         r_without = audit_platform_citation(**_defaults(llms=llms_without))
         perp_with = next(p for p in r_with.platforms if p.platform == "perplexity")
         perp_without = next(p for p in r_without.platforms if p.platform == "perplexity")
-        assert perp_with.score > perp_without.score
+        assert perp_with.score == perp_without.score
 
     def test_schema_boosts_google_ai(self):
         schema_rich = SchemaResult(any_schema_found=True, schema_richness_score=6, has_website=True)

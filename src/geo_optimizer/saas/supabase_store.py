@@ -79,6 +79,56 @@ class SupabasePlatformStore:
             "Content-Type": "application/json",
         }
 
+    def save_search_connection(self, org_id: int, domain: str, provider: str, property_id: str, encrypted: str) -> None:
+        self._request(
+            "POST",
+            "geo_search_connections",
+            params={"on_conflict": "org_id,domain,provider"},
+            json_body={
+                "org_id": org_id,
+                "domain": domain,
+                "provider": provider,
+                "property_id": property_id,
+                "encrypted_refresh_token": encrypted,
+                "status": "connected",
+                "last_synced_at": None,
+                "last_result_json": "{}",
+            },
+            prefer="resolution=merge-duplicates,return=minimal",
+        )
+
+    def list_search_connections(self, org_id: int | None = None) -> list[dict]:
+        params = {"select": "*", "order": "last_synced_at.asc.nullsfirst", "limit": "100"}
+        if org_id is not None:
+            params["org_id"] = f"eq.{org_id}"
+        return self._request("GET", "geo_search_connections", params=params)
+
+    def update_search_connection(self, org_id: int, domain: str, provider: str, values: dict) -> None:
+        self._request(
+            "PATCH",
+            "geo_search_connections",
+            params={"org_id": f"eq.{org_id}", "domain": f"eq.{domain}", "provider": f"eq.{provider}"},
+            json_body=values,
+            prefer="return=minimal",
+        )
+
+    def delete_search_connection(self, org_id: int, domain: str, provider: str) -> None:
+        self._request(
+            "DELETE",
+            "geo_search_connections",
+            params={"org_id": f"eq.{org_id}", "domain": f"eq.{domain}", "provider": f"eq.{provider}"},
+            prefer="return=minimal",
+        )
+
+    def mark_search_connection_error(self, org_id: int, domain: str, provider: str, at: str) -> None:
+        self._request(
+            "PATCH",
+            "geo_search_connections",
+            params={"org_id": f"eq.{org_id}", "domain": f"eq.{domain}", "provider": f"eq.{provider}"},
+            json_body={"status": "sync_error", "last_synced_at": at},
+            prefer="return=minimal",
+        )
+
     def _request(
         self,
         method: str,

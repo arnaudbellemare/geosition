@@ -1,3 +1,5 @@
+> **Scoring update:** Examples and point totals below reflect the previous scoring model. See the [current scoring rubric](scoring-rubric.md). Scores from the two models are not directly comparable.
+
 # GEOSITION CLI Product Entry
 
 GEOSITION is the product-facing command for the open GEOSITION core. It keeps the audit engine free and local, then layers paid hosted workflow around monitoring, scheduled runs, team access, managed collection, and client-ready reporting.

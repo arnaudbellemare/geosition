@@ -119,6 +119,8 @@ def format_audit_json(result: AuditResult) -> str:
         },
         "score_breakdown": result.score_breakdown,
         "recommendations": result.recommendations,
+        "recommendation_evidence": result.recommendation_evidence,
+        "commerce": result.commerce,
     }
 
     # WebMCP Readiness (#233) — separate informational section
@@ -253,7 +255,7 @@ def format_audit_text(result: AuditResult) -> str:
     lines.append("")
     lines.append(_section_header("2. LLMS.TXT — AI Index File"))
     if not result.llms.found:
-        lines.append("  ❌ llms.txt not found — essential for AI indexing!")
+        lines.append("  ℹ️ llms.txt not found — optional; not required for Google Search.")
     else:
         lines.append(f"  ✅ llms.txt found (~{result.llms.word_count} words)")
         if result.llms.has_h1:
@@ -562,7 +564,7 @@ def format_audit_text(result: AuditResult) -> str:
         "excellent": "🏆 EXCELLENT — Site is well optimized for AI search engines!",
         "good": "✅ GOOD — Core optimizations in place, fine-tune content and schema",
         "foundation": "⚠️  FOUNDATION — Core elements missing, implement priority fixes",
-        "critical": "❌ CRITICAL — Site is not visible to AI search engines",
+        "critical": "❌ CRITICAL — Significant readiness checks need review",
     }
     lines.append(f"\n  {band_labels.get(result.band, result.band)}")
     # Fix #442: generazione dinamica delle bande da SCORE_BANDS (non hardcoded)
@@ -576,7 +578,9 @@ def format_audit_text(result: AuditResult) -> str:
         lines.append("  🎉 Excellent! All main optimizations are implemented.")
     else:
         for i, action in enumerate(result.recommendations, 1):
-            lines.append(f"  {i}. {action}")
+            evidence = result.recommendation_evidence[i - 1] if i <= len(result.recommendation_evidence) else {}
+            level = "provider guidance" if evidence.get("level") == "provider_guidance" else "product heuristic"
+            lines.append(f"  {i}. {action} [{level}]")
 
     lines.append("")
     return "\n".join(lines)

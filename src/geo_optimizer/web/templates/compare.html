@@ -142,7 +142,7 @@ footer a{color:var(--text-muted)}
 <script__NONCE_ATTR__>
 fetch('/api/stats').then(function(r){return r.json()}).then(function(d){var ns=document.getElementById('nav-stars');if(ns&&d.github_stars)ns.textContent='★ '+d.github_stars}).catch(function(){});
 const BANDS={excellent:'#22c55e',good:'#06b6d4',foundation:'#eab308',critical:'#ef4444'};
-const CATS=[{k:'robots',l:'Robots',m:18},{k:'llms',l:'llms.txt',m:18},{k:'schema',l:'Schema',m:16},{k:'meta',l:'Meta',m:14},{k:'content',l:'Content',m:12},{k:'signals',l:'Signals',m:6},{k:'ai_discovery',l:'AI Disc.',m:6},{k:'brand_entity',l:'Brand',m:10}];
+const CATS=[{k:'robots',l:'Robots',m:25},{k:'llms',l:'llms.txt',m:0},{k:'schema',l:'Schema',m:16},{k:'meta',l:'Meta',m:20},{k:'content',l:'Content',m:21},{k:'signals',l:'Signals',m:8},{k:'ai_discovery',l:'AI Disc.',m:0},{k:'brand_entity',l:'Brand',m:10}];
 const $=id=>document.getElementById(id);
 
 $('btn').addEventListener('click',run);
@@ -187,7 +187,7 @@ function render(a,b){
     const bars=document.createElement('div');bars.className='bars';
     const br=d.score_breakdown||{};
     for(const cat of CATS){
-      const v=br[cat.k]||0;const pct=Math.min(v/cat.m*100,100);
+      const v=br[cat.k]||0;const pct=Math.min((cat.m ? v/cat.m*100 : 0),100);
       const row=document.createElement('div');row.className='bar-row';
       const lbl=document.createElement('span');lbl.className='bar-lbl';lbl.textContent=cat.l;
       const track=document.createElement('div');track.className='bar-track';

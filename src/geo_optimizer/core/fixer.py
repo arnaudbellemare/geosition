@@ -1085,9 +1085,7 @@ def _estimate_score_after(result: AuditResult, fixes: list[FixItem]) -> int:
         if result.robots.found:
             current_robots = SCORING["robots_found"]
             if result.robots.citation_bots_ok:
-                current_robots += (
-                    SCORING["robots_citation_ok"] if result.robots.citation_bots_explicit else ROBOTS_PARTIAL_SCORE
-                )
+                current_robots += SCORING["robots_citation_ok"]
             elif result.robots.bots_allowed:
                 current_robots += ROBOTS_PARTIAL_SCORE
         bonus += max_robots - current_robots

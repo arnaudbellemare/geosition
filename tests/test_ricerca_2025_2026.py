@@ -376,24 +376,11 @@ class TestPesiCitability:
         assert "answer_first" in _IMPROVEMENT_SUGGESTIONS
         assert "passage_density" in _IMPROVEMENT_SUGGESTIONS
 
-    def test_pesi_geo_score_invariati(self):
-        """I pesi del GEO score principale NON devono cambiare (v4.0 calibrati).
+    def test_readiness_weights_exclude_optional_discovery_files(self):
+        from geo_optimizer.core.scoring import CATEGORY_MAX_SCORES
 
-        NB: la somma di TUTTI i pesi SCORING > 100 perché include percorsi
-        alternativi (es. robots_some_allowed vs robots_citation_ok).
-        Verifichiamo che i pesi delle singole categorie siano invariati.
-        """
-        # Robots: 18 max (5 + 13)
-        assert SCORING["robots_found"] == 5
-        assert SCORING["robots_citation_ok"] == 13
-        # Meta: 20 max
-        # meta_description ridotta da 8 a 6 per fare spazio a ai_discovery (6 punti)
-        assert (
-            SCORING["meta_title"] + SCORING["meta_description"] + SCORING["meta_canonical"] + SCORING["meta_og"] == 14
-        )
-        # Content: 12 max (v4.3: content_numbers=1, content_links=1)
-        content_keys = [k for k in SCORING if k.startswith("content_")]
-        assert sum(SCORING[k] for k in content_keys) == 12
-        # Signals: 6 max (v4.3: signals_rss=2, signals_freshness=1)
-        signals_keys = [k for k in SCORING if k.startswith("signals_")]
-        assert sum(SCORING[k] for k in signals_keys) == 6
+        assert sum(CATEGORY_MAX_SCORES.values()) == 100
+        assert CATEGORY_MAX_SCORES["robots"] == 25
+        assert CATEGORY_MAX_SCORES["llms"] == 0
+        assert CATEGORY_MAX_SCORES["ai_discovery"] == 0
+        assert CATEGORY_MAX_SCORES["content"] == 21

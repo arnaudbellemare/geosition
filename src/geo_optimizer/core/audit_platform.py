@@ -56,19 +56,12 @@ def _score_chatgpt(robots, llms, content, citability, schema) -> PlatformScore:
     strengths: list[str] = []
     recs: list[str] = []
 
-    # GPTBot access
-    if any(b == "GPTBot" for b in robots.bots_allowed):
+    # Search indexing is independent of GPTBot's model-training purpose.
+    if any(b == "OAI-SearchBot" for b in robots.bots_allowed):
         score += 15
-        strengths.append("GPTBot allowed in robots.txt")
+        strengths.append("OAI-SearchBot allowed in robots.txt")
     else:
-        recs.append("Allow GPTBot in robots.txt")
-
-    # llms.txt
-    if llms.found:
-        score += 15
-        strengths.append("llms.txt present")
-    else:
-        recs.append("Add /llms.txt for LLM-friendly site summary")
+        recs.append("Review OAI-SearchBot access in robots.txt; GPTBot training access is a separate choice")
 
     # FAQ schema (ChatGPT loves Q&A format)
     if schema.has_faq:
@@ -79,12 +72,12 @@ def _score_chatgpt(robots, llms, content, citability, schema) -> PlatformScore:
 
     # Content structure
     if content.has_h1 and content.word_count >= 300:
-        score += 10
+        score += 15
         strengths.append("Well-structured content")
 
     # Citability
     if citability.total_score >= 60:
-        score += 15
+        score += 25
         strengths.append(f"Citability score {citability.total_score}/100")
     elif citability.total_score >= 40:
         score += 8
@@ -122,19 +115,9 @@ def _score_perplexity(robots, llms, content, citability, signals) -> PlatformSco
     else:
         recs.append("Allow PerplexityBot in robots.txt")
 
-    # llms.txt with links (source diversity)
-    if llms.found and llms.has_links:
-        score += 15
-        strengths.append("llms.txt with links")
-    elif llms.found:
-        score += 8
-        recs.append("Add links in llms.txt for source diversity")
-    else:
-        recs.append("Add /llms.txt with links to key resources")
-
     # Citation density (Perplexity values inline citations)
     if citability.total_score >= 70:
-        score += 20
+        score += 30
         strengths.append(f"High citability ({citability.total_score}/100)")
     elif citability.total_score >= 50:
         score += 12
@@ -148,7 +131,7 @@ def _score_perplexity(robots, llms, content, citability, signals) -> PlatformSco
 
     # Content depth
     if content.word_count >= 500:
-        score += 10
+        score += 15
         strengths.append("Substantial content depth")
     elif content.word_count >= 300:
         score += 5
@@ -174,12 +157,12 @@ def _score_google_ai(robots, schema, meta, content, citability, ai_discovery) ->
     strengths: list[str] = []
     recs: list[str] = []
 
-    # Google-Extended access
-    if any(b == "Google-Extended" for b in robots.bots_allowed):
+    # Googlebot controls Search crawling; Google-Extended is a separate choice.
+    if any(b == "Googlebot" for b in robots.bots_allowed):
         score += 10
-        strengths.append("Google-Extended allowed")
+        strengths.append("Googlebot allowed")
     else:
-        recs.append("Allow Google-Extended in robots.txt")
+        recs.append("Review Googlebot access for pages intended for Google Search")
 
     # Schema richness (Google loves structured data)
     if schema.schema_richness_score >= 5:
@@ -193,7 +176,7 @@ def _score_google_ai(robots, schema, meta, content, citability, ai_discovery) ->
 
     # Meta tags (traditional SEO)
     if meta.has_title and meta.has_description and meta.has_canonical:
-        score += 15
+        score += 20
         strengths.append("Complete meta tags")
     else:
         recs.append("Complete title, description, and canonical meta tags")
@@ -212,15 +195,8 @@ def _score_google_ai(robots, schema, meta, content, citability, ai_discovery) ->
 
     # Content quality
     if content.has_h1 and content.word_count >= 300:
-        score += 10
+        score += 15
         strengths.append("Quality content structure")
-
-    # AI discovery endpoints
-    if ai_discovery and ai_discovery.has_well_known_ai:
-        score += 10
-        strengths.append("AI discovery endpoints present")
-    else:
-        recs.append("Add /.well-known/ai.txt for AI discovery")
 
     # sameAs links (domain authority proxy)
     if schema.has_sameas:

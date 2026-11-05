@@ -28,7 +28,7 @@ class MethodEvidence:
 
 @dataclass
 class MethodScore:
-    """Score for a single Princeton GEO method."""
+    """A content heuristic; its score is not a measured citation effect."""
 
     name: str  # "cite_sources"
     label: str  # "Cite Sources"
@@ -37,6 +37,7 @@ class MethodScore:
     max_score: int = 10
     impact: str = ""  # "+27%"
     details: MethodEvidence | Mapping[str, object] = field(default_factory=MethodEvidence)
+    evidence_level: str = "product_heuristic"
 
 
 @dataclass

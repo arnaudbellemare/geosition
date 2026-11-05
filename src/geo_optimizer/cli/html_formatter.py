@@ -107,7 +107,10 @@ def format_audit_html(result: AuditResult) -> str:
     # Recommendations
     recs_html = ""
     if result.recommendations:
-        recs_items = "".join(f"<li>{_escape(r)}</li>" for r in result.recommendations)
+        recs_items = "".join(
+            f"<li>{_escape(rec)} <small>[{('provider guidance' if i < len(result.recommendation_evidence) and result.recommendation_evidence[i].get('level') == 'provider_guidance' else 'product heuristic')}]</small></li>"
+            for i, rec in enumerate(result.recommendations)
+        )
         recs_html = f"""
         <div class="section">
             <h2>Recommendations</h2>

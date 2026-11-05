@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "crons": [{"path": "/api/v1/search-connections/scheduled-sync", "schedule": "0 6 * * *"}],
   "builds": [
     {
       "src": "api/index.py",

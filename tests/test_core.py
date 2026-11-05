@@ -596,7 +596,7 @@ class TestConfig:
 
     def test_scoring_values_are_positive_ints(self):
         # schema_sameas è 0 per retrocompatibilità — migrato a brand_kg_readiness (v4.3)
-        deprecated_zero_keys = {"schema_sameas"}
+        deprecated_zero_keys = {key for key in SCORING if key.startswith(("llms_", "ai_discovery_"))} | {"schema_sameas"}
         for key, val in SCORING.items():
             assert isinstance(val, int), f"SCORING[{key}] should be int"
             if key not in deprecated_zero_keys:
@@ -1332,7 +1332,7 @@ class TestComputeGeoScore:
             MetaResult(),
             ContentResult(),
         )
-        assert score == SCORING["robots_found"] + ROBOTS_PARTIAL_SCORE
+        assert score == SCORING["robots_found"] + SCORING["robots_citation_ok"]
 
     def test_robots_some_allowed(self):
         robots = RobotsResult(found=True, bots_allowed=["GPTBot"], citation_bots_ok=False)

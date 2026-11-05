@@ -87,12 +87,8 @@ def _score_robots(robots) -> int:
         return 0
     s = SCORING["robots_found"]
     if robots.citation_bots_ok:
-        if robots.citation_bots_explicit:
-            # Full score: citation bots explicitly allowed
-            s += SCORING["robots_citation_ok"]
-        else:
-            # Allowed only via wildcard: partial score
-            s += ROBOTS_PARTIAL_SCORE
+        # An applicable wildcard allow is as effective as an explicit rule.
+        s += SCORING["robots_citation_ok"]
     elif robots.bots_allowed:
         s += ROBOTS_PARTIAL_SCORE
     return s

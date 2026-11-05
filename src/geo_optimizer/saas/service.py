@@ -912,6 +912,8 @@ class PlatformService:
             "band": result.band,
             "error": result.error,
             "recommendations": result.recommendations[:15],
+            "recommendation_evidence": result.recommendation_evidence[:15],
+            "commerce": result.commerce,
             "run": asdict(completed) if completed else {},
         }
 
@@ -1910,6 +1912,13 @@ class PlatformService:
             "has_data": True,
             "summary": asdict(summary),
         }
+
+    def require_verified_domain(self, token: str, domain: str) -> str:
+        """Authenticate and return a domain verified by this workspace."""
+        _, org = self.require_session(token)
+        normalized = self._normalize_domain(domain)
+        self._require_verified(org.org_id, normalized)
+        return normalized
 
     def _require_verified(self, org_id: int, domain: str) -> None:
         for record in self.store.list_domains(org_id):

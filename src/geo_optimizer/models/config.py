@@ -137,13 +137,15 @@ AI_BOTS = {
     "ChatGPT-User": "OpenAI (ChatGPT on-demand fetch)",
     # ── Anthropic ───────────────────────────────────────────────────────────
     "anthropic-ai": "Anthropic (Claude training)",
-    "ClaudeBot": "Anthropic (Claude citations)",
+    "ClaudeBot": "Anthropic (model training)",
     "Claude-SearchBot": "Anthropic (Claude search citations)",
+    "Claude-User": "Anthropic (user-directed retrieval)",
     "claude-web": "Anthropic (Claude web crawl)",
     # ── Perplexity ──────────────────────────────────────────────────────────
     "PerplexityBot": "Perplexity AI (index builder)",
     "Perplexity-User": "Perplexity (citation fetch on-demand)",
     # ── Google ──────────────────────────────────────────────────────────────
+    "Googlebot": "Google (Search crawling)",
     "Google-Extended": "Google (Gemini training)",
     "Google-CloudVertexBot": "Google (Vertex AI)",
     # ── Microsoft ───────────────────────────────────────────────────────────
@@ -179,6 +181,7 @@ AI_BOTS = {
 BOT_TIERS = {
     "training": {
         "GPTBot",
+        "ClaudeBot",
         "anthropic-ai",
         "claude-web",
         "Google-Extended",
@@ -195,7 +198,7 @@ BOT_TIERS = {
     },
     "search": {
         "OAI-SearchBot",
-        "ClaudeBot",
+        "Googlebot",
         "Claude-SearchBot",
         "PerplexityBot",
         "Bingbot",
@@ -206,6 +209,7 @@ BOT_TIERS = {
     },
     "user": {
         "ChatGPT-User",
+        "Claude-User",
         "Perplexity-User",
         "Meta-ExternalFetcher",
         "facebookexternalhit",
@@ -213,7 +217,7 @@ BOT_TIERS = {
 }
 
 # Critical citation bots (search-tier, directly cite sources in AI responses)
-CITATION_BOTS = {"OAI-SearchBot", "ClaudeBot", "Claude-SearchBot", "PerplexityBot"}
+CITATION_BOTS = {"OAI-SearchBot", "Claude-SearchBot", "PerplexityBot"}
 
 # ─── Brand normalization ──────────────────────────────────────────────────────
 
@@ -475,20 +479,20 @@ OPTIONAL_CATEGORIES = {"Privacy & Legal", "Terms", "Contact", "Other"}
 # ─── Scoring weights ─────────────────────────────────────────────────────────
 
 SCORING = {
-    # robots.txt — 18 points (was 20)
+    # robots.txt — 25 points; crawler access is separate from training consent.
     "robots_found": 5,
-    "robots_citation_ok": 13,  # was 15
+    "robots_citation_ok": 20,
     # robots_some_allowed: removed from dict, now in ROBOTS_PARTIAL_SCORE (fix #332)
-    # llms.txt — 18 points — graduated quality + coverage
-    "llms_found": 5,
-    "llms_h1": 2,
-    "llms_blockquote": 1,  # blockquote description present
-    "llms_sections": 2,
-    "llms_links": 2,
-    "llms_depth": 1,  # reduced from 2 to make room for coverage
-    "llms_depth_high": 1,  # reduced from 2 to make room for coverage
-    "llms_full": 2,
-    "llms_coverage": 2,  # NEW v4.14: important pages (about/services/pricing/contact/blog) linked
+    # Optional informational checks, not known universal ranking factors.
+    "llms_found": 0,
+    "llms_h1": 0,
+    "llms_blockquote": 0,
+    "llms_sections": 0,
+    "llms_links": 0,
+    "llms_depth": 0,
+    "llms_depth_high": 0,
+    "llms_full": 0,
+    "llms_coverage": 0,
     # Schema JSON-LD — 16 points (was 25) — any valid type + sameAs + richness
     "schema_any_valid": 2,  # any valid JSON-LD schema found (was 5, reduced for richness)
     "schema_richness": 3,  # NEW: schema with 5+ relevant attributes (Growth Marshal 2026)
@@ -499,30 +503,30 @@ SCORING = {
     "schema_sameas": 0,  # was 3, migrated to brand KG — kept at 0 for backward compat
     # Meta tags — 15 points (title 5 + description 2 + canonical 3 + og 4 + twitter 1)
     # Length penalties: -1pt if title outside 40–60 chars; -1pt if description outside 120–160 chars
-    "meta_title": 5,
-    "meta_description": 2,
-    "meta_canonical": 3,
+    "meta_title": 6,
+    "meta_description": 5,
+    "meta_canonical": 4,
     "meta_og": 4,
     "meta_twitter": 1,  # twitter:card + twitter:title both present
     # Content quality — 12 points — structure + extractability checks
-    "content_h1": 2,
+    "content_h1": 3,
     "content_numbers": 1,
-    "content_links": 1,
+    "content_links": 3,
     "content_word_count": 2,
-    "content_heading_hierarchy": 1,  # reduced from 2 to make room
-    "content_lists_or_tables": 2,
-    "content_front_loading": 1,  # reduced from 2 to make room
+    "content_heading_hierarchy": 3,
+    "content_lists_or_tables": 3,
+    "content_front_loading": 3,
     "content_heading_ids": 1,  # NEW v4.14: ≥50% of h2/h3 have id= for section citations
-    "content_definition_first": 1,  # NEW v4.14: opening paragraph answers the topic
+    "content_definition_first": 2,
     # Signals — 6 points (NEW category)
-    "signals_lang": 3,  # NEW: <html lang="...">
+    "signals_lang": 4,
     "signals_rss": 2,  # was 3
-    "signals_freshness": 1,  # was 2
+    "signals_freshness": 2,
     # AI Discovery — 6 points (geo-checklist.dev standard)
-    "ai_discovery_well_known": 2,  # /.well-known/ai.txt present
-    "ai_discovery_summary": 2,  # /ai/summary.json valid
-    "ai_discovery_faq": 1,  # /ai/faq.json present
-    "ai_discovery_service": 1,  # /ai/service.json present
+    "ai_discovery_well_known": 0,
+    "ai_discovery_summary": 0,
+    "ai_discovery_faq": 0,
+    "ai_discovery_service": 0,
     # Brand & Entity — 10 points (NEW category v4.3)
     "brand_entity_coherence": 3,  # name consistent across H1/title/og:title/schema
     "brand_kg_readiness": 3,  # sameAs pointing to Wikipedia/Wikidata/LinkedIn/Crunchbase

@@ -94,6 +94,54 @@ class PlatformStore:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
 
+    def save_search_connection(self, org_id: int, domain: str, provider: str, property_id: str, encrypted: str) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                """INSERT INTO search_connections (org_id, domain, provider, property_id, encrypted_refresh_token)
+                   VALUES (?, ?, ?, ?, ?) ON CONFLICT(org_id, domain, provider) DO UPDATE SET
+                   property_id=excluded.property_id, encrypted_refresh_token=excluded.encrypted_refresh_token,
+                   status='connected', last_synced_at=NULL, last_result_json='{}'""",
+                (org_id, domain, provider, property_id, encrypted),
+            )
+
+    def list_search_connections(self, org_id: int | None = None) -> list[dict]:
+        with self._connect() as conn:
+            if org_id is None:
+                rows = conn.execute("SELECT * FROM search_connections ORDER BY last_synced_at LIMIT 100").fetchall()
+            else:
+                rows = conn.execute("SELECT * FROM search_connections WHERE org_id=?", (org_id,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def update_search_connection(self, org_id: int, domain: str, provider: str, values: dict) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                """UPDATE search_connections SET status=?, last_synced_at=?, last_result_json=?,
+                   encrypted_refresh_token=? WHERE org_id=? AND domain=? AND provider=?""",
+                (
+                    values["status"],
+                    values["last_synced_at"],
+                    values["last_result_json"],
+                    values["encrypted_refresh_token"],
+                    org_id,
+                    domain,
+                    provider,
+                ),
+            )
+
+    def delete_search_connection(self, org_id: int, domain: str, provider: str) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "DELETE FROM search_connections WHERE org_id=? AND domain=? AND provider=?", (org_id, domain, provider)
+            )
+
+    def mark_search_connection_error(self, org_id: int, domain: str, provider: str, at: str) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "UPDATE search_connections SET status='sync_error', last_synced_at=? "
+                "WHERE org_id=? AND domain=? AND provider=?",
+                (at, org_id, domain, provider),
+            )
+
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
@@ -126,6 +174,18 @@ class PlatformStore:
         with self._connect() as conn:
             conn.executescript(
                 """
+                CREATE TABLE IF NOT EXISTS search_connections (
+                    org_id INTEGER NOT NULL,
+                    domain TEXT NOT NULL,
+                    provider TEXT NOT NULL,
+                    property_id TEXT NOT NULL,
+                    encrypted_refresh_token TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'connected',
+                    last_synced_at TEXT,
+                    last_result_json TEXT NOT NULL DEFAULT '{}',
+                    PRIMARY KEY (org_id, domain, provider)
+                );
+
                 CREATE TABLE IF NOT EXISTS platform_users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     email TEXT NOT NULL UNIQUE,

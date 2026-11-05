@@ -129,6 +129,8 @@ class AuditResult:
     aeo: AEOResult = field(default_factory=AEOResult)
     # v4.10: Search Experience Optimization (intent-content alignment)
     sxo: SXOResult = field(default_factory=SXOResult)
+    recommendation_evidence: list[dict[str, str]] = field(default_factory=list)
+    commerce: dict[str, object] = field(default_factory=dict)
 
 
 # ─── Batch audit ─────────────────────────────────────────────────────────────

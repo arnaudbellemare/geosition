@@ -283,6 +283,31 @@
             </div>
           </section>
 
+          <section class="dash-panel audit-panel-large" data-requires-verify>
+            <h2>First-party search data</h2>
+            <p class="msg">Connect a verified website to see its search traffic, refreshed daily. These totals are not AI citation counts.</p>
+            <div>
+              <button type="button" id="connect-google">Connect Google Search Console</button>
+              <button type="button" id="connect-bing">Connect Bing Webmaster Tools</button>
+            </div>
+            <p class="msg" id="search-connections-status" role="status">Verify your website to connect a search account.</p>
+            <div id="search-connections-list"></div>
+            <details><summary>Advanced: fetch with a temporary access token</summary>
+            <p class="msg">For one-time checks, supply a short-lived provider token. It is not saved.</p>
+            <form id="search-measurement-form">
+              <label>Provider <select id="measurement-provider"><option value="google">Google Search Console</option><option value="bing">Bing Webmaster Tools</option></select></label>
+              <label>Verified domain <input id="measurement-domain" placeholder="example.com" required></label>
+              <label>Provider property <input id="measurement-property" placeholder="sc-domain:example.com or https://example.com/" required></label>
+              <label>Access token <input id="measurement-token" type="password" autocomplete="off" required></label>
+              <label>From <input id="measurement-start" type="date" required></label>
+              <label>To <input id="measurement-end" type="date" required></label>
+              <button type="submit">Fetch search data</button>
+            </form>
+            <p class="msg">Bing returns its available traffic history across search surfaces. Google returns web search traffic for the selected dates. <a href="/docs/search-measurement">Setup instructions</a></p>
+            <p id="measurement-result" class="msg" role="status"></p>
+            </details>
+          </section>
+
           <section class="dash-panel audit-panel-large" data-requires-verify id="schema">
             <div class="audit-panel-head">
               <div>
@@ -487,6 +512,92 @@
     function authHeaders() {
       return { 'Content-Type': 'application/json', 'X-CSRF-Token': cookieValue('geo_csrf') };
     }
+    var searchConnectionDomain = '';
+    async function refreshSearchConnections(domain) {
+      searchConnectionDomain = domain || '';
+      var status = document.getElementById('search-connections-status');
+      var list = document.getElementById('search-connections-list');
+      list.replaceChildren();
+      if (!domain) { status.textContent = 'Verify your website to connect a search account.'; return; }
+      try {
+        var response = await fetch('/api/v1/search-connections?domain=' + encodeURIComponent(domain), {headers: authHeaders()});
+        var data = await readApiResponse(response);
+        if (!response.ok) throw new Error(data.detail || 'Could not load connections.');
+        var failed = new URLSearchParams(window.location.search).get('search_connection') === 'failed';
+        status.textContent = failed ? 'Connection failed. Check that the provider account has access to this verified domain, then try again.' :
+          data.connections.length ? 'Connected accounts for ' + domain : 'Connect an account for ' + domain + '.';
+        data.connections.forEach(function (connection) {
+          var row = document.createElement('div');
+          var title = document.createElement('strong');
+          title.textContent = connection.provider === 'google' ? 'Google Search Console' : 'Bing Webmaster Tools';
+          row.appendChild(title);
+          var details = document.createElement('p');
+          var rows = connection.result.rows || [];
+          var clicks = 0, impressions = 0;
+          rows.forEach(function (item) { clicks += Number(item.clicks || item.Clicks || 0); impressions += Number(item.impressions || item.Impressions || 0); });
+          details.textContent = connection.status === 'sync_error' ? 'Sync failed. We will retry on the next scheduled run; reconnect if the problem continues.' :
+            connection.last_synced_at ? 'Last synced ' + new Date(connection.last_synced_at).toLocaleString() + ': ' + clicks.toLocaleString() + ' clicks, ' + impressions.toLocaleString() + ' impressions. Search traffic, not AI citations.' : 'Connected. The first daily sync is pending.';
+          row.appendChild(details);
+          var disconnect = document.createElement('button');
+          disconnect.type = 'button'; disconnect.textContent = 'Disconnect';
+          disconnect.addEventListener('click', async function () {
+            var res = await fetch('/api/v1/search-connections/disconnect', {method:'POST', headers:authHeaders(), body:JSON.stringify({domain:domain, provider:connection.provider})});
+            if (!res.ok) { status.textContent = 'Could not disconnect the account.'; return; }
+            refreshSearchConnections(domain);
+          });
+          row.appendChild(disconnect); list.appendChild(row);
+        });
+      } catch (err) { status.textContent = err.message || 'Could not load connections.'; }
+    }
+    ['google', 'bing'].forEach(function (provider) {
+      document.getElementById('connect-' + provider).addEventListener('click', async function () {
+        var status = document.getElementById('search-connections-status');
+        if (!searchConnectionDomain) { status.textContent = 'Verify your website first.'; return; }
+        try {
+          var response = await fetch('/api/v1/search-connections/start', {method:'POST', headers:authHeaders(), body:JSON.stringify({domain:searchConnectionDomain, provider:provider})});
+          var data = await readApiResponse(response);
+          if (!response.ok) throw new Error(data.detail || 'Could not start the connection.');
+          window.location.assign(data.authorization_url);
+        } catch (err) { status.textContent = err.message || 'Could not start the connection.'; }
+      });
+    });
+    (function setupSearchMeasurement() {
+      var form = document.getElementById('search-measurement-form');
+      var end = new Date();
+      var start = new Date(end.getTime() - 28 * 86400000);
+      document.getElementById('measurement-start').value = start.toISOString().slice(0, 10);
+      document.getElementById('measurement-end').value = end.toISOString().slice(0, 10);
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        var output = document.getElementById('measurement-result');
+        var secret = document.getElementById('measurement-token');
+        output.textContent = 'Fetching first-party search data…';
+        try {
+          var response = await fetch('/api/v1/measurement/search', {
+            method: 'POST', headers: authHeaders(), body: JSON.stringify({
+              provider: document.getElementById('measurement-provider').value,
+              domain: document.getElementById('measurement-domain').value.trim(),
+              property_id: document.getElementById('measurement-property').value.trim(),
+              access_token: secret.value,
+              start_date: document.getElementById('measurement-start').value,
+              end_date: document.getElementById('measurement-end').value
+            })
+          });
+          var data = await readApiResponse(response);
+          if (!response.ok) throw new Error(data.detail || 'Unable to fetch search data.');
+          var clicks = 0, impressions = 0;
+          data.rows.forEach(function (row) {
+            clicks += Number(row.clicks || row.Clicks || 0);
+            impressions += Number(row.impressions || row.Impressions || 0);
+          });
+          output.textContent = data.note + ' Returned ' + data.rows.length + ' rows: ' + clicks.toLocaleString() + ' clicks and ' + impressions.toLocaleString() + ' impressions.';
+        } catch (err) {
+          output.textContent = err.message || 'Unable to fetch search data.';
+        } finally {
+          secret.value = '';
+        }
+      });
+    })();
     async function readApiResponse(res) {
       const text = await res.text();
       if (!text) return {};
@@ -1063,6 +1174,7 @@
       setWorkspaceLocked(!hasVerified);
       renderAgencyLoop(d.agency_loop, !hasVerified);
       var activeDomain = hasVerified ? d.primary_verified_domain : '';
+      refreshSearchConnections(activeDomain);
       updateDomainStatusNote(activeDomain || initialDomainFromUrl || (d.domains && d.domains[0] ? d.domains[0].domain : ''), hasVerified);
       refreshVisibilitySummary(activeDomain);
       refreshCollectionStatus(activeDomain);
@@ -1267,6 +1379,18 @@
           marker.textContent = String(index + 1);
           item.appendChild(marker);
           appendText(item, 'p', action);
+          var evidence = (config.evidence || [])[index];
+          if (evidence) {
+            appendText(item, 'small', evidence.level === 'provider_guidance' ? 'Provider guidance' : 'GEOSITION heuristic');
+            if (evidence.source_url && evidence.source_url.indexOf('https://developers.google.com/') === 0) {
+              var source = document.createElement('a');
+              source.href = evidence.source_url;
+              source.target = '_blank';
+              source.rel = 'noopener noreferrer';
+              source.textContent = ' View source';
+              item.appendChild(source);
+            }
+          }
           list.appendChild(item);
         });
         listBlock.appendChild(list);
@@ -1301,6 +1425,7 @@
         emptyTitle: 'No immediate fixes returned',
         emptyCopy: 'Run a benchmark next so GEOSITION can compare prompt visibility against competitors.',
         actions: data.recommendations || [],
+        evidence: data.recommendation_evidence || [],
       });
     }
     function renderBenchmarkResult(data, ok) {

@@ -1832,7 +1832,7 @@ async def ai_faq():
             },
             {
                 "question": "How is the GEO score calculated?",
-                "answer": "Across 8 categories: robots.txt (18pt), llms.txt (18pt), schema (16pt), meta (14pt), content (12pt), signals (6pt), AI discovery (6pt), brand & entity (10pt).",
+                "answer": "Readiness is scored across crawler access (25), schema (16), meta tags (20), content (21), signals (8), and brand and entity (10). Optional discovery files are unscored; citations are measured separately.",
             },
             {
                 "question": "What does the GEOSITION platform workflow do?",

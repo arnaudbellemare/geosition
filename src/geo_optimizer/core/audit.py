@@ -608,6 +608,10 @@ def _build_audit_result(
     if effective_sxo.checked:
         recommendations.extend(effective_sxo.recommendations)
 
+    from geo_optimizer.core.audit_commerce import audit_commerce
+
+    commerce = audit_commerce(soup) if soup is not None else {"applicable": False, "checks": []}
+    recommendations.extend(commerce.get("recommendations", []))
     result = AuditResult(
         url=base_url,
         score=score,
@@ -619,6 +623,20 @@ def _build_audit_result(
         content=content,
         citability=citability,
         recommendations=recommendations,
+        recommendation_evidence=[
+            {
+                "recommendation": rec,
+                "level": "provider_guidance" if rec in commerce.get("recommendations", []) else "product_heuristic",
+                "note": "Review in the context of your site; no citation gain is guaranteed.",
+                "source_url": (
+                    "https://developers.google.com/search/docs/appearance/structured-data/merchant-listing"
+                    if rec in commerce.get("recommendations", [])
+                    else ""
+                ),
+            }
+            for rec in recommendations
+        ],
+        commerce=commerce,
         http_status=http_status,
         page_size=page_size,
         extra_checks=plugin_results,

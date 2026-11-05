@@ -436,7 +436,7 @@ def test_public_geo_json_describes_agent_workflow(client):
     assert "https://geosition-web.onrender.com" not in str(summary)
 
     answers = " ".join(item["answer"] for item in faq["faqs"])
-    assert "Across 8 categories" in answers
+    assert "Optional discovery files are unscored" in answers
     assert "Skill Files" in answers
     assert "before/after deltas by URL and prompt" in answers
 
@@ -1011,18 +1011,12 @@ def test_ai_faq_json_punteggi_coerenti_con_config(client):
 
     response = score_faq["answer"]
 
-    # Verify correct categories and scores (from config.SCORING)
-    assert "8 categories" in response, f"Deve citare 8 categorie, trovato: {response}"
-    assert "schema (16pt)" in response, f"Schema deve essere 16pt, trovato: {response}"
-    assert "content (12pt)" in response, f"Content deve essere 12pt, trovato: {response}"
-    assert "signals (6pt)" in response, f"Signals deve essere 6pt, trovato: {response}"
-    assert "brand" in response.lower(), f"Deve includere la categoria brand, trovato: {response}"
-
-    # Verifies that i vecchi valori errati non siano presenti
-    assert "7 categories" not in response, f"Non deve citare 7 categorie: {response}"
-    assert "schema (22pt)" not in response, f"schema=22pt è il value errato: {response}"
-    assert "content (14pt)" not in response, f"content=14pt è il value errato: {response}"
-    assert "signals (8pt)" not in response, f"signals=8pt è il value errato: {response}"
+    assert "crawler access (25)" in response
+    assert "schema (16)" in response
+    assert "content (21)" in response
+    assert "signals (8)" in response
+    assert "unscored" in response
+    assert "citations are measured separately" in response
 
 
 def test_ai_summary_json_restituisce_struttura_valida(client):

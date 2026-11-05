@@ -399,6 +399,8 @@ class TestScoringConsistency:
                 "meta.has_canonical": True,
                 "meta.has_og_title": True,
                 "meta.has_og_description": True,
+                "meta.has_twitter_card": True,
+                "meta.has_twitter_title": True,
                 # content: 2 + 1 + 1 + 2 + 1 + 2 + 1 + 1 + 1 = 12 (v4.14: heading_ids + definition_first)
                 "content.has_h1": True,
                 "content.has_numbers": True,

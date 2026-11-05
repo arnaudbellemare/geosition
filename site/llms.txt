@@ -25,7 +25,7 @@ The main documentation is available at: [GEOSITION Docs](https://arnaudbellemare
 ## Reference
 
 - [AI Bots Reference](https://arnaudbellemare.github.io/geosition/ai-bots-reference/): 27 AI crawlers with 3-tier classification (training, search, user)
-- [47 GEO Methods](https://arnaudbellemare.github.io/geosition/geo-methods/): Research-backed citability methods — Quotation +41%, Statistics +33%, Fluency +29%, Cite Sources +27%
+- [47 GEO Methods](https://arnaudbellemare.github.io/geosition/geo-methods/): Research-informed content heuristics; experimental results are not guaranteed outcomes
 - [Troubleshooting](https://arnaudbellemare.github.io/geosition/troubleshooting/): Solutions to common installation and runtime problems
 
 ## Optional

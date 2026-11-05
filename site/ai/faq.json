@@ -2,15 +2,15 @@
   "faqs": [
     {
       "question": "What is GEOSITION?",
-      "answer": "GEOSITION is a source-available Python toolkit that audits websites for AI search engine visibility. It scores sites 0-100 based on 47 research-backed methods and generates fixes for robots.txt, llms.txt, JSON-LD schema, and meta tags. Install with: pip install geosition"
+      "answer": "GEOSITION audits AI search readiness and suggests fixes. Its score estimates observable technical and content signals, not actual citations or rankings."
     },
     {
       "question": "How is the GEO score calculated?",
-      "answer": "The GEO score (0-100) is calculated across 8 categories: robots.txt AI bot access (18 points), llms.txt presence and quality (18), JSON-LD schema richness (16), meta tags (14), content quality (12), technical signals like lang and RSS (6), AI discovery endpoints (6), and brand & entity signals (10). Bands: 86-100 excellent, 68-85 good, 36-67 foundation, 0-35 critical."
+      "answer": "The readiness score covers crawler access (25 points), schema (16), metadata (20), content (21), technical signals (8), and brand and entity (10). Optional llms.txt and AI discovery checks do not affect the score."
     },
     {
       "question": "What are the 47 GEO methods?",
-      "answer": "GEOSITION measures content citability using 47 methods based on Princeton KDD 2024, AutoGEO ICLR 2026, and SE Ranking 2025 research. Top methods by impact: Quotation Addition +41%, Statistics +33%, Fluency +29%, Cite Sources +27%, Answer-First +25%, Passage Density +23%. v4.1.0 added 5 RAG readiness checks: Answer Capsule Detection, Token Efficiency, Entity Resolution, Knowledge Graph Density, and Retrieval Trigger Patterns."
+      "answer": "A separate content analysis uses research-informed and product-defined heuristics. It does not measure citations or guarantee an increase in visibility."
     },
     {
       "question": "How do I use GEOSITION with Claude or Cursor?",

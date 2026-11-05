@@ -48,6 +48,8 @@ class NextAction:
     effort: str = "medium"  # low | medium | high
     priority: str = "P2"  # P1 | P2 | P3
     expected_score_gain: int = 0
+    evidence_level: str = "product_heuristic"
+    evidence_note: str = "Score impact reflects GEOSITION's rubric, not a predicted change in citations."
 
 
 # ─── Marketing audit (v4.12) ─────────────────────────────────────────────────

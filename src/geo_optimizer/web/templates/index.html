@@ -230,10 +230,10 @@ footer .credit{font-size:.72rem;color:var(--text-muted)}
 
 <!-- GEO: Schema JSON-LD -->
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"GEOSITION","url":"https://geositionai.com","description":"Source-available toolkit to audit, fix, and optimize websites for AI search engine visibility. Score 0-100 based on 48 research-backed methods.","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Arnaud Bellemare","url":"https://github.com/arnaudbellemare","sameAs":["https://github.com/arnaudbellemare","https://pypi.org/project/geosition/","https://www.linkedin.com/company/arnaudbellemare","https://www.crunchbase.com/organization/arnaudbellemare"],"contactPoint":{"@type":"ContactPoint","contactType":"technical support","email":"asapbellemare@gmail.com","url":"https://github.com/arnaudbellemare/geosition/issues"},"address":{"@type":"PostalAddress","addressCountry":"IT"}}}
+{"@context":"https://schema.org","@type":"WebApplication","name":"GEOSITION","url":"https://geositionai.com","description":"Source-available toolkit to audit, fix, and optimize websites for AI search engine visibility. A readiness score based on technical and content checks.","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"Arnaud Bellemare","url":"https://github.com/arnaudbellemare","sameAs":["https://github.com/arnaudbellemare","https://pypi.org/project/geosition/","https://www.linkedin.com/company/arnaudbellemare","https://www.crunchbase.com/organization/arnaudbellemare"],"contactPoint":{"@type":"ContactPoint","contactType":"technical support","email":"asapbellemare@gmail.com","url":"https://github.com/arnaudbellemare/geosition/issues"},"address":{"@type":"PostalAddress","addressCountry":"IT"}}}
 </script>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is GEOSITION?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is a source-available toolkit that audits websites for AI search engine visibility. It scores sites 0-100 based on 48 research-backed methods and generates fixes for robots.txt, llms.txt, JSON-LD schema, and meta tags."}},{"@type":"Question","name":"How does the GEO score work?","acceptedAnswer":{"@type":"Answer","text":"The score is calculated across 8 categories: robots.txt (18pt), llms.txt (18pt), JSON-LD schema (16pt), meta tags (14pt), content quality (12pt), signals (6pt), AI discovery (6pt), brand & entity (10pt). Bands: 86-100 excellent, 68-85 good, 36-67 foundation, 0-35 critical."}},{"@type":"Question","name":"Is GEOSITION free?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is available under the GEOSITION license. Install with: pip install geosition"}}]}
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is GEOSITION?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is a source-available toolkit that audits websites for AI search engine visibility. It assesses AI search readiness and suggests fixes for crawl access, structured data, and page content. The score does not measure citations."}},{"@type":"Question","name":"How does the GEO score work?","acceptedAnswer":{"@type":"Answer","text":"The score is calculated across 8 categories: robots.txt (25pt), JSON-LD schema (16pt), meta tags (20pt), content quality (21pt), signals (8pt), and brand & entity (10pt). Optional llms.txt and AI discovery checks are unscored. Bands: 86-100 excellent, 68-85 good, 36-67 foundation, 0-35 critical."}},{"@type":"Question","name":"Is GEOSITION free?","acceptedAnswer":{"@type":"Answer","text":"GEOSITION is available under the GEOSITION license. Install with: pip install geosition"}}]}
 </script>
 <link rel="alternate" type="application/rss+xml" title="GEOSITION Updates" href="https://github.com/arnaudbellemare/geosition/releases.atom">
 </head>
@@ -374,13 +374,13 @@ footer .credit{font-size:.72rem;color:var(--text-muted)}
 /* ─── Constants ─── */
 const BANDS = {excellent:'#22c55e',good:'#06b6d4',foundation:'#eab308',critical:'#ef4444'};
 const CATEGORIES = [
-  {key:'robots',label:'Robots.txt',max:18},
-  {key:'llms',label:'llms.txt',max:18},
+  {key:'robots',label:'Robots.txt',max:25},
+  {key:'llms',label:'llms.txt',max:0},
   {key:'schema',label:'Schema JSON-LD',max:16},
-  {key:'meta',label:'Meta Tags',max:14},
-  {key:'content',label:'Content',max:12},
-  {key:'signals',label:'Signals',max:6},
-  {key:'ai_discovery',label:'AI Discovery',max:6},
+  {key:'meta',label:'Meta Tags',max:20},
+  {key:'content',label:'Content',max:21},
+  {key:'signals',label:'Signals',max:8},
+  {key:'ai_discovery',label:'AI Discovery',max:0},
   {key:'brand_entity',label:'Brand & Entity',max:10},
 ];
 const SPIN_MSGS = ['Checking robots.txt...','Analyzing llms.txt...','Parsing schema...','Evaluating content...','Scoring citability...','Compiling results...'];
@@ -464,7 +464,7 @@ function renderResult(data,url){
   const br=data.score_breakdown||{};
   for(const cat of CATEGORIES){
     const val=br[cat.key]||0;
-    const pct=Math.min(val/cat.max*100,100);
+    const pct=Math.min((cat.max ? val/cat.max*100 : 0),100);
     const row=document.createElement('div');row.className='bar-row';
 
     const lbl=document.createElement('span');lbl.className='bar-label';lbl.textContent=cat.label;

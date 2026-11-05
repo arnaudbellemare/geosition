@@ -126,8 +126,8 @@ _IMPROVEMENT_SUGGESTIONS = {
     "snippet_ready": "Add snippet-ready definitions after headings: 'X is...', 'X refers to...' (+10%)",
     "chunk_quotability": "Write self-contained paragraphs (50-150 words) with concrete data for AI quoting (+10%)",
     "blog_structure": "Add Article/BlogPosting schema with datePublished, author, and categories (+8%)",
-    "shopping_readiness": "Add Product schema with price, availability, and AggregateRating (+8%)",
-    "chatgpt_shopping": "Complete Product schema with name, price, image, availability, brand for ChatGPT Shopping (+8%)",
+    "shopping_readiness": "Review Product structured data for accurate price and availability where applicable",
+    "chatgpt_shopping": "Review product name, price, image, availability and brand; feed eligibility is checked separately",
     # Quality Signals Batch A v3.16.0
     "voice_search_ready": "Add question-format headings with concise answers for voice search (+5%)",
     "multi_platform": "Add 3+ platform links in sameAs schema (GitHub, LinkedIn, Twitter, etc.) (+10%)",
@@ -141,7 +141,7 @@ _IMPROVEMENT_SUGGESTIONS = {
     "temporal_coherence": "Add coherent date signals: schema dateModified, visible 'Last updated' dates within 30 days (+8%)",
     "anchor_text_quality": "Use descriptive anchor text for internal links instead of 'click here' or 'read more' (+5%)",
     "international_geo": "Add hreflang tags and schema inLanguage for multilingual sites (+5%)",
-    "crawl_budget": "Remove meta robots noindex/nofollow to allow AI crawlers to index content (+5%)",
+    "crawl_budget": "Review noindex and nofollow directives for pages you intend search engines to index",
     # RAG Readiness Batch v4.1.0
     "answer_capsule": "Write self-contained answer paragraphs (30-120 words) with concrete facts for RAG extraction (+12%)",
     "token_efficiency": "Increase content-to-noise ratio: use <main>/<article> tags, reduce boilerplate (+8%)",
@@ -312,6 +312,11 @@ def audit_citability(soup, base_url: str, soup_clean=None) -> CitabilityResult:
         detect_retrieval_triggers(soup, clean_text=clean_text),
     ]
 
+    # Detector-level impact strings describe historical assumptions, not measured
+    # effects for this page. Do not present them as projected citation gains.
+    for item in methods:
+        item.impact = ""
+
     # Sum scores (max possible = 100)
     total = sum(m.score for m in methods)
     total = max(min(total, 100), 0)
@@ -324,7 +329,14 @@ def audit_citability(soup, base_url: str, soup_clean=None) -> CitabilityResult:
             continue
         needs_improvement = method.detected if method_name in _NEGATIVE_METHODS else not method.detected
         if needs_improvement:
-            improvements.append(_IMPROVEMENT_SUGGESTIONS[method_name])
+            suggestion = _IMPROVEMENT_SUGGESTIONS[method_name]
+            # Legacy suggestions end in illustrative percentages without a
+            # valid site-specific estimate; omit those claims from output.
+            if suggestion.endswith(")") and "(+" in suggestion:
+                suggestion = suggestion[: suggestion.rfind(" (+")]
+            elif suggestion.endswith(")") and "(-" in suggestion:
+                suggestion = suggestion[: suggestion.rfind(" (-")]
+            improvements.append(suggestion)
         if len(improvements) >= 3:
             break
 

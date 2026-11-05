@@ -161,6 +161,20 @@ class HostedCollectionBody(BaseModel):
     providers: list[str] = Field(default_factory=list)
 
 
+class SearchMeasurementBody(BaseModel):
+    domain: str = Field(max_length=253)
+    provider: str = Field(max_length=16)
+    property_id: str = Field(max_length=2048)
+    access_token: str = Field(max_length=8192, repr=False)
+    start_date: str = Field(max_length=10)
+    end_date: str = Field(max_length=10)
+
+
+class SearchConnectionBody(BaseModel):
+    domain: str = Field(max_length=253)
+    provider: str = Field(max_length=16)
+
+
 def _read_template(name: str) -> str:
     return (_TEMPLATES / name).read_text(encoding="utf-8")
 
@@ -1123,6 +1137,154 @@ async def api_visibility_summary(domain: str = "", token: str = Depends(require_
         return _get_service().citation_share_summary(token, domain=domain)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/measurement/search")
+async def api_search_measurement(body: SearchMeasurementBody, token: str = Depends(require_expensive_write_token)):
+    """Fetch provider-owned search data without saving provider credentials."""
+    from geo_optimizer.core.search_measurement import fetch_search_measurement, validate_property
+
+    try:
+        service = _get_service()
+        domain = service.require_verified_domain(token, body.domain)
+        validate_property(body.provider, body.property_id, domain)
+        result = await asyncio.to_thread(
+            fetch_search_measurement,
+            body.provider,
+            body.property_id,
+            body.access_token,
+            body.start_date,
+            body.end_date,
+        )
+        return JSONResponse(result, headers={"Cache-Control": "no-store"})
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/search-connections/start")
+async def api_search_connection_start(
+    body: SearchConnectionBody, request: Request, token: str = Depends(require_write_token)
+):
+    from geo_optimizer.saas.search_connections import begin_connection
+
+    try:
+        domain = _get_service().require_verified_domain(token, body.domain)
+        url, state = begin_connection(body.provider, domain, token)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    response = JSONResponse({"authorization_url": url}, headers={"Cache-Control": "no-store"})
+    response.set_cookie(
+        "geo_oauth_state",
+        state,
+        max_age=600,
+        httponly=True,
+        secure=_secure_cookie(request),
+        samesite="lax",
+        path="/api/v1/search-connections/callback",
+    )
+    return response
+
+
+@router.get("/api/v1/search-connections/callback/{provider}")
+async def api_search_connection_callback(provider: str, request: Request, token: str = Depends(require_token)):
+    from geo_optimizer.saas.search_connections import exchange_code, save_connection, sync_connection, verify_state
+
+    try:
+        state = verify_state(
+            provider, request.query_params.get("state", ""), request.cookies.get("geo_oauth_state", ""), token
+        )
+        code = request.query_params.get("code", "")
+        if not code or len(code) > 4096:
+            raise ValueError("Access was not granted. Please try connecting again.")
+        service = _get_service()
+        domain = service.require_verified_domain(token, str(state["domain"]))
+        _, org = service.require_session(token)
+        tokens = await asyncio.to_thread(exchange_code, provider, code)
+        await asyncio.to_thread(save_connection, service.store, org.org_id, domain, provider, tokens)
+        rows = service.store.list_search_connections(org.org_id)
+        connection = next(row for row in rows if row["domain"] == domain and row["provider"] == provider)
+        try:
+            await asyncio.to_thread(sync_connection, service.store, connection)
+        except Exception:
+            from datetime import datetime, timezone
+
+            service.store.mark_search_connection_error(
+                org.org_id, domain, provider, datetime.now(timezone.utc).isoformat()
+            )
+        location = "/platform/dashboard?search_connection=connected"
+    except (ValueError, RuntimeError, KeyError, StopIteration):
+        location = "/platform/dashboard?search_connection=failed"
+    response = RedirectResponse(
+        location, status_code=303, headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"}
+    )
+    response.delete_cookie("geo_oauth_state", path="/api/v1/search-connections/callback")
+    return response
+
+
+@router.get("/api/v1/search-connections")
+async def api_search_connections(domain: str, token: str = Depends(require_token)):
+    try:
+        service = _get_service()
+        normalized = service.require_verified_domain(token, domain)
+        _, org = service.require_session(token)
+        rows = service.store.list_search_connections(org.org_id)
+        connections = [
+            {
+                "provider": row["provider"],
+                "property": row["property_id"],
+                "status": row["status"],
+                "last_synced_at": row["last_synced_at"],
+                "result": json.loads(row["last_result_json"] or "{}"),
+            }
+            for row in rows
+            if row["domain"] == normalized
+        ]
+        return JSONResponse({"connections": connections}, headers={"Cache-Control": "no-store"})
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/search-connections/disconnect")
+async def api_search_connection_disconnect(body: SearchConnectionBody, token: str = Depends(require_write_token)):
+    if body.provider not in ("google", "bing"):
+        raise HTTPException(status_code=400, detail="Unsupported search provider.")
+    try:
+        service = _get_service()
+        domain = service.require_verified_domain(token, body.domain)
+        _, org = service.require_session(token)
+        service.store.delete_search_connection(org.org_id, domain, body.provider)
+        return {"status": "disconnected"}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/api/v1/search-connections/scheduled-sync")
+async def api_search_connection_scheduled_sync(request: Request):
+    from datetime import datetime, timedelta, timezone
+
+    from geo_optimizer.saas.search_connections import sync_connection
+
+    expected = os.environ.get("CRON_SECRET", "")
+    supplied = request.headers.get("Authorization", "")
+    if not expected or not secrets.compare_digest(supplied, "Bearer " + expected):
+        raise HTTPException(status_code=403, detail="Invalid scheduler token")
+    service = _get_service()
+    now = datetime.now(timezone.utc)
+    completed, failed = 0, 0
+    for row in service.store.list_search_connections():
+        try:
+            last = row.get("last_synced_at")
+            if last and datetime.fromisoformat(last.replace("Z", "+00:00")) > now - timedelta(hours=23):
+                continue
+            # A removed or unverified workspace domain must not keep syncing.
+            service._require_verified(row["org_id"], row["domain"])
+            await asyncio.to_thread(sync_connection, service.store, row)
+            completed += 1
+        except Exception:
+            failed += 1
+            # Do not log provider responses or credentials.
+            service.store.mark_search_connection_error(row["org_id"], row["domain"], row["provider"], now.isoformat())
+    return {"synced": completed, "failed": failed}
 
 
 @router.get("/api/v1/index/preview")

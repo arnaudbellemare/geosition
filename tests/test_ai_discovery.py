@@ -232,7 +232,7 @@ class TestAiDiscoveryScoring:
             + SCORING["ai_discovery_service"]
         )
         assert score == expected
-        assert score == 6
+        assert score == 0
 
     def test_score_no_endpoint(self):
         """No endpoint → punteggio 0."""
@@ -298,7 +298,7 @@ class TestAiDiscoveryScoring:
             + SCORING["schema_website"]
             + SCORING["schema_sameas"]
         )
-        max_meta = SCORING["meta_title"] + SCORING["meta_description"] + SCORING["meta_canonical"] + SCORING["meta_og"]
+        max_meta = sum(v for k, v in SCORING.items() if k.startswith("meta_"))
         max_content = (
             SCORING["content_h1"]
             + SCORING["content_numbers"]

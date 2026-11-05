@@ -571,17 +571,21 @@ def _print_rich(url, result, mkt, rival_url, rival_result, rival_mkt):
         from geo_optimizer.cli.scoring_helpers import (
             signals_score as _sig_score,
         )
-        from geo_optimizer.core.scoring import _score_ai_discovery
+        from geo_optimizer.core.scoring import CATEGORY_MAX_SCORES, _score_ai_discovery
 
         geo_cats = [
-            ("Robots", _r_score(result), 18),
-            ("llms.txt", _l_score(result), 18),
-            ("Schema", _s_score(result), 16),
-            ("Meta", _m_score(result), 14),
-            ("Content", _c_score(result), 12),
-            ("Signals", _sig_score(result), 6),
-            ("Brand", _be_score(result), 10),
-            ("AI Disc.", _score_ai_discovery(result.ai_discovery) if result.ai_discovery else 0, 6),
+            ("Robots", _r_score(result), CATEGORY_MAX_SCORES["robots"]),
+            ("llms.txt", _l_score(result), CATEGORY_MAX_SCORES["llms"]),
+            ("Schema", _s_score(result), CATEGORY_MAX_SCORES["schema"]),
+            ("Meta", _m_score(result), CATEGORY_MAX_SCORES["meta"]),
+            ("Content", _c_score(result), CATEGORY_MAX_SCORES["content"]),
+            ("Signals", _sig_score(result), CATEGORY_MAX_SCORES["signals"]),
+            ("Brand", _be_score(result), CATEGORY_MAX_SCORES["brand_entity"]),
+            (
+                "AI Disc.",
+                _score_ai_discovery(result.ai_discovery) if result.ai_discovery else 0,
+                CATEGORY_MAX_SCORES["ai_discovery"],
+            ),
         ]
         seg_colors = [
             _COLORS["brand_1"],
@@ -1414,7 +1418,7 @@ def _print_plain(url, result, mkt, rival_url, rival_result, rival_mkt):
     from geo_optimizer.cli.scoring_helpers import (
         signals_score as _sig_score,
     )
-    from geo_optimizer.core.scoring import _score_ai_discovery
+    from geo_optimizer.core.scoring import CATEGORY_MAX_SCORES, _score_ai_discovery
 
     w = 66
     copy = mkt.copywriting
@@ -1424,14 +1428,18 @@ def _print_plain(url, result, mkt, rival_url, rival_result, rival_mkt):
     perf = result.perf
 
     geo_cats = [
-        ("Robots", _r_score(result), 18),
-        ("llms.txt", _l_score(result), 18),
-        ("Schema", _s_score(result), 16),
-        ("Meta", _m_score(result), 14),
-        ("Content", _c_score(result), 12),
-        ("Signals", _sig_score(result), 6),
-        ("Brand", _be_score(result), 10),
-        ("AI Disc.", _score_ai_discovery(result.ai_discovery) if result.ai_discovery else 0, 6),
+        ("Robots", _r_score(result), CATEGORY_MAX_SCORES["robots"]),
+        ("llms.txt", _l_score(result), CATEGORY_MAX_SCORES["llms"]),
+        ("Schema", _s_score(result), CATEGORY_MAX_SCORES["schema"]),
+        ("Meta", _m_score(result), CATEGORY_MAX_SCORES["meta"]),
+        ("Content", _c_score(result), CATEGORY_MAX_SCORES["content"]),
+        ("Signals", _sig_score(result), CATEGORY_MAX_SCORES["signals"]),
+        ("Brand", _be_score(result), CATEGORY_MAX_SCORES["brand_entity"]),
+        (
+            "AI Disc.",
+            _score_ai_discovery(result.ai_discovery) if result.ai_discovery else 0,
+            CATEGORY_MAX_SCORES["ai_discovery"],
+        ),
     ]
 
     def section(title):
@@ -1792,17 +1800,21 @@ def _build_markdown(url, result, mkt, rival_url, rival_result, rival_mkt) -> str
     from geo_optimizer.cli.scoring_helpers import (
         signals_score as _sig,
     )
-    from geo_optimizer.core.scoring import _score_ai_discovery
+    from geo_optimizer.core.scoring import CATEGORY_MAX_SCORES, _score_ai_discovery
 
     geo_cats = [
-        ("Robots", _r(result), 18),
-        ("llms.txt", _l(result), 18),
-        ("Schema", _s(result), 16),
-        ("Meta", _m(result), 14),
-        ("Content", _c(result), 12),
-        ("Signals", _sig(result), 6),
-        ("Brand", _be(result), 10),
-        ("AI Disc.", _score_ai_discovery(result.ai_discovery) if result.ai_discovery else 0, 6),
+        ("Robots", _r(result), CATEGORY_MAX_SCORES["robots"]),
+        ("llms.txt", _l(result), CATEGORY_MAX_SCORES["llms"]),
+        ("Schema", _s(result), CATEGORY_MAX_SCORES["schema"]),
+        ("Meta", _m(result), CATEGORY_MAX_SCORES["meta"]),
+        ("Content", _c(result), CATEGORY_MAX_SCORES["content"]),
+        ("Signals", _sig(result), CATEGORY_MAX_SCORES["signals"]),
+        ("Brand", _be(result), CATEGORY_MAX_SCORES["brand_entity"]),
+        (
+            "AI Disc.",
+            _score_ai_discovery(result.ai_discovery) if result.ai_discovery else 0,
+            CATEGORY_MAX_SCORES["ai_discovery"],
+        ),
     ]
     lines.append("| Category | Score | Max |")
     lines.append("|----------|------:|----:|")

@@ -29,7 +29,7 @@ Perplexity: "According to [Competitor.com], their services include..."
              ↑ They appear. You don't.
 ```
 
-GEOSITION audits your site against **47 research-backed methods** ([Princeton KDD 2024](https://arxiv.org/abs/2311.09735), [AutoGEO ICLR 2026](https://arxiv.org/abs/2510.11438)) and generates the fixes so AI engines can find, parse, and cite you.
+GEOSITION audits your website for AI search readiness using technical and content checks informed by provider guidance and research, and generates suggested fixes. The readiness score does not measure citations or guarantee visibility. See [Google guidance](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide), [OpenAI publisher guidance](https://help.openai.com/en/articles/12627856-publishers-and-developers-faq), and the [Princeton GEO paper](https://arxiv.org/abs/2311.09735).
 
 ---
 
@@ -163,16 +163,17 @@ aiv fixer --url https://yoursite.com --apply
 
 | Area | Points | What GEOSITION looks for |
 |------|--------|------------------------------|
-| **Robots.txt** | /18 | 27 AI bots across 3 tiers (training, search, user). Citation bots explicitly allowed? |
-| **llms.txt** | /18 | Present, has H1 + blockquote, sections, links, depth. Companion llms-full.txt? |
-| **Schema JSON-LD** | /16 | WebSite, Organization, FAQPage, Article. Schema richness (5+ attributes)? |
-| **Meta Tags** | /15 | Title (40–60 chars), description (120–160 chars), canonical, Open Graph, Twitter Card? |
-| **Content** | /12 | H1, statistics, external citations, heading hierarchy, lists/tables, front-loading? |
-| **Brand & Entity** | /10 | Brand name coherence, Knowledge Graph links (Wikipedia/Wikidata/LinkedIn/Crunchbase), about page, geo signals, topic authority |
-| **Signals** | /6 | `<html lang>`, RSS/Atom feed, dateModified freshness? |
-| **AI Discovery** | /6 | `.well-known/ai.txt`, `/ai/summary.json`, `/ai/faq.json`, `/ai/service.json`? |
+| **Robots.txt** | /25 | Search crawler access; training crawler access is a separate choice. |
+| **Schema JSON-LD** | /16 | Structured data and entity details where applicable. |
+| **Meta Tags** | /20 | Titles, descriptions, canonical URLs and social metadata. |
+| **Content** | /21 | Headings, links, structure and other content heuristics. |
+| **Brand & Entity** | /10 | Business identity and contact signals. |
+| **Signals** | /8 | Language, feed and freshness signals. |
+| **llms.txt and AI discovery files** | Unscored | Optional informational checks; not required for Google Search. |
 
 **Score bands:** 86–100 Excellent · 68–85 Good · 36–67 Foundation · 0–35 Critical
+
+The dashboard supports read-only Google Search Console and Bing Webmaster connections for verified domains, with daily synchronization when OAuth, durable storage, and the scheduler are configured. These are search traffic totals, not AI-only citation counts. See [first-party search measurements](docs/search-measurement.md) for setup and limitations.
 
 **Bonus checks** (informational, don't affect your score):
 
@@ -188,8 +189,7 @@ aiv fixer --url https://yoursite.com --apply
 | **Content Decay Prediction** | Detects temporal, statistical, version, event, and price decay patterns — evergreen score 0–100 |
 | **Platform Citation Profile** | Per-platform readiness scores for ChatGPT, Perplexity, Google AI |
 
-Plus a separate **Citability Score** (0–100) measuring content quality across 47 methods:
-Quotation +41% · Statistics +33% · Fluency +29% · Cite Sources +27% · and 43 more.
+A separate **Citability Score** summarizes content heuristics. It is not a measurement of citations, and individual checks do not guarantee an uplift. Use repeated visibility tests and first-party analytics to measure outcomes.
 
 ---
 

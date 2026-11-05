@@ -5,6 +5,10 @@ date: 2026-04-28
 tags: [getting-started, installation, quickstart, cli]
 ---
 
+
+> **Scoring update:** Examples and point totals below reflect the previous scoring model. See the [current scoring rubric](scoring-rubric.md). Scores from the two models are not directly comparable.
+
+
 # Getting Started
 
 Get the toolkit installed and run your first GEO audit in under 5 minutes.

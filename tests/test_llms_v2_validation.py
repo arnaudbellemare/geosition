@@ -249,7 +249,7 @@ class TestLlmsScoringV2:
         )
         score_with_bq = _score_llms(llms_with_bq)
 
-        assert score_with_bq == score_no_bq + 1
+        assert score_with_bq == score_no_bq == 0
 
     def test_full_llms_score_unchanged_total(self):
         """Il totale massimo llms rimane 18 con blockquote incluso."""
@@ -266,7 +266,7 @@ class TestLlmsScoringV2:
             + SCORING["llms_full"]
             + SCORING.get("llms_coverage", 0)
         )
-        assert total == 18
+        assert total == 0
 
 
 # ─── Test integrazione audit_llms_txt con mock HTTP ──────────────────────────

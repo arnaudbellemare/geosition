@@ -1294,7 +1294,7 @@ class TestAuditCitability:
     def test_top_improvements_generate(self):
         result = audit_citability(_soup("<html><body><p>Testo semplice.</p></body></html>"), "https://example.com")
         assert len(result.top_improvements) > 0
-        assert any("+" in imp for imp in result.top_improvements)
+        assert all("%" not in imp for imp in result.top_improvements)
 
 
 def test_graph_jsonld_supported_by_platform_detectors():

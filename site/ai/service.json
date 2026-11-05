@@ -4,7 +4,7 @@
   "capabilities": [
     "Audit website GEO score (0-100) across 8 categories",
     "Auto-generate fix files (robots.txt, llms.txt, schema, meta)",
-    "Content citability analysis with 47 research-backed methods",
+    "Content analysis using research-informed and product-defined heuristics",
     "MCP server for Claude Code, Cursor, Windsurf",
     "CI/CD integration with GitHub Actions, SARIF, JUnit",
     "Side-by-side GEO score comparison",

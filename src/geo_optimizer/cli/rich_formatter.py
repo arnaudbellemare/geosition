@@ -1173,6 +1173,9 @@ def format_audit_rich(result: AuditResult) -> str:
             rec_line = Text()
             rec_line.append(f"  {i}. ", style=f"bold {_COLORS['foundation']}")
             rec_line.append(rec, style="default")
+            evidence = result.recommendation_evidence[i - 1] if i <= len(result.recommendation_evidence) else {}
+            level = "provider guidance" if evidence.get("level") == "provider_guidance" else "product heuristic"
+            rec_line.append(f" [{level}]", style="dim")
             rec_parts.append(rec_line)
 
         rec_table = Table(show_header=False, box=None, expand=True, padding=0)
