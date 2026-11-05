@@ -47,7 +47,7 @@ For changes to repository SEO data, also run `npm ci` and `npm run seo:verify`. 
 1. Keep the change focused and describe the problem it solves.
 2. Include relevant tests, documentation, and screenshots for visual changes.
 3. Summarize the checks you ran and any limitations reviewers should know about.
-4. Update [CHANGELOG.md](../CHANGELOG.md) when the change is user-facing.
+4. Update [the changelog](../docs/CHANGELOG.md) when the change is user-facing.
 
 Use descriptive commit messages; Conventional Commits are appreciated. Please avoid including credentials, customer data, audit reports, or local databases in a pull request. `.gitignore` helps exclude common local outputs, but review `git status` and your diff before committing.
 

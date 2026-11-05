@@ -19,7 +19,7 @@ Closes #
 - [ ] Tests added/updated (`pytest tests/ -v` passes)
 - [ ] Lint passes (`ruff check src/ tests/`)
 - [ ] Format passes (`ruff format --check src/ tests/`)
-- [ ] CHANGELOG.md updated under `[Unreleased]`
+- [ ] `docs/CHANGELOG.md` updated under `[Unreleased]`
 - [ ] Docs updated (if adding/changing features)
 - [ ] Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/)
 

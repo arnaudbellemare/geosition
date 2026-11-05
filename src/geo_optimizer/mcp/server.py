@@ -723,12 +723,12 @@ def get_citability_methods() -> str:
 
 @mcp.resource("geo://changelog")
 def get_changelog() -> str:
-    """Latest changes from CHANGELOG.md (first 50 lines)."""
+    """Latest changes from docs/CHANGELOG.md (first 50 lines)."""
     from pathlib import Path
 
-    changelog_path = Path(__file__).parent.parent.parent.parent / "CHANGELOG.md"
+    changelog_path = Path(__file__).parent.parent.parent.parent / "docs" / "CHANGELOG.md"
     if not changelog_path.exists():
-        return "CHANGELOG.md not found"
+        return "docs/CHANGELOG.md not found"
     lines = changelog_path.read_text(encoding="utf-8").splitlines()[:50]
     return "\n".join(lines)
 

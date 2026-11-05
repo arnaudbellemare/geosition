@@ -74,10 +74,11 @@ def audit_github_repo(repo_path: str) -> GithubRepoAuditResult:
             result.missing_files.append(rel)
 
     for rel in _OPTIONAL_TRUST_FILES:
-        p = root / rel
-        if p.exists():
+        candidates = (rel, f"docs/{rel}") if rel == "CHANGELOG.md" else (rel,)
+        found = next((candidate for candidate in candidates if (root / candidate).is_file()), None)
+        if found:
             score += 5
-            result.found_files.append(rel)
+            result.found_files.append(found)
         else:
             result.missing_files.append(rel)
 

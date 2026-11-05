@@ -33,4 +33,4 @@ The main documentation is available at: [GEOSITION Docs](https://arnaudbellemare
 - [GitHub Repository](https://github.com/arnaudbellemare/geosition): Source code, issues, discussions
 - [PyPI Package](https://pypi.org/project/geosition/): Latest release
 - [Live Demo](https://geosition-web.onrender.com): Audit any website online
-- [Changelog](https://github.com/arnaudbellemare/geosition/blob/main/CHANGELOG.md): All version changes
+- [Changelog](https://github.com/arnaudbellemare/geosition/blob/main/docs/CHANGELOG.md): All version changes

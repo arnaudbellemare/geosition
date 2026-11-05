@@ -36,6 +36,17 @@ def test_github_repo_audit_recognizes_github_community_files(tmp_path) -> None:
     assert "SECURITY.md" not in result.missing_files
 
 
+def test_github_repo_audit_recognizes_changelog_in_docs(tmp_path) -> None:
+    docs = tmp_path / "docs"
+    docs.mkdir()
+    (docs / "CHANGELOG.md").write_text("# Changelog", encoding="utf-8")
+
+    result = audit_github_repo(str(tmp_path))
+
+    assert "docs/CHANGELOG.md" in result.found_files
+    assert "CHANGELOG.md" not in result.missing_files
+
+
 def test_github_cmd_writes_reports(tmp_path) -> None:
     repo = tmp_path / "repo2"
     repo.mkdir()

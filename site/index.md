@@ -80,4 +80,4 @@ Async: `result = await audit_async("https://example.com")`
 - [Live Demo](https://geosition-web.onrender.com) — audit any site online
 - [GitHub](https://github.com/arnaudbellemare/geosition) — source, issues, discussions
 - [PyPI](https://pypi.org/project/geosition/) — latest release
-- [Changelog](https://github.com/arnaudbellemare/geosition/blob/main/CHANGELOG.md)
+- [Changelog](https://github.com/arnaudbellemare/geosition/blob/main/docs/CHANGELOG.md)
