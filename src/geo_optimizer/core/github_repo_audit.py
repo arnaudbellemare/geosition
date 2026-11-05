@@ -65,7 +65,7 @@ def audit_github_repo(repo_path: str) -> GithubRepoAuditResult:
 
     # Base files
     for rel in _REQUIRED_FILES:
-        candidates = (rel, f".github/{rel}", f"docs/{rel}") if rel in {"CONTRIBUTING.md", "SECURITY.md"} else (rel,)
+        candidates = [rel, f".github/{rel}", f"docs/{rel}"] if rel in {"CONTRIBUTING.md", "SECURITY.md"} else [rel]
         found = next((candidate for candidate in candidates if (root / candidate).is_file()), None)
         if found:
             score += 10
@@ -74,7 +74,7 @@ def audit_github_repo(repo_path: str) -> GithubRepoAuditResult:
             result.missing_files.append(rel)
 
     for rel in _OPTIONAL_TRUST_FILES:
-        candidates = (rel, f"docs/{rel}") if rel == "CHANGELOG.md" else (rel,)
+        candidates = [rel, f"docs/{rel}"] if rel == "CHANGELOG.md" else [rel]
         found = next((candidate for candidate in candidates if (root / candidate).is_file()), None)
         if found:
             score += 5
