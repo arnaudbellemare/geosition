@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report; do not improvise. When done, update the status row for this plan in
-> `plans/README.md`.
+> `docs/plans/README.md`.
 >
 > **Drift check (run first)**:
 > `git diff --stat 6845682..HEAD -- src/geo_optimizer/saas/models.py src/geo_optimizer/saas/service.py src/geo_optimizer/web/platform_routes.py src/geo_optimizer/web/templates/platform/dashboard.html tests/test_platform_saas.py`
@@ -182,7 +182,7 @@ Use the existing `test_platform_first_run_website_field_and_locked_dashboard_flo
 - [x] `python3 -m pytest tests/ -q` passes.
 - [x] `python3 -m ruff check src/geo_optimizer/saas/models.py src/geo_optimizer/saas/service.py src/geo_optimizer/web/platform_routes.py tests/test_platform_saas.py` passes.
 - [x] `git diff --check` passes.
-- [x] `plans/README.md` status row updated.
+- [x] `docs/plans/README.md` status row updated.
 
 ## STOP Conditions
 

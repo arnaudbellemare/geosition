@@ -190,18 +190,18 @@ Platform-optimized versions of this skill for different AI tools:
 
 | Platform | File | Size | Limit | How to use |
 |----------|------|------|-------|------------|
-| Claude Projects | `ai-context/claude-project.md` | ~11,700 chars | No limit | Project → Add as Knowledge |
-| ChatGPT Custom GPT | `ai-context/chatgpt-custom-gpt.md` | ~4,500 chars | 8,000 chars | GPT Builder → System prompt |
-| ChatGPT Instructions | `ai-context/chatgpt-instructions.md` | ~800 chars | 1,500 chars/field | Settings → Custom Instructions |
-| Cursor | `ai-context/cursor.mdc` | ~4,200 chars | No limit | Copy to `.cursor/rules/geo-optimizer.mdc` |
-| Windsurf | `ai-context/windsurf.md` | ~4,500 chars | 12,000 chars | Copy to `.windsurf/rules/geo-optimizer.md` |
-| Kiro | `ai-context/kiro-steering.md` | ~3,300 chars | No limit | Copy to `.kiro/steering/geo-optimizer.md` |
+| Claude Projects | `docs/ai-context-files/claude-project.md` | ~11,700 chars | No limit | Project → Add as Knowledge |
+| ChatGPT Custom GPT | `docs/ai-context-files/chatgpt-custom-gpt.md` | ~4,500 chars | 8,000 chars | GPT Builder → System prompt |
+| ChatGPT Instructions | `docs/ai-context-files/chatgpt-instructions.md` | ~800 chars | 1,500 chars/field | Settings → Custom Instructions |
+| Cursor | `docs/ai-context-files/cursor.mdc` | ~4,200 chars | No limit | Copy to `.cursor/rules/geo-optimizer.mdc` |
+| Windsurf | `docs/ai-context-files/windsurf.md` | ~4,500 chars | 12,000 chars | Copy to `.windsurf/rules/geo-optimizer.md` |
+| Kiro | `docs/ai-context-files/kiro-steering.md` | ~3,300 chars | No limit | Copy to `.kiro/steering/geo-optimizer.md` |
 
 ```bash
 # Quick copy commands
-mkdir -p .cursor/rules && cp ai-context/cursor.mdc .cursor/rules/geo-optimizer.mdc
-mkdir -p .windsurf/rules && cp ai-context/windsurf.md .windsurf/rules/geo-optimizer.md
-mkdir -p .kiro/steering && cp ai-context/kiro-steering.md .kiro/steering/geo-optimizer.md
+mkdir -p .cursor/rules && cp docs/ai-context-files/cursor.mdc .cursor/rules/geo-optimizer.mdc
+mkdir -p .windsurf/rules && cp docs/ai-context-files/windsurf.md .windsurf/rules/geo-optimizer.md
+mkdir -p .kiro/steering && cp docs/ai-context-files/kiro-steering.md .kiro/steering/geo-optimizer.md
 ```
 
 ---

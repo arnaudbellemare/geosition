@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report; do not improvise. When done, update the status row for this plan in
-> `plans/README.md`.
+> `docs/plans/README.md`.
 >
 > **Drift check (run first)**:
 > `git diff --stat 6845682..HEAD -- src/geo_optimizer/saas/supabase_store.py src/geo_optimizer/saas/store.py src/geo_optimizer/web/platform_routes.py tests/test_platform_saas.py`
@@ -247,7 +247,7 @@ Model route-storage-failure tests after `test_auth_routes_return_json_when_platf
 - [x] `python3 -m pytest tests/ -q` passes.
 - [x] `python3 -m ruff check src/geo_optimizer/saas/supabase_store.py src/geo_optimizer/saas/store.py src/geo_optimizer/web/platform_routes.py tests/test_platform_saas.py` passes.
 - [x] `git diff --check` passes.
-- [x] `plans/README.md` status row updated.
+- [x] `docs/plans/README.md` status row updated.
 
 ## STOP Conditions
 

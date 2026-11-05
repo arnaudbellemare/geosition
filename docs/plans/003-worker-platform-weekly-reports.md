@@ -1,6 +1,6 @@
 # Plan 003: Connect Weekly Evidence Runs To Workers And Platform Reports
 
-> **Executor instructions**: Follow this plan step by step. Run every verification command and confirm the expected result before moving to the next step. If anything in the "STOP conditions" section occurs, stop and report. When done, update the status row for this plan in `plans/README.md`.
+> **Executor instructions**: Follow this plan step by step. Run every verification command and confirm the expected result before moving to the next step. If anything in the "STOP conditions" section occurs, stop and report. When done, update the status row for this plan in `docs/plans/README.md`.
 >
 > **Drift check (run first)**: `git diff --stat c81730a..HEAD -- src/geo_optimizer/cli/geosition_cmd.py src/geo_optimizer/web/platform_routes.py src/geo_optimizer/web/templates/platform/dashboard.html src/geo_optimizer/web/templates/platform/site.css src/geo_optimizer/saas/service.py tests/test_geosition_cmd.py tests/test_platform_saas.py`
 > If any in-scope file changed since this plan was written, compare the "Current state" excerpts against the live code before proceeding; on a mismatch, treat it as a STOP condition.
@@ -10,7 +10,7 @@
 - **Priority**: P1
 - **Effort**: L
 - **Risk**: MED
-- **Depends on**: `plans/001-weekly-evidence-run-model.md`, `plans/002-geosition-weekly-report-command.md`
+- **Depends on**: `docs/plans/001-weekly-evidence-run-model.md`, `docs/plans/002-geosition-weekly-report-command.md`
 - **Category**: direction
 - **Planned at**: commit `c81730a`, 2026-06-12
 

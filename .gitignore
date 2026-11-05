@@ -48,8 +48,10 @@ CLAUDE.md
 # Other
 node_modules/
 docs_dev/
-.claude/*
-!.claude/skills/
+.agents/
+.claude/
+.memoire/
+skills-lock.json
 
 # Local caches
 local_cache/

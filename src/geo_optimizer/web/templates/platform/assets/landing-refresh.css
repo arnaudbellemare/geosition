@@ -592,7 +592,7 @@
 
 /* Reveal the automation steps in order, then repeat the sequence. */
 @media (prefers-reduced-motion:no-preference) {
- .clone-feature-peach .clone-audit.is-ready > * { animation-duration:9s; animation-delay:0s; animation-timing-function:ease; animation-iteration-count:infinite; animation-fill-mode:both; animation-play-state:paused; }
+ .clone-feature-peach .clone-audit.is-ready > * { animation-duration:3.8s; animation-delay:0s; animation-timing-function:ease; animation-iteration-count:infinite; animation-fill-mode:both; animation-play-state:paused; }
  .clone-feature-peach .clone-audit.is-ready.is-visible > * { animation-play-state:running; }
  .clone-feature-peach .clone-audit.is-ready > .audit-node:first-child { animation-name:audit-step-one; }
  .clone-feature-peach .clone-audit.is-ready > .audit-connector:nth-child(2) { animation-name:audit-line-one; transform-origin:top; }
@@ -606,7 +606,7 @@
 @keyframes audit-line-two { 0%,29% { opacity:0; transform:scaleY(0); } 36%,90% { opacity:1; transform:scaleY(1); } 100% { opacity:0; transform:scaleY(1); } }
 @keyframes audit-step-three { 0%,39% { opacity:0; transform:translateY(6px); } 48%,90% { opacity:1; transform:translateY(0); } 100% { opacity:0; transform:translateY(0); } }
 @media (prefers-reduced-motion:no-preference) {
- .clone-feature-peach .clone-audit.is-ready > div { animation-duration:9s; animation-delay:0s; animation-timing-function:ease; animation-iteration-count:infinite; animation-fill-mode:both; }
+ .clone-feature-peach .clone-audit.is-ready > div { animation-duration:3.8s; animation-delay:0s; animation-timing-function:ease; animation-iteration-count:infinite; animation-fill-mode:both; }
 }
 @media (prefers-reduced-motion:no-preference) {
  .clone-feature-peach .clone-audit.is-ready > div { animation-play-state:paused; }

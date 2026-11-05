@@ -12,7 +12,11 @@ GEOSITION contains a Python toolkit, a web platform, and supporting documentatio
 | `src/geo_optimizer/saas/` | Workspace, storage, and platform services |
 | `src/geo_optimizer/mcp/` | MCP server |
 | `tests/` | Automated tests |
-| `docs/` and `site/` | Documentation source and published documentation site |
+| `docs/` and `site/` | Documentation, research references, plans, and the published documentation site |
+| `docs/ai-context-files/` | Reusable instructions for AI tools |
+| `docs/references/` | Research, crawler, and schema reference material |
+| `docs/plans/` | Implementation plans and their status |
+| `docs/marketing/` | Article drafts and publication notes |
 | `examples/` | Sample benchmark data and plugin |
 | `apps/` | Additional applications, including the visibility tracker |
 | `seo/` | Repository SEO program and illustrative keyword estimates |

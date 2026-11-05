@@ -1,6 +1,6 @@
 # Plan 004: Stabilize SERP, Lighthouse, And Crawler Evidence Providers
 
-> **Executor instructions**: Follow this plan step by step. Run every verification command and confirm the expected result before moving to the next step. If anything in the "STOP conditions" section occurs, stop and report. When done, update the status row for this plan in `plans/README.md`.
+> **Executor instructions**: Follow this plan step by step. Run every verification command and confirm the expected result before moving to the next step. If anything in the "STOP conditions" section occurs, stop and report. When done, update the status row for this plan in `docs/plans/README.md`.
 >
 > **Drift check (run first)**: `git diff --stat c81730a..HEAD -- src/geo_optimizer/core/audit_serp.py src/geo_optimizer/core/seo_intelligence.py src/geo_optimizer/core/log_analyzer.py src/geo_optimizer/saas/service.py src/geo_optimizer/storage/artifacts.py tests/test_seo_intelligence.py tests/test_platform_saas.py`
 > If any in-scope file changed since this plan was written, compare the "Current state" excerpts against the live code before proceeding; on a mismatch, treat it as a STOP condition.
@@ -10,7 +10,7 @@
 - **Priority**: P2
 - **Effort**: L
 - **Risk**: HIGH
-- **Depends on**: `plans/001-weekly-evidence-run-model.md`
+- **Depends on**: `docs/plans/001-weekly-evidence-run-model.md`
 - **Category**: direction
 - **Planned at**: commit `c81730a`, 2026-06-12
 

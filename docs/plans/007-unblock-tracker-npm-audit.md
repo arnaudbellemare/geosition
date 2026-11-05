@@ -4,7 +4,7 @@
 > verification command and confirm the expected result before moving to the
 > next step. If anything in the "STOP conditions" section occurs, stop and
 > report; do not improvise. When done, update the status row for this plan in
-> `plans/README.md`.
+> `docs/plans/README.md`.
 >
 > **Drift check (run first)**:
 > `git diff --stat 6845682..HEAD -- apps/geo-aeo-tracker/package.json apps/geo-aeo-tracker/package-lock.json .github/workflows/ci.yml`
@@ -182,7 +182,7 @@ This is a dependency/CI gate plan. Verification is command-based:
 - [x] No CI audit threshold was weakened.
 - [x] Only in-scope files changed.
 - [x] `git diff --check` passes.
-- [x] `plans/README.md` status row updated.
+- [x] `docs/plans/README.md` status row updated.
 
 ## STOP Conditions
 

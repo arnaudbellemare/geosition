@@ -1,6 +1,6 @@
 # AI Context Files — Platform Guide
 
-GEOSITION provides platform-specific context files in the `ai-context/` folder. Each file is optimized for its platform's format and character limits.
+GEOSITION provides platform-specific context files in the `docs/ai-context-files/` folder. Each file is optimized for its platform's format and character limits.
 
 > **TL;DR:** See `SKILL.md` for the quick-reference table. This doc has step-by-step setup for each platform.
 
@@ -8,7 +8,7 @@ GEOSITION provides platform-specific context files in the `ai-context/` folder. 
 
 ## Claude Projects
 
-**File:** `ai-context/claude-project.md`  
+**File:** `docs/ai-context-files/claude-project.md`<br>
 **Limit:** No practical limit — full context loaded  
 **What you get:** Full workflow, 9 Princeton methods with impact %, all scripts with flags, framework examples (Astro, Next.js, WordPress), GEO checklist, robots.txt block, llms.txt templates, JSON-LD schema examples
 
@@ -16,7 +16,7 @@ GEOSITION provides platform-specific context files in the `ai-context/` folder. 
 
 1. Go to [claude.ai](https://claude.ai) → click **Projects** in the sidebar
 2. Click **+ New Project** (e.g. "GEOSITION")
-3. Click **Add content** → **Upload file** → select `ai-context/claude-project.md`
+3. Click **Add content** → **Upload file** → select `docs/ai-context-files/claude-project.md`
 4. Start a new conversation inside the Project
 
 Claude will have persistent GEO context across every conversation in that Project.
@@ -32,7 +32,7 @@ Claude will have persistent GEO context across every conversation in that Projec
 
 ## ChatGPT Custom GPT (GPT Builder)
 
-**File:** `ai-context/chatgpt-custom-gpt.md`  
+**File:** `docs/ai-context-files/chatgpt-custom-gpt.md`<br>
 **Limit:** 8,000 characters for system prompt  
 **File size:** ~4,500 characters — well within limit  
 **Requires:** ChatGPT Plus, Team, or Enterprise (paid plan)
@@ -41,7 +41,7 @@ Claude will have persistent GEO context across every conversation in that Projec
 
 1. Go to [chat.openai.com](https://chat.openai.com) → click your avatar → **My GPTs**
 2. Click **Create a GPT** → go to the **Configure** tab
-3. In the **Instructions** field, paste the full contents of `ai-context/chatgpt-custom-gpt.md`
+3. In the **Instructions** field, paste the full contents of `docs/ai-context-files/chatgpt-custom-gpt.md`
 4. Give the GPT a name (e.g. "GEOSITION") and save
 
 ### What to expect
@@ -57,7 +57,7 @@ Claude will have persistent GEO context across every conversation in that Projec
 
 ## ChatGPT Custom Instructions
 
-**File:** `ai-context/chatgpt-instructions.md`  
+**File:** `docs/ai-context-files/chatgpt-instructions.md`<br>
 **Limit:** 1,500 characters per field (2 fields = 3,000 max)  
 **File size:** ~800 characters — fits in a single field  
 **Requires:** Free or paid ChatGPT account
@@ -67,7 +67,7 @@ Claude will have persistent GEO context across every conversation in that Projec
 ### Setup
 
 1. Go to [chat.openai.com](https://chat.openai.com) → click your avatar → **Customize ChatGPT**
-2. Under **"What would you like ChatGPT to know about you?"** paste the contents of `ai-context/chatgpt-instructions.md`
+2. Under **"What would you like ChatGPT to know about you?"** paste the contents of `docs/ai-context-files/chatgpt-instructions.md`
 3. Save. Active for all new conversations.
 
 ### What to expect
@@ -75,13 +75,13 @@ Claude will have persistent GEO context across every conversation in that Projec
 - ChatGPT will understand GEO context without re-explaining every time
 - Knows the 3 script commands and top 3 Princeton methods
 - Does NOT have the full 9-method table, schema templates, or framework examples
-- For complex tasks, paste relevant sections from `ai-context/claude-project.md` directly into the chat
+- For complex tasks, paste relevant sections from `docs/ai-context-files/claude-project.md` directly into the chat
 
 ---
 
 ## Cursor
 
-**File:** `ai-context/cursor.mdc`  
+**File:** `docs/ai-context-files/cursor.mdc`<br>
 **Format:** `.mdc` with YAML frontmatter  
 **Limit:** No character limit  
 **Activation:** Rules load when files match the `globs` pattern
@@ -90,12 +90,12 @@ Claude will have persistent GEO context across every conversation in that Projec
 
 ```bash
 mkdir -p .cursor/rules
-cp ~/geosition/ai-context/cursor.mdc .cursor/rules/geo-optimizer.mdc
+cp ~/geosition/docs/ai-context-files/cursor.mdc .cursor/rules/geo-optimizer.mdc
 ```
 
 Or copy manually:
 1. In your project root, create `.cursor/rules/` directory
-2. Copy `ai-context/cursor.mdc` → `.cursor/rules/geo-optimizer.mdc`
+2. Copy `docs/ai-context-files/cursor.mdc` → `.cursor/rules/geo-optimizer.mdc`
 3. Cursor loads the rule automatically when you open matching files
 
 The `globs` pattern activates the rule for: `*.html`, `*.astro`, `*.tsx`, `*.jsx`, `*.php`, `robots.txt`, `llms.txt`, `*.json`
@@ -121,7 +121,7 @@ Change `alwaysApply: true` to load the rule in every Cursor session regardless o
 
 ## Windsurf
 
-**File:** `ai-context/windsurf.md`  
+**File:** `docs/ai-context-files/windsurf.md`<br>
 **Format:** Plain Markdown — NO YAML frontmatter  
 **Limit:** ~12,000 chars (UI activation)  
 **Activation:** Configured via Windsurf UI → Customizations → Rules (4 modes: Always On, Glob, Model Decision, Manual)
@@ -132,12 +132,12 @@ Change `alwaysApply: true` to load the rule in every Cursor session regardless o
 
 ```bash
 mkdir -p .windsurf/rules
-cp ~/geosition/ai-context/windsurf.md .windsurf/rules/geo-optimizer.md
+cp ~/geosition/docs/ai-context-files/windsurf.md .windsurf/rules/geo-optimizer.md
 ```
 
 Or copy manually:
 1. In your project root, create `.windsurf/rules/` directory
-2. Copy `ai-context/windsurf.md` → `.windsurf/rules/geo-optimizer.md`
+2. Copy `docs/ai-context-files/windsurf.md` → `.windsurf/rules/geo-optimizer.md`
 3. Open Windsurf → **Customizations** (top-right slider icon) → **Rules**
 4. Find `geo-optimizer.md` in the list and set the activation mode
 
@@ -162,7 +162,7 @@ Or copy manually:
 
 ## Kiro
 
-**File:** `ai-context/kiro-steering.md`  
+**File:** `docs/ai-context-files/kiro-steering.md`<br>
 **Format:** Markdown with YAML frontmatter  
 **Limit:** No character limit  
 **Activation:** `inclusion: fileMatch` — loads only when matching files are open
@@ -171,12 +171,12 @@ Or copy manually:
 
 ```bash
 mkdir -p .kiro/steering
-cp ~/geosition/ai-context/kiro-steering.md .kiro/steering/geo-optimizer.md
+cp ~/geosition/docs/ai-context-files/kiro-steering.md .kiro/steering/geo-optimizer.md
 ```
 
 Or copy manually:
 1. In your project root, create `.kiro/steering/` directory
-2. Copy `ai-context/kiro-steering.md` → `.kiro/steering/geo-optimizer.md`
+2. Copy `docs/ai-context-files/kiro-steering.md` → `.kiro/steering/geo-optimizer.md`
 3. Kiro loads the steering file automatically when files matching the pattern are open
 
 ### What to expect
@@ -223,9 +223,9 @@ When the GEOSITION toolkit is updated, re-copy the relevant files:
 
 ```bash
 # Update all IDE rule files
-cp ~/geosition/ai-context/cursor.mdc .cursor/rules/geo-optimizer.mdc
-cp ~/geosition/ai-context/windsurf.md .windsurf/rules/geo-optimizer.md
-cp ~/geosition/ai-context/kiro-steering.md .kiro/steering/geo-optimizer.md
+cp ~/geosition/docs/ai-context-files/cursor.mdc .cursor/rules/geo-optimizer.mdc
+cp ~/geosition/docs/ai-context-files/windsurf.md .windsurf/rules/geo-optimizer.md
+cp ~/geosition/docs/ai-context-files/kiro-steering.md .kiro/steering/geo-optimizer.md
 
 # For Claude/ChatGPT: re-upload/re-paste the updated file manually
 ```

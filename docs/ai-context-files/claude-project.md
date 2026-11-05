@@ -234,7 +234,7 @@ Based on KDD 2024 research — tested on 10,000 queries across real Perplexity.a
 
 **Apply in priority order.** Items 1–2 alone can double AI visibility on a citation-heavy query.
 
-> Full research: `references/princeton-geo-methods.md`
+> Full research: `docs/references/princeton-geo-methods.md`
 
 ---
 
@@ -339,9 +339,9 @@ add_action("wp_head", "add_geo_schema");
 
 | File | Contents |
 |------|----------|
-| `references/princeton-geo-methods.md` | Full detail on all 9 methods with examples and query-type analysis |
-| `references/ai-bots-list.md` | All AI crawlers — user-agents, purpose, robots.txt snippets |
-| `references/schema-templates.md` | Ready-to-use JSON-LD templates for 8 schema types |
+| `docs/references/princeton-geo-methods.md` | Full detail on all 9 methods with examples and query-type analysis |
+| `docs/references/ai-bots-list.md` | All AI crawlers — user-agents, purpose, robots.txt snippets |
+| `docs/references/schema-templates.md` | Ready-to-use JSON-LD templates for 8 schema types |
 
 ---
 
