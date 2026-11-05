@@ -20,6 +20,22 @@ def test_github_repo_audit_detects_missing_files(tmp_path) -> None:
     assert result.recommendations
 
 
+def test_github_repo_audit_recognizes_github_community_files(tmp_path) -> None:
+    (tmp_path / "README.md").write_text("# Project", encoding="utf-8")
+    (tmp_path / "LICENSE").write_text("License", encoding="utf-8")
+    github = tmp_path / ".github"
+    github.mkdir()
+    (github / "CONTRIBUTING.md").write_text("Contribute", encoding="utf-8")
+    (github / "SECURITY.md").write_text("Security", encoding="utf-8")
+
+    result = audit_github_repo(str(tmp_path))
+
+    assert ".github/CONTRIBUTING.md" in result.found_files
+    assert ".github/SECURITY.md" in result.found_files
+    assert "CONTRIBUTING.md" not in result.missing_files
+    assert "SECURITY.md" not in result.missing_files
+
+
 def test_github_cmd_writes_reports(tmp_path) -> None:
     repo = tmp_path / "repo2"
     repo.mkdir()

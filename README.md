@@ -10,7 +10,7 @@ A source-available developer toolkit for auditing websites for AI search readine
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-303830)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-source--available-303830)](LICENSE)
 
-[Documentation](https://arnaudbellemare.github.io/geosition/) · [Website](https://geositionai.com/) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+[Documentation](https://arnaudbellemare.github.io/geosition/) · [Website](https://geositionai.com/) · [Contributing](.github/CONTRIBUTING.md) · [Security](.github/SECURITY.md)
 
 ## Get started
 
@@ -87,7 +87,7 @@ pytest tests/ -q
 ruff check src/geo_optimizer/
 ```
 
-Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), and report security issues using [SECURITY.md](SECURITY.md).
+Contributions are welcome. Start with [CONTRIBUTING.md](.github/CONTRIBUTING.md), and report security issues using [SECURITY.md](.github/SECURITY.md).
 
 ## License
 

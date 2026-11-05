@@ -65,10 +65,11 @@ def audit_github_repo(repo_path: str) -> GithubRepoAuditResult:
 
     # Base files
     for rel in _REQUIRED_FILES:
-        p = root / rel
-        if p.exists():
+        candidates = (rel, f".github/{rel}", f"docs/{rel}") if rel in {"CONTRIBUTING.md", "SECURITY.md"} else (rel,)
+        found = next((candidate for candidate in candidates if (root / candidate).is_file()), None)
+        if found:
             score += 10
-            result.found_files.append(rel)
+            result.found_files.append(found)
         else:
             result.missing_files.append(rel)
 

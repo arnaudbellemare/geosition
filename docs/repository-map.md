@@ -25,6 +25,6 @@ GEOSITION contains a Python toolkit, a web platform, and supporting documentatio
 | `assets/` | Repository branding |
 | `deploy/` | Additional deployment files, including the web Dockerfile |
 
-The root contains configuration and entry points used by packaging, deployment, CI, and external integrations. Files such as `action.yml`, `main.py`, and `install.sh` remain at their existing paths for compatibility. `SCORING_RUBRIC.md` is a compatibility pointer; the current rubric is in [`docs/scoring-rubric.md`](scoring-rubric.md). Run `npm run typecheck` for the scripts and `npm run test:dashboard` for the dashboard browser tests.
+The root contains configuration and entry points used by packaging, deployment, CI, and external integrations. Files such as `action.yml`, `main.py`, and `install.sh` remain at their existing paths for compatibility. The scoring rubric is in [`docs/scoring-rubric.md`](scoring-rubric.md). Run `npm run typecheck` for the scripts and `npm run test:dashboard` for the dashboard browser tests.
 
-For architectural boundaries and security-sensitive code, read [`AGENTS.md`](../AGENTS.md). For development setup and submitting changes, see [`CONTRIBUTING.md`](../CONTRIBUTING.md).
+For architectural boundaries and security-sensitive code, read [`AGENTS.md`](../AGENTS.md). For development setup and submitting changes, see [`CONTRIBUTING.md`](../.github/CONTRIBUTING.md).
