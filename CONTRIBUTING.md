@@ -7,8 +7,8 @@ Thank you for considering contributing! GEO Optimizer aims to make websites more
 ```bash
 # 1. Fork the repo on GitHub
 # 2. Clone your fork
-git clone https://github.com/YOUR_USERNAME/geo-optimizer-skill.git
-cd geo-optimizer-skill
+git clone https://github.com/YOUR_USERNAME/geosition.git
+cd geosition
 
 # 3. Create a branch
 git checkout -b feature/your-feature-name
@@ -58,7 +58,7 @@ src/geo_optimizer/
 │   ├── audit_robots.py      # robots.txt analysis (fetch_url)
 │   ├── audit_llms.py        # llms.txt analysis (fetch_url)
 │   ├── audit_ai_discovery.py # AI discovery endpoints (fetch_url)
-│   ├── citability.py        # 47 citability methods (~3500 lines)
+│   ├── citability/          # Content and citability heuristics
 │   ├── scoring.py           # Engine scoring (weights from config.py)
 │   ├── injection_detector.py # Prompt Injection Detection (8 categories)
 │   ├── fixer.py             # Fix generation (robots, llms, schema, meta)

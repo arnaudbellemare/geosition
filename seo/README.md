@@ -22,3 +22,7 @@ Versioned artifacts that tie **live GEO analysis** (`geo full`, `geo orchestrate
 ## Relation to GEO Optimizer CLI
 
 After a full audit, the CLI reminds operators to align numeric findings with `seo/audit-issues.json` and to keep artifacts validated. Automation checks structure only — not ranking outcomes.
+
+## Keyword data
+
+[`keyword-estimates.csv`](keyword-estimates.csv) contains illustrative local estimates for SEO experiments. It is sample data, not a live keyword research feed.

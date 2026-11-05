@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" role="img" aria-labelledby="title desc">
+  <title id="title">GEOSITION — AI search readiness for the web</title>
+  <desc id="desc">A minimal banner with the GEOSITION wordmark and an example terminal command.</desc>
+  <rect width="1200" height="400" rx="24" fill="#f3f4ef"/>
+  <g fill="none" stroke="#191c18" stroke-width="5" stroke-linecap="round" transform="translate(72 64)">
+    <path d="M0-20v40M-20 0h40M-14-14l28 28M14-14l-28 28"/>
+  </g>
+  <text x="112" y="74" fill="#191c18" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" letter-spacing="1.5">GEOSITION</text>
+  <text x="72" y="171" fill="#191c18" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" letter-spacing="-1.6">Build for AI search.</text>
+  <text x="72" y="215" fill="#666c65" font-family="Arial, Helvetica, sans-serif" font-size="23">Audit your site. Find the next fix.</text>
+  <rect x="72" y="259" width="672" height="66" rx="12" fill="#20241f"/>
+  <text x="96" y="301" fill="#9cc8a1" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20">$</text>
+  <text x="124" y="301" fill="#f3f4ef" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20">geo audit --url https://example.com</text>
+  <g transform="translate(945 200)" fill="none" stroke="#bac9b9" stroke-width="2">
+    <circle r="112"/><circle r="78"/><circle r="44"/>
+    <path d="M-112 0h224M0-112v224"/>
+    <circle cx="0" cy="0" r="9" fill="#7aa781" stroke="none"/>
+    <circle cx="55" cy="-55" r="7" fill="#20241f" stroke="#f3f4ef" stroke-width="4"/>
+  </g>
+</svg>
