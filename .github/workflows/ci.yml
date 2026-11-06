@@ -88,6 +88,30 @@ jobs:
           pip-audit
           pip-audit -r apps/ai-scraper-api/requirements.txt
 
+  mcp-compatibility:
+    name: MCP SDK ${{ matrix.mcp-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mcp-version: ['1', '2']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install package and MCP SDK
+        run: |
+          pip install -e '.[dev]'
+          if [ '${{ matrix.mcp-version }}' = '1' ]; then
+            pip install 'mcp>=1,<2'
+          else
+            pip install 'mcp>=2,<3'
+          fi
+      - name: Test MCP server
+        run: pytest tests/test_mcp.py tests/test_mcp_protocol.py -q
+
   geo-aeo-tracker:
     name: GEO/AEO Tracker build
     runs-on: ubuntu-latest

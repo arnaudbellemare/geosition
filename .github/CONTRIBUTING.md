@@ -42,6 +42,10 @@ ruff format --check src/geo_optimizer/
 
 For changes to repository SEO data, also run `npm ci` and `npm run seo:verify`. Changes to the tracker under `apps/geo-aeo-tracker/` need its own build; see its README and the [CI workflow](workflows/ci.yml). Add or update tests when behavior changes, and mock network calls in normal tests.
 
+### Local hooks
+
+Install `pre-commit`, `gitleaks`, ShellCheck, Node.js, and Python, then run `pre-commit install`. Install the repository's pre-push check with `python3 scripts/install-pre-push.py`. The commit checks scan changed text files for secrets, validate Python, JavaScript, JSON and shell syntax, lint shell scripts, and check Python source with Ruff. The push hook runs these checks on files changed by the pushed commits. CI runs the complete test and build suites.
+
 ## Open a pull request
 
 1. Keep the change focused and describe the problem it solves.

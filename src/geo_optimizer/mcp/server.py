@@ -44,10 +44,13 @@ _MCP_IMPORT_ERROR: ModuleNotFoundError | None = None
 try:
     from mcp.server.fastmcp import FastMCP
 except ModuleNotFoundError as exc:
-    if exc.name != "mcp":
+    if exc.name == "mcp.server.fastmcp":
+        from mcp.server.mcpserver import MCPServer as FastMCP
+    elif exc.name == "mcp":
+        _MCP_IMPORT_ERROR = exc
+        FastMCP = None  # type: ignore[assignment]
+    else:
         raise
-    _MCP_IMPORT_ERROR = exc
-    FastMCP = None  # type: ignore[assignment]
 
 
 class _MissingMCP:
