@@ -8,6 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · [SemVer](https://semv
 ## Contents
 
 - [Unreleased](#unreleased)
+- [4.9.1 — 2026-11-06](#491--2026-11-06)
 - [4.9.0 — 2026-04-16](#490--2026-04-16)
 - [4.8.0 — 2026-04-16](#480--2026-04-16)
 - [4.7.0 — 2026-04-16](#470--2026-04-16)
@@ -45,9 +46,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/) · [SemVer](https://semv
 
 ## [Unreleased]
 
-Next planned release: **v4.10.0** (Veil) — Late May / Early June 2026.
+Changes planned for future releases.
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the full release calendar and project direction.
+---
+
+## [4.9.1] — 2026-11-06
+
+### Fixed
+- Support both MCP Python SDK 1.x and 2.x when starting the MCP server.
+- Exercise MCP tool discovery through a real stdio client in the compatibility tests.
 
 ---
 
