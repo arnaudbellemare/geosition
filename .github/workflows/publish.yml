@@ -3,12 +3,13 @@ name: Publish to PyPI
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 jobs:
   # Job ci: esegue i test prima di qualsiasi pubblicazione
   ci:
     name: Test Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -34,7 +35,7 @@ jobs:
   build:
     name: Build distribution
     needs: [ci]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v6
@@ -59,7 +60,8 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: [ci, build]
-    runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
     environment:
       name: pypi
       url: https://pypi.org/p/geosition
