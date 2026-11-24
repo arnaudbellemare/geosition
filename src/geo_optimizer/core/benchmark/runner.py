@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urljoin, urlsplit, urlunsplit
+from xml.etree import ElementTree
 
 from geo_optimizer.core.audit import run_full_audit
 from geo_optimizer.core.benchmark.citation_economics import compute_citation_economics
@@ -16,6 +19,7 @@ from geo_optimizer.core.benchmark.store import BenchmarkStore
 from geo_optimizer.core.benchmark.task_classifier import classify_prompt
 from geo_optimizer.core.benchmark.unique_value import assess_unique_value
 from geo_optimizer.core.snapshots import extract_citations
+from geo_optimizer.models.config import BENCHMARK_SITE_MAX_PAGES
 from geo_optimizer.models.results import AuditResult
 from geo_optimizer.models.results.benchmark import (
     BenchmarkRunResult,
@@ -23,11 +27,67 @@ from geo_optimizer.models.results.benchmark import (
     NegotiationReportData,
     UniqueValueAssessment,
 )
+from geo_optimizer.utils.http import fetch_url
 
 
 def _domain_url(domain: str) -> str:
     normalized = normalize_benchmark_domain(domain)
     return f"https://{normalized}"
+
+
+def _site_pages(start_url: str, tasks: set[str]) -> list[str]:
+    """Select a bounded same-origin sitemap sample, prioritizing matching tasks."""
+    start = urlsplit(start_url)
+    origin = (start.scheme.lower(), start.netloc.lower())
+    sitemap_url = urljoin(start_url, "/sitemap.xml")
+    try:
+        candidates = []
+        queue = [sitemap_url]
+        seen_sitemaps: set[str] = set()
+        while queue and len(seen_sitemaps) < 4:
+            current = queue.pop(0)
+            if current in seen_sitemaps:
+                continue
+            seen_sitemaps.add(current)
+            response, error = fetch_url(current, timeout=5)
+            if error or response is None or response.status_code != 200:
+                continue
+            final = urlsplit(response.url)
+            if (final.scheme.lower(), final.netloc.lower()) != origin or "<!DOCTYPE" in response.text.upper():
+                continue
+            root = ElementTree.fromstring(response.text)
+            kind = root.tag.split("}")[-1]
+            if kind not in ("urlset", "sitemapindex"):
+                continue
+            for entry in root:
+                loc = next((node.text for node in entry if node.tag.split("}")[-1] == "loc"), None)
+                if not loc:
+                    continue
+                p = urlsplit(urljoin(current, loc.strip()))
+                if (p.scheme.lower(), p.netloc.lower()) != origin or p.username or p.password or p.query:
+                    continue
+                url = urlunsplit((p.scheme, p.netloc, p.path or "/", "", ""))
+                if kind == "sitemapindex":
+                    if url not in seen_sitemaps and url not in queue:
+                        queue.append(url)
+                    continue
+                if p.path.lower().endswith((".xml", ".pdf", ".jpg", ".png", ".webp", ".js", ".css")):
+                    continue
+                if any(
+                    part in {"logout", "signout", "checkout", "cart", "delete"} for part in p.path.lower().split("/")
+                ):
+                    continue
+                if url.rstrip("/") != start_url.rstrip("/") and url not in candidates:
+                    candidates.append(url)
+
+        def relevance(url):
+            classification = classify_prompt(urlsplit(url).path)
+            return classification.task not in tasks or classification.signals == ["default"]
+
+        candidates.sort(key=relevance)
+        return candidates[: BENCHMARK_SITE_MAX_PAGES - 1]
+    except (ValueError, TypeError, AttributeError, OSError, ElementTree.ParseError):
+        return []
 
 
 def _memory_snapshots(
@@ -125,6 +185,7 @@ def run_domain_benchmark(
                 "cited_triples": [(c.url, c.domain, c.position) for c in citations],
                 "prompt_id": prompt_record.prompt_id if prompt_record else None,
                 "extra_urls": row.get("citation_urls"),
+                "collection_evidence": row.get("collection_evidence"),
             }
         )
     if not pending_rows:
@@ -141,6 +202,20 @@ def run_domain_benchmark(
                 page_coverage = [map_audit_to_page_coverage(audit_result)]
         except Exception:
             audit_result = None
+
+    if audit_result is not None:
+        pages = _site_pages(audit_url or _domain_url(domain), {row["task"] for row in pending_rows})
+
+        def audit_page(url):
+            try:
+                result = run_full_audit(url, use_cache=use_cache)
+                return None if result.error else map_audit_to_page_coverage(result)
+            except Exception:
+                return None
+
+        if pages:
+            with ThreadPoolExecutor(max_workers=min(4, len(pages))) as executor:
+                page_coverage.extend(item for item in executor.map(audit_page, pages) if item is not None)
 
     snapshot_records, mentions_by_snapshot = _memory_snapshots(
         pending_rows,
@@ -190,6 +265,16 @@ def run_domain_benchmark(
     )
     run_id = run_record.run_id
 
+    for row in answer_rows:
+        if row.get("experiment_batch"):
+            benchmark_store.save_evidence_artifact(
+                run_id,
+                "memory_search_experiment",
+                "canonical_experiment",
+                json.dumps(row["experiment_batch"]),
+            )
+            break
+
     if page_coverage:
         benchmark_store.save_page_task_coverage(run_id, page_coverage)
 
@@ -218,6 +303,8 @@ def run_domain_benchmark(
                     "prompt": persisted.prompt_text,
                     "answer": persisted.answer_text[:4000],
                     "cited_urls": persisted.cited_urls,
+                    "snapshot_id": persisted.snapshot_id,
+                    "collection_evidence": pending.get("collection_evidence"),
                 }
             ),
         )
@@ -233,7 +320,7 @@ def run_domain_benchmark(
     executive = (
         f"GEO Benchmark {score}/100 ({band}). "
         f"AI citation share ~{avg_citation:.0%} across {len(task_metrics)} task/provider slices. "
-        f"{len(task_gaps)} task gap(s); commodity risk {unique_value.commodity_risk}."
+        f"{len(task_gaps)} task gap(s) in {len(page_coverage)} sampled page(s); commodity risk {unique_value.commodity_risk}."
     )
 
     return BenchmarkRunResult(
@@ -252,7 +339,7 @@ def run_domain_benchmark(
         unique_value=unique_value,
         citation_economics=citation_economics,
         snapshots_stored=len(pending_rows),
-        evidence_artifacts=[],
+        evidence_artifacts=benchmark_store.get_evidence_artifacts(run_id),
         executive_summary=executive,
     )
 
@@ -337,5 +424,6 @@ def load_benchmark_run_result(
         unique_value=UniqueValueAssessment(unique_value_score=run_record.breakdown.unique_value),
         citation_economics=citation_economics,
         snapshots_stored=len(snapshots),
+        evidence_artifacts=benchmark_store.get_evidence_artifacts(run_id),
         executive_summary=f"GEO Benchmark {run_record.benchmark_score}/100 ({run_record.band}).",
     )

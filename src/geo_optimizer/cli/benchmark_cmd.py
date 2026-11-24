@@ -155,5 +155,7 @@ def benchmark_history(domain, limit, benchmark_db):
 
 
 from geo_optimizer.cli.collect_cmd import collect_group  # noqa: E402
+from geo_optimizer.cli.experiment_cmd import experiment_group  # noqa: E402
 
 benchmark_group.add_command(collect_group)
+benchmark_group.add_command(experiment_group)

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from geo_optimizer.storage.artifacts import ArtifactStore
 
 COLLECTION_HOME = resolve_collection_home()
-PARSER_VERSION = "1.0.0"
+PARSER_VERSION = "1.1.0"
 _SAFE_SEGMENT_RE = re.compile(r"[^A-Za-z0-9._-]+")
 
 
@@ -65,11 +65,14 @@ class CollectionArtifactStore:
         prompt_id: str,
         payload: object,
         suffix: str = "json",
+        attempt_id: str = "",
     ) -> str:
         """Save raw payload; return relative path from collection home."""
         directory = self.run_dir(run_id)
         safe_provider = _safe_segment(provider, fallback="provider")
         safe_id = _safe_segment(prompt_id, fallback="prompt")
+        if attempt_id:
+            safe_id += "_" + _safe_segment(attempt_id, fallback="attempt")
         safe_suffix = _safe_segment(suffix, fallback="txt")
         filename = f"{safe_provider}_{safe_id}.{safe_suffix}"
         path = directory / filename
@@ -84,7 +87,7 @@ class CollectionArtifactStore:
                 run_id,
                 org_slug=self.org_slug,
                 provider=provider,
-                prompt_id=prompt_id,
+                prompt_id=safe_id,
                 payload=payload,
             )
             return uri

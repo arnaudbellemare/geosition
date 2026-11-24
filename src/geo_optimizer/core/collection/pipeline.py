@@ -51,7 +51,13 @@ def _save_raw_for_adapter(adapter, request, store, run_id) -> tuple[CollectedAns
 
     if hasattr(adapter, "collect_with_raw"):
         answer, raw = adapter.collect_with_raw(request)
-        rel = store.save_raw(run_id, provider=adapter.provider_id, prompt_id=request.prompt.prompt_id, payload=raw)
+        rel = store.save_raw(
+            run_id,
+            provider=adapter.provider_id,
+            prompt_id=request.prompt.prompt_id,
+            payload=raw,
+            attempt_id=request.provenance.attempt_id,
+        )
         answer.raw_response_path = rel
         return answer, raw
     answer = adapter.collect(request)
@@ -180,7 +186,13 @@ def import_tracker_export(path: Path, *, target_domain: str = "") -> CollectedAn
 
     if isinstance(payload, list):
         for item in payload:
-            answers.extend(from_bulk_analysis_item(item))
+            if "query_text" in item or "collection_evidence" in item or "experiment_batch" in item:
+                imported = batch_from_dict({"answers": [item]})
+                if imported.experiment:
+                    return imported
+                answers.extend(imported.answers)
+            else:
+                answers.extend(from_bulk_analysis_item(item))
     elif isinstance(payload, dict):
         if "platforms" in payload or "grounding" in payload:
             answers.extend(from_bulk_analysis_item(payload))

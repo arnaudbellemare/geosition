@@ -1,0 +1,9 @@
+# GEOSITION workspace setup MCP (local pilot)
+
+This local stdio server lets an AI client inspect the signed-in workspace and its domains, read saved commerce setup and Vercel connection status, run a bounded commerce audit, check existing domain ownership proof, and record team progress. It uses the existing hosted API and the existing session's selected workspace, membership checks, and verified-domain gates.
+
+Run with `python -m geo_optimizer.mcp.workspace_connector` from an environment with `geosition[mcp]` installed. Supply an existing GEOSITION **session token** as the `GEOSITION_SESSION_TOKEN` environment variable using your MCP client's secure secret facility. Do not put a token in tool arguments, chat, or a committed config file. Sessions expire; the user must reauthenticate. The tool never selects a different workspace: select the intended workspace in the authenticated session first, then call `geosition_workspace` and pass its current workspace ID to subsequent tools. Use a separate session for each business.
+
+This is a local pilot, not hosted multi-user OAuth. Do not expose this process on a network or share its environment. There is not yet an automated way to provision a session to the connector or connect it to ChatGPT/Claude as a remote service. A production remote connector needs per-user OAuth, tenant-scoped request authentication and a safe account-linking UX.
+
+Domain verification checks pre-existing DNS/HTTPS proof; it does not edit DNS. A successful check may queue hosted collection if enabled in the platform. An audit is a bounded public-site crawl and saves its result in the workspace. A progress entry is self-reported, not verification. A saved Vercel connection does not prove the token still works or that ChatGPT cloud-browser access is verified. These tools do not connect accounts, submit feeds, change provider configuration, or take payments.

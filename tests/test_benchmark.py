@@ -74,7 +74,7 @@ def test_benchmark_store_run_persistence(tmp_path):
 
     summary = store.get_latest_citation_share_summary("velora.example")
     assert summary is not None
-    assert summary.scoring_version == "evidence-v2"
+    assert summary.scoring_version == "evidence-v3-site-sample"
     assert summary.evidence_coverage == result.breakdown.measured_weight
     assert summary.sample_size == 2
     assert summary.target_cited_count == 2
@@ -523,7 +523,7 @@ def test_benchmark_scoring_excludes_unmeasured_components():
     assert breakdown.serp_rank is None
     assert breakdown.technical_performance is None
     assert breakdown.competitor_position is None
-    assert breakdown.scoring_version == "evidence-v2"
+    assert breakdown.scoring_version == "evidence-v3-site-sample"
     assert breakdown.measured_weight == 0.6
     assert score == round((50 * 0.25 + 12 * 0.2 + 40 * 0.15) / 0.6)
 

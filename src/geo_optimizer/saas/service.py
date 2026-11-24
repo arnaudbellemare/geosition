@@ -310,7 +310,10 @@ class PlatformService:
             "url_configured": bool(
                 os.environ.get("SUPABASE_URL", os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "")).strip()
             ),
-            "service_role_configured": bool(os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()),
+            "service_role_configured": bool(
+                os.environ.get("SUPABASE_SECRET_KEY", "").strip()
+                or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+            ),
             "forced_backend": os.environ.get("GEO_PLATFORM_BACKEND", "").strip() or "auto",
         }
         critical_ok = bool(storage.get("ok")) and bool(reset_delivery["ready"]) and bool(worker["configured"])
@@ -1247,6 +1250,16 @@ class PlatformService:
         except Exception as exc:
             self.store.fail_run(run.run_id, org.org_id, error=str(exc))
             raise
+        from geo_optimizer.core.benchmark.monitoring import build_citation_share_summary
+
+        stored_run = benchmark_store.get_benchmark_run(result.run_id)
+        if stored_run is None:
+            raise RuntimeError("Benchmark result could not be loaded for its citation summary.")
+        citation_summary = build_citation_share_summary(
+            stored_run,
+            benchmark_store.get_snapshots_for_run(result.run_id),
+            benchmark_store.get_competitor_mentions_for_run(result.run_id),
+        )
         link = self.store.link_benchmark_run(
             org.org_id,
             domain=normalized,
@@ -1254,6 +1267,12 @@ class PlatformService:
             benchmark_score=result.benchmark_score,
             band=result.band,
             run_at=result.run_at,
+            details={
+                "version": 1,
+                "result": asdict(result),
+                "answers": answer_rows,
+                "citation_share_summary": asdict(citation_summary),
+            },
         )
         completed = self.store.complete_run(
             run.run_id,
@@ -1287,6 +1306,20 @@ class PlatformService:
             "link": asdict(link),
             "run": asdict(completed) if completed else {},
             "index_events_recorded": len(telemetry_events),
+        }
+
+    def benchmark_details(self, token: str, *, link_id: int) -> dict:
+        """Return a saved benchmark only to a member of its owning workspace."""
+        _, org = self.require_session(token)
+        row = self.store.get_benchmark_details(org.org_id, link_id)
+        if row is None:
+            raise PermissionError("Benchmark not found.")
+        self._require_verified(org.org_id, row["domain"])
+        return {
+            "id": link_id,
+            "domain": row["domain"],
+            "details": row["details"],
+            "details_available": row["details"] is not None,
         }
 
     def queue_hosted_collection(
@@ -1897,21 +1930,16 @@ class PlatformService:
             raise ValueError("Add and verify a domain before viewing citation share.")
         self._require_verified(org.org_id, normalized)
 
-        from geo_optimizer.storage.paths import resolve_benchmark_db_path
-
-        bench_db = os.environ.get("GEO_BENCHMARK_DB")
-        benchmark_store = BenchmarkStore(Path(bench_db) if bench_db else resolve_benchmark_db_path())
-        summary = benchmark_store.get_latest_citation_share_summary(normalized)
-        if summary is None:
+        row = self.store.get_latest_benchmark_details(org.org_id, normalized)
+        details = row.get("details") if row else None
+        summary = details.get("citation_share_summary") if isinstance(details, dict) else None
+        if not isinstance(summary, dict):
             return {
                 "domain": normalized,
                 "has_data": False,
                 "message": "Run an AI benchmark to start monitoring citation share.",
             }
-        return {
-            "has_data": True,
-            "summary": asdict(summary),
-        }
+        return {"has_data": True, "summary": summary}
 
     def require_verified_domain(self, token: str, domain: str) -> str:
         """Authenticate and return a domain verified by this workspace."""
@@ -1964,44 +1992,59 @@ class PlatformService:
             # Citation order does not establish recommendation rank.
             top_recommendation = False
             confidence = self._clamp_float(row.get("parse_confidence", 1.0), 0.0, 1.0)
-            events.append(
-                self.store.record_agent_usage_event(
-                    org_id,
-                    domain=domain,
-                    page_url=first.url if first else "",
-                    source_type="benchmark",
-                    agent=str(row.get("provider", "")),
-                    query=str(row.get("prompt") or row.get("query_text", "")),
-                    answer_excerpt=answer_text[:1000],
-                    cited_url=first.url if first else "",
-                    cited_rank=cited_rank,
+            observation_key = self._benchmark_observation_key(domain, row)
+            event = self.store.record_agent_usage_event(
+                org_id,
+                domain=domain,
+                page_url=first.url if first else "",
+                source_type="benchmark",
+                agent=str(row.get("provider", "")),
+                query=str(row.get("prompt") or row.get("query_text", "")),
+                answer_excerpt=answer_text[:1000],
+                cited_url=first.url if first else "",
+                cited_rank=cited_rank,
+                surfaced=surfaced,
+                cited=cited,
+                top_recommendation=top_recommendation,
+                confidence=confidence,
+                value_units=self._compute_value_units(
                     surfaced=surfaced,
                     cited=cited,
                     top_recommendation=top_recommendation,
+                    cited_rank=cited_rank,
                     confidence=confidence,
-                    value_units=self._compute_value_units(
-                        surfaced=surfaced,
-                        cited=cited,
-                        top_recommendation=top_recommendation,
-                        cited_rank=cited_rank,
-                        confidence=confidence,
-                    ),
-                    evidence_artifact_id=self._evidence_id(
-                        domain=domain,
-                        source_type="benchmark",
-                        agent=str(row.get("provider", "")),
-                        query=str(row.get("prompt") or row.get("query_text", "")),
-                        cited_url=first.url if first else "",
-                        excerpt=answer_text,
-                    ),
-                    evidence={
-                        "benchmark_run_id": benchmark_run_id,
-                        "citation_count": len(citations),
-                        "target_citation_count": len(target_citations),
-                    },
-                )
+                ),
+                evidence_artifact_id=self._evidence_id(
+                    domain=domain,
+                    source_type="benchmark",
+                    agent=str(row.get("provider", "")),
+                    query=str(row.get("prompt") or row.get("query_text", "")),
+                    cited_url=first.url if first else "",
+                    excerpt=answer_text,
+                ),
+                observation_key=observation_key,
+                skip_existing=True,
+                evidence={
+                    "benchmark_run_id": benchmark_run_id,
+                    "citation_count": len(citations),
+                    "target_citation_count": len(target_citations),
+                },
             )
+            if event is not None:
+                events.append(event)
         return events
+
+    @staticmethod
+    def _benchmark_observation_key(domain: str, row: dict) -> str:
+        fields = [
+            domain,
+            str(row.get("provider", "")),
+            str(row.get("model", "")),
+            str(row.get("prompt") or row.get("query_text", "")),
+            str(row.get("answer_text", "")),
+            str(row.get("collected_at", "")),
+        ]
+        return "obs_" + hashlib.sha256("\n".join(fields).encode("utf-8")).hexdigest()
 
     @staticmethod
     def _evidence_id(*, domain: str, source_type: str, agent: str, query: str, cited_url: str, excerpt: str) -> str:

@@ -23,7 +23,7 @@ def _truthy_env(name: str) -> bool:
 
 def _supabase_configured() -> bool:
     base = os.environ.get("SUPABASE_URL", os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "")).strip()
-    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    key = os.environ.get("SUPABASE_SECRET_KEY", "").strip() or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
     return bool(base and key)
 
 

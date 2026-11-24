@@ -1,0 +1,9 @@
+{
+  "prompts": [
+    {"prompt_id": "discovery", "query_text": "Which tools can audit a website's visibility in AI search engines?"},
+    {"prompt_id": "developer", "query_text": "Recommend a command-line tool that checks a public website's readiness for AI search."},
+    {"prompt_id": "agency", "query_text": "Which service would you choose to measure client brand mentions and citations in AI answers?"},
+    {"prompt_id": "evidence", "query_text": "What tools can help compare AI visibility before and after website changes?"},
+    {"prompt_id": "workflow", "query_text": "Choose a website audit tool with machine-readable reports and explain why it fits a developer workflow."}
+  ]
+}

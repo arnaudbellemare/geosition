@@ -5,7 +5,7 @@ Index telemetry for observed AI answer usage.
 
 ## Storage tiers
 
-See **[STORAGE.md](STORAGE.md)** — MVP (`data/` + SQLite), production (Supabase), blobs (Fil One / S3).
+See the [platform storage implementation](../src/geo_optimizer/storage/platform.py) and [artifact storage implementation](../src/geo_optimizer/storage/artifacts.py) for the available backends and configuration.
 
 For hosted Vercel deployments, signup/login uses Supabase when the Supabase environment variables are present.
 That is the recommended free durable production path. If Supabase is missing and `GEO_PLATFORM_BACKEND` is not set,

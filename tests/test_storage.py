@@ -148,8 +148,9 @@ def test_platform_store_explicit_supabase_requires_config(monkeypatch):
     monkeypatch.delenv("SUPABASE_URL", raising=False)
     monkeypatch.delenv("NEXT_PUBLIC_SUPABASE_URL", raising=False)
     monkeypatch.delenv("SUPABASE_SERVICE_ROLE_KEY", raising=False)
+    monkeypatch.delenv("SUPABASE_SECRET_KEY", raising=False)
 
-    with pytest.raises(RuntimeError, match="SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"):
+    with pytest.raises(RuntimeError, match="SUPABASE_URL and a Supabase secret or service-role key are required"):
         get_platform_store()
 
 

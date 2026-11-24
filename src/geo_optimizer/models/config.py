@@ -95,7 +95,16 @@ BENCHMARK_BANDS = {
 
 TASK_CLASSIFIER_SIGNALS: dict[str, list[str]] = {
     "discovery": ["what is", "overview", "guide to", "introduction", "learn about", "explore"],
-    "comparison": ["compare", "versus", " vs ", "difference between", "pros and cons", "better than"],
+    "comparison": [
+        "compare",
+        "comparer",
+        "comparatif",
+        "versus",
+        " vs ",
+        "difference between",
+        "pros and cons",
+        "better than",
+    ],
     "recommendation": ["best", "top", "recommend", "which should i", "pick", "leading"],
     "pricing": ["price", "pricing", "cost", "fee", "quote", "how much"],
     "local": ["near me", "local", "in my area", "city", "neighborhood", "condo"],
@@ -103,6 +112,8 @@ TASK_CLASSIFIER_SIGNALS: dict[str, list[str]] = {
     "implementation": ["how to", "setup", "install", "configure", "implement", "step by step"],
     "vendor_selection": ["provider", "vendor", "which company", "who offers", "choose a", "selection"],
 }
+
+BENCHMARK_SITE_MAX_PAGES = 5
 
 # ─── Passive AI visibility monitoring ────────────────────────────────────────
 
@@ -765,3 +776,10 @@ CITATION_ECONOMICS_THRESHOLDS: dict[str, float] = {
 
 # Number of most-cited pages to surface in the economics report.
 CITATION_ECONOMICS_TOP_PAGES = 25
+
+# Paired memory/search experiments: exploratory defaults, independent of GEO scoring.
+EXPERIMENT_REPETITIONS = 3
+EXPERIMENT_MAX_REQUESTS = 120
+EXPERIMENT_MAX_OUTPUT_TOKENS = 1024
+EXPERIMENT_TEMPERATURE = 0.0
+EXPERIMENT_BOOTSTRAP_SAMPLES = 1000

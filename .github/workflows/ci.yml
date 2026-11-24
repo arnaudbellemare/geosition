@@ -111,6 +111,15 @@ jobs:
           fi
       - name: Test MCP server
         run: pytest tests/test_mcp.py tests/test_mcp_protocol.py -q
+      - name: Test hosted connector and OAuth
+        # The hosted connector uses the MCP 1.x API. These tests skip without jwt or mcp,
+        # so check the imports first: a run that skips them all must fail, not pass.
+        if: matrix.mcp-version == '1'
+        run: |
+          python -c "import jwt, mcp.server.fastmcp"
+          pytest -q tests/test_auth0_*.py tests/test_hosted_*.py tests/test_oauth_*.py \
+            tests/test_local_oauth_flow.py tests/test_consent_routes.py tests/test_supabase_oauth_*.py \
+            tests/test_sqlite_oauth_grants.py tests/test_workspace_mcp.py
 
   geo-aeo-tracker:
     name: GEO/AEO Tracker build

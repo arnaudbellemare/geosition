@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Protocol
 
-from geo_optimizer.models.results.collection import CollectedAnswer, PromptSpec
+from geo_optimizer.models.results.collection import AnswerProvenance, CollectedAnswer, PromptSpec
 
 
 @dataclass
@@ -18,6 +18,9 @@ class CollectionRequest:
     language: str = "en"
     device: str = "desktop"
     require_sources: bool = True
+    retrieval_policy: str = "default"  # default | disabled | enabled
+    provenance: AnswerProvenance = field(default_factory=AnswerProvenance)
+    generation_settings: dict[str, float | int] = field(default_factory=dict)
 
 
 class AnswerCollectorAdapter(Protocol):

@@ -146,6 +146,11 @@ from geo_optimizer.cli.audit_cmd import audit  # noqa: E402
 from geo_optimizer.cli.autopilot_cmd import autopilot  # noqa: E402
 from geo_optimizer.cli.benchmark_cmd import benchmark_group  # noqa: E402
 from geo_optimizer.cli.coherence_cmd import coherence  # noqa: E402
+from geo_optimizer.cli.commerce_cmd import commerce_audit  # noqa: E402
+from geo_optimizer.cli.commerce_feed_cmd import commerce_feed  # noqa: E402
+from geo_optimizer.cli.commerce_monitor_cmd import commerce_monitor  # noqa: E402
+from geo_optimizer.cli.commerce_prepare_cmd import commerce_prepare  # noqa: E402
+from geo_optimizer.cli.commerce_service_prepare_cmd import commerce_service_prepare  # noqa: E402
 from geo_optimizer.cli.content_cmd import content_cmd  # noqa: E402
 from geo_optimizer.cli.diff_cmd import diff  # noqa: E402
 from geo_optimizer.cli.fix_cmd import fix  # noqa: E402
@@ -176,6 +181,11 @@ cli.add_command(audit, name="scanner")
 cli.add_command(audit, name="scorer")
 cli.add_command(coherence)
 cli.add_command(content_cmd)
+cli.add_command(commerce_audit)
+cli.add_command(commerce_feed)
+cli.add_command(commerce_monitor)
+cli.add_command(commerce_prepare)
+cli.add_command(commerce_service_prepare)
 cli.add_command(diff)
 cli.add_command(fix)
 cli.add_command(fix, name="citation-optimizer")

@@ -36,6 +36,7 @@ class SessionInfo:
     token: str = ""
     user_id: int = 0
     expires_at: str = ""
+    org_id: int | None = None
 
 
 @dataclass

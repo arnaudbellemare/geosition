@@ -57,6 +57,7 @@ _REQUIRED_SUPABASE_TABLES = (
     (_TABLE_AGENT_USAGE, "002_geo_platform.sql"),
     (_TABLE_PAGE_AUDITS, "004_platform_feature_storage_backfill.sql"),
     (_TABLE_WEEKLY_EVIDENCE, "004_platform_feature_storage_backfill.sql"),
+    ("geo_workspace_invitations", "006_workspace_invitations.sql"),
 )
 
 
@@ -69,15 +70,49 @@ class SupabasePlatformStore:
 
     def __init__(self) -> None:
         base = os.environ.get("SUPABASE_URL", os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "")).rstrip("/")
-        key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+        key = (
+            os.environ.get("SUPABASE_SECRET_KEY", "").strip() or os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+        )
         if not base or not key:
-            raise RuntimeError("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for Supabase backend")
+            raise RuntimeError("SUPABASE_URL and a Supabase secret or service-role key are required")
         self.base_url = f"{base}/rest/v1"
         self.headers = {
             "apikey": key,
-            "Authorization": f"Bearer {key}",
             "Content-Type": "application/json",
         }
+        if not key.startswith("sb_secret_"):
+            self.headers["Authorization"] = f"Bearer {key}"
+
+    def save_vercel_connection(self, org_id, domain, project_id, team_id, encrypted):
+        self._request(
+            "POST",
+            "geo_vercel_connections",
+            params={"on_conflict": "org_id,domain"},
+            json_body={
+                "org_id": org_id,
+                "domain": domain,
+                "project_id": project_id,
+                "team_id": team_id,
+                "encrypted_token": encrypted,
+            },
+            prefer="resolution=merge-duplicates,return=minimal",
+        )
+
+    def get_vercel_connection(self, org_id, domain):
+        rows = self._request(
+            "GET",
+            "geo_vercel_connections",
+            params={"org_id": f"eq.{org_id}", "domain": f"eq.{domain}", "select": "*", "limit": "1"},
+        )
+        return rows[0] if rows else None
+
+    def delete_vercel_connection(self, org_id, domain):
+        self._request(
+            "DELETE",
+            "geo_vercel_connections",
+            params={"org_id": f"eq.{org_id}", "domain": f"eq.{domain}"},
+            prefer="return=minimal",
+        )
 
     def save_search_connection(self, org_id: int, domain: str, provider: str, property_id: str, encrypted: str) -> None:
         self._request(
@@ -313,6 +348,59 @@ class SupabasePlatformStore:
         org_rows = self._request("GET", _TABLE_ORGS, params={"id": f"eq.{org_id}", "limit": "1"})
         return self._row_org(org_rows[0]) if org_rows else None
 
+    def list_user_orgs(self, user_id: int) -> list[Organization]:
+        rows = self._request("GET", _TABLE_MEMBERSHIPS, params={"user_id": f"eq.{user_id}", "select": "org_id"})
+        result = []
+        for row in rows:
+            orgs = self._request("GET", _TABLE_ORGS, params={"id": f"eq.{row['org_id']}", "limit": "1"})
+            if orgs:
+                result.append(self._row_org(orgs[0]))
+        return result
+
+    def select_session_org(self, user_id: int, token: str, org_id: int) -> bool:
+        if self.get_member_org(user_id, org_id) is None:
+            return False
+        rows = self._request(
+            "PATCH",
+            _TABLE_SESSIONS,
+            params={"token": f"eq.{token}", "user_id": f"eq.{user_id}"},
+            json_body={"org_id": org_id},
+        )
+        return bool(rows)
+
+    def get_member_org(self, user_id: int, org_id: int) -> Organization | None:
+        rows = self._request(
+            "GET", _TABLE_MEMBERSHIPS, params={"user_id": f"eq.{user_id}", "org_id": f"eq.{org_id}", "limit": "1"}
+        )
+        if not rows:
+            return None
+        orgs = self._request("GET", _TABLE_ORGS, params={"id": f"eq.{org_id}", "limit": "1"})
+        return self._row_org(orgs[0]) if orgs else None
+
+    def membership_role(self, user_id: int, org_id: int) -> str:
+        rows = self._request(
+            "GET",
+            _TABLE_MEMBERSHIPS,
+            params={"user_id": f"eq.{user_id}", "org_id": f"eq.{org_id}", "select": "role", "limit": "1"},
+        )
+        return str(rows[0]["role"]) if rows else ""
+
+    def create_workspace_invitation(self, org_id: int, email: str, token_hash: str, expires_at: str) -> None:
+        self._request(
+            "POST",
+            "geo_workspace_invitations",
+            json_body={"org_id": org_id, "email": email, "token_hash": token_hash, "expires_at": expires_at},
+            prefer="return=minimal",
+        )
+
+    def accept_workspace_invitation(self, token_hash: str, user_id: int, session_token: str) -> bool:
+        result = self._request(
+            "POST",
+            "rpc/geo_accept_workspace_invitation",
+            json_body={"p_token_hash": token_hash, "p_user_id": user_id, "p_session_token": session_token},
+        )
+        return bool(result and result[0] is True)
+
     def create_session(self, user_id: int, token: str, expires_at: str) -> None:
         self._request(
             "POST",
@@ -340,7 +428,9 @@ class SupabasePlatformStore:
         if not rows:
             return None
         row = rows[0]
-        return SessionInfo(token=row["token"], user_id=int(row["user_id"]), expires_at=row["expires_at"])
+        return SessionInfo(
+            token=row["token"], user_id=int(row["user_id"]), expires_at=row["expires_at"], org_id=row.get("org_id")
+        )
 
     def delete_session(self, token: str) -> None:
         self._request("DELETE", _TABLE_SESSIONS, params={"token": f"eq.{token}"}, prefer="return=minimal")
@@ -484,6 +574,7 @@ class SupabasePlatformStore:
         band: str,
         run_at: str,
         artifact_report_uri: str = "",
+        details: dict | None = None,
     ) -> OrgBenchmarkLink:
         rows = self._request(
             "POST",
@@ -496,6 +587,7 @@ class SupabasePlatformStore:
                 "band": band,
                 "run_at": run_at,
                 "artifact_report_uri": artifact_report_uri,
+                "details": details,
             },
         )
         row = rows[0]
@@ -508,6 +600,28 @@ class SupabasePlatformStore:
             band=row["band"],
             run_at=row["run_at"],
         )
+
+    def get_benchmark_details(self, org_id: int, link_id: int) -> dict | None:
+        rows = self._request(
+            "GET",
+            _TABLE_BENCHMARKS,
+            params={"org_id": f"eq.{org_id}", "id": f"eq.{link_id}", "select": "domain,details", "limit": "1"},
+        )
+        return rows[0] if rows else None
+
+    def get_latest_benchmark_details(self, org_id: int, domain: str) -> dict | None:
+        rows = self._request(
+            "GET",
+            _TABLE_BENCHMARKS,
+            params={
+                "org_id": f"eq.{org_id}",
+                "domain": f"eq.{_normalize_domain(domain)}",
+                "select": "details",
+                "order": "run_at.desc,id.desc",
+                "limit": "1",
+            },
+        )
+        return rows[0] if rows else None
 
     def list_benchmark_runs(self, org_id: int, limit: int = 12) -> list[OrgBenchmarkLink]:
         rows = self._request(
@@ -619,10 +733,12 @@ class SupabasePlatformStore:
         )
         return self._row_run(rows[0]) if rows else None
 
-    def list_runs(self, org_id: int, *, limit: int = 12, kind: str = "") -> list[PlatformRun]:
+    def list_runs(self, org_id: int, *, limit: int = 12, kind: str = "", domain: str = "") -> list[PlatformRun]:
         params = {"org_id": f"eq.{org_id}", "order": "created_at.desc,id.desc", "limit": str(limit)}
         if kind:
             params["kind"] = f"eq.{kind}"
+        if domain:
+            params["domain"] = f"eq.{_normalize_domain(domain)}"
         rows = self._request("GET", _TABLE_RUNS, params=params)
         return [self._row_run(row) for row in rows]
 
@@ -812,11 +928,15 @@ class SupabasePlatformStore:
         value_units: float = 0.0,
         evidence_artifact_id: str = "",
         evidence: dict[str, object] | None = None,
-    ) -> AgentUsageEvent:
+        observation_key: str = "",
+        skip_existing: bool = False,
+    ) -> AgentUsageEvent | None:
         created_at = _now_iso()
         rows = self._request(
             "POST",
             _TABLE_AGENT_USAGE,
+            params={"on_conflict": "org_id,domain,source_type,observation_key"} if observation_key else None,
+            prefer="resolution=ignore-duplicates,return=representation" if observation_key else "return=representation",
             json_body={
                 "org_id": org_id,
                 "domain": _normalize_domain(domain),
@@ -833,10 +953,25 @@ class SupabasePlatformStore:
                 "confidence": confidence,
                 "value_units": value_units,
                 "evidence_artifact_id": evidence_artifact_id[:160],
+                "observation_key": observation_key or None,
                 "evidence_json": json.dumps(evidence or {}, ensure_ascii=False, default=str)[:4000],
                 "created_at": created_at,
             },
         )
+        if not rows and observation_key:
+            if skip_existing:
+                return None
+            rows = self._request(
+                "GET",
+                _TABLE_AGENT_USAGE,
+                params={
+                    "org_id": f"eq.{org_id}",
+                    "domain": f"eq.{_normalize_domain(domain)}",
+                    "source_type": f"eq.{source_type[:64]}",
+                    "observation_key": f"eq.{observation_key}",
+                    "limit": "1",
+                },
+            )
         return self._row_agent_usage_event(rows[0])
 
     def list_agent_usage_events(

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Connect an AI service · GEOSITION</title>
+  <link rel="stylesheet" href="/platform/assets/site.css">
+  <script src="/platform/assets/mcp-consent.js" defer></script>
+</head>
+<body>
+  <main class="auth-page">
+    <div class="auth-card">
+      <a class="auth-brand" href="/platform">GEOSITION</a>
+      <div class="auth-card-head">
+        <p class="meta">AI CONNECTION</p>
+        <h1>Connect your workspace</h1>
+        <p class="meta">Sign in, review what the AI can do, and choose whether to connect.</p>
+      </div>
+      <p id="message" class="err" role="status" aria-live="polite"></p>
+      <section id="workspace-signin" hidden aria-labelledby="workspace-signin-title">
+        <h2 id="workspace-signin-title">1. Sign in to GEOSITION</h2>
+        <form id="workspace-form">
+          <label for="workspace-email">GEOSITION account email</label>
+          <input id="workspace-email" type="email" autocomplete="username" required>
+          <label for="workspace-password">Password</label>
+          <input id="workspace-password" type="password" autocomplete="current-password" required>
+          <button type="submit">Continue</button>
+        </form>
+      </section>
+      <section id="identity-signin" hidden aria-labelledby="identity-signin-title">
+        <h2 id="identity-signin-title">2. Confirm your identity</h2>
+        <p class="meta">Workspace: <strong id="active-workspace"></strong></p>
+        <p class="meta">Sign in to your GEOSITION AI identity account to link it to this workspace.</p>
+        <form id="identity-form">
+          <label for="identity-email">AI identity email</label>
+          <input id="identity-email" type="email" autocomplete="username" required>
+          <label for="identity-password">AI identity password</label>
+          <input id="identity-password" type="password" autocomplete="current-password" required>
+          <button type="submit">Review connection</button>
+        </form>
+        <p class="meta">If you do not have an AI identity account yet, ask your GEOSITION operator for help.</p>
+        <p class="links"><a href="/platform/dashboard">Choose a different workspace</a></p>
+      </section>
+      <section id="review" hidden aria-labelledby="review-title">
+        <h2 id="review-title">3. Review access</h2>
+        <p><strong id="client-name"></strong> wants to connect to <strong id="review-workspace"></strong>.</p>
+        <p class="meta">Choose what this connection can do.</p>
+        <form id="consent-form">
+          <fieldset>
+            <legend>Workspace access</legend>
+            <label><input id="permission-read" type="checkbox" value="setup:read" checked> Read setup and audit results</label>
+            <label><input id="permission-write" type="checkbox" value="setup:write"> Run audits and update setup progress</label>
+          </fieldset>
+          <p class="meta">Identity information requested: <span id="provider-scopes"></span></p>
+          <p class="meta">After your decision, you return to <span id="redirect-host"></span>.</p>
+          <button type="submit">Approve connection</button>
+          <button id="deny" type="button">Don't connect</button>
+        </form>
+      </section>
+      <p class="links"><a href="/platform/dashboard">Back to workspace</a></p>
+    </div>
+  </main>
+</body>
+</html>

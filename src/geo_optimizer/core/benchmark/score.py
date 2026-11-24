@@ -68,7 +68,7 @@ def aggregate_benchmark_score(
         domain_backlink=domain_backlink_score,
         serp_rank=serp_rank_score,
         technical_performance=technical_score,
-        scoring_version="evidence-v2",
+        scoring_version="evidence-v3-site-sample",
     )
 
     components = {
