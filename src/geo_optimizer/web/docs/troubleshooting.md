@@ -130,10 +130,10 @@ User-agent names are case-sensitive. `ClaudeBot` ≠ `Claudebot`.
 
 ```
 User-agent: ClaudeBot
-Allow: /          ← this works
+Allow: /          # this works
 
 User-agent: *
-Disallow: /       ← but this doesn't override the above in most parsers
+Disallow: /       # but this doesn't override the above in most parsers
 ```
 
 To be safe, place specific bot entries before the catch-all `User-agent: *` block.

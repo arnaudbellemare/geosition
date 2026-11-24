@@ -81,7 +81,7 @@ Format: `"Quote" — Name, Role, Organization, Year`
 
 **Measured impact: +6–12% average AI visibility**
 
-Write with an expert voice. Eliminate vague hedging language and replace it with precise, structured explanations. Use the format: definition → how it works → practical implications.
+Write with an expert voice. Eliminate vague hedging language and replace it with precise, structured explanations. Use the format: definition, then how it works, then practical implications.
 
 **Apply when:** Explaining any technical concept, process, or recommendation.
 
@@ -210,7 +210,7 @@ Place the key conclusion or answer in the first 150 characters after every H2 he
 + how this works helps you negotiate better terms.
 ```
 
-Structure: **Answer → Context → Detail**. The first sentence after each H2 should be extractable as a standalone answer. Think of it as the "TL;DR" for that section.
+Structure: **Answer, then Context, then Detail**. The first sentence after each H2 should be extractable as a standalone answer. Think of it as the "TL;DR" for that section.
 
 ---
 
@@ -254,7 +254,7 @@ Focus on the two highest-ROI methods first.
 ### Phase 2 — Structural Optimization (Days 4–10)
 
 4. **Quotation Addition** — Find 1–2 quotable experts per topic. Add direct quotes with attribution.
-5. **Authoritative Tone** — Rewrite introductions and summaries using the definition → explanation → implication structure.
+5. **Authoritative Tone** — Rewrite introductions and summaries using a definition, explanation and implication structure.
 6. **Technical Terms** — Audit your use of acronyms and jargon. Add full forms on first use.
 
 ### Phase 3 — Fine Tuning (Ongoing)

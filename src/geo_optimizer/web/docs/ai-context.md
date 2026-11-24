@@ -14,9 +14,9 @@ GEOSITION provides platform-specific context files in the `docs/ai-context-files
 
 ### Setup
 
-1. Go to [claude.ai](https://claude.ai) → click **Projects** in the sidebar
+1. Go to [claude.ai](https://claude.ai) and click **Projects** in the sidebar
 2. Click **+ New Project** (e.g. "GEOSITION")
-3. Click **Add content** → **Upload file** → select `docs/ai-context-files/claude-project.md`
+3. Click **Add content**, then **Upload file**, and select `docs/ai-context-files/claude-project.md`
 4. Start a new conversation inside the Project
 
 Claude will have persistent GEO context across every conversation in that Project.
@@ -39,8 +39,8 @@ Claude will have persistent GEO context across every conversation in that Projec
 
 ### Setup
 
-1. Go to [chat.openai.com](https://chat.openai.com) → click your avatar → **My GPTs**
-2. Click **Create a GPT** → go to the **Configure** tab
+1. Go to [chat.openai.com](https://chat.openai.com), click your avatar, then **My GPTs**
+2. Click **Create a GPT** and go to the **Configure** tab
 3. In the **Instructions** field, paste the full contents of `docs/ai-context-files/chatgpt-custom-gpt.md`
 4. Give the GPT a name (e.g. "GEOSITION") and save
 
@@ -66,7 +66,7 @@ Claude will have persistent GEO context across every conversation in that Projec
 
 ### Setup
 
-1. Go to [chat.openai.com](https://chat.openai.com) → click your avatar → **Customize ChatGPT**
+1. Go to [chat.openai.com](https://chat.openai.com), click your avatar, then **Customize ChatGPT**
 2. Under **"What would you like ChatGPT to know about you?"** paste the contents of `docs/ai-context-files/chatgpt-instructions.md`
 3. Save. Active for all new conversations.
 
@@ -95,7 +95,7 @@ cp ~/geosition/docs/ai-context-files/cursor.mdc .cursor/rules/geo-optimizer.mdc
 
 Or copy manually:
 1. In your project root, create `.cursor/rules/` directory
-2. Copy `docs/ai-context-files/cursor.mdc` → `.cursor/rules/geo-optimizer.mdc`
+2. Copy `docs/ai-context-files/cursor.mdc` to `.cursor/rules/geo-optimizer.mdc`
 3. Cursor loads the rule automatically when you open matching files
 
 The `globs` pattern activates the rule for: `*.html`, `*.astro`, `*.tsx`, `*.jsx`, `*.php`, `robots.txt`, `llms.txt`, `*.json`
@@ -124,7 +124,7 @@ Change `alwaysApply: true` to load the rule in every Cursor session regardless o
 **File:** `docs/ai-context-files/windsurf.md`<br>
 **Format:** Plain Markdown — NO YAML frontmatter  
 **Limit:** ~12,000 chars (UI activation)  
-**Activation:** Configured via Windsurf UI → Customizations → Rules (4 modes: Always On, Glob, Model Decision, Manual)
+**Activation:** Configured in the Windsurf UI under Customizations, then Rules (4 modes: Always On, Glob, Model Decision, Manual)
 
 > ⚠️ **Windsurf does NOT read YAML frontmatter** from rule files — activation mode is configured in the Windsurf UI, not in this file. If you add YAML frontmatter here, Cascade reads it as literal text.
 
@@ -137,8 +137,8 @@ cp ~/geosition/docs/ai-context-files/windsurf.md .windsurf/rules/geo-optimizer.m
 
 Or copy manually:
 1. In your project root, create `.windsurf/rules/` directory
-2. Copy `docs/ai-context-files/windsurf.md` → `.windsurf/rules/geo-optimizer.md`
-3. Open Windsurf → **Customizations** (top-right slider icon) → **Rules**
+2. Copy `docs/ai-context-files/windsurf.md` to `.windsurf/rules/geo-optimizer.md`
+3. Open Windsurf, then **Customizations** (top-right slider icon), then **Rules**
 4. Find `geo-optimizer.md` in the list and set the activation mode
 
 ### Activation modes (Windsurf UI)
@@ -176,7 +176,7 @@ cp ~/geosition/docs/ai-context-files/kiro-steering.md .kiro/steering/geo-optimiz
 
 Or copy manually:
 1. In your project root, create `.kiro/steering/` directory
-2. Copy `docs/ai-context-files/kiro-steering.md` → `.kiro/steering/geo-optimizer.md`
+2. Copy `docs/ai-context-files/kiro-steering.md` to `.kiro/steering/geo-optimizer.md`
 3. Kiro loads the steering file automatically when files matching the pattern are open
 
 ### What to expect

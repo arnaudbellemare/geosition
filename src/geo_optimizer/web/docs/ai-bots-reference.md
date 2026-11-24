@@ -265,7 +265,7 @@ grep -E "GPTBot|OAI-SearchBot|ClaudeBot|PerplexityBot" \
   /var/log/apache2/access.log | awk '{print $1, $7}' | head -50
 ```
 
-For managed hosting without log access, check **Google Search Console → Settings → Crawl Stats** — it shows `Googlebot` and `Google-Extended` activity. For other bots, there is no equivalent dashboard; server logs are the only reliable source.
+For managed hosting without log access, check **Google Search Console**, open **Settings**, then **Crawl Stats** — it shows `Googlebot` and `Google-Extended` activity. For other bots, there is no equivalent dashboard; server logs are the only reliable source.
 
 ---
 

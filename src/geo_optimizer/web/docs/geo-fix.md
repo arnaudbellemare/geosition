@@ -96,7 +96,7 @@ Use --apply to write these files to disk.
 The `geo_fix` MCP tool provides the same functionality:
 
 ```
-"Fix my site's GEO issues" → calls geo_fix tool
+"Fix my site's GEO issues" (calls the geo_fix tool)
 ```
 
 Returns the complete fix plan as JSON, which AI assistants can then help you implement.

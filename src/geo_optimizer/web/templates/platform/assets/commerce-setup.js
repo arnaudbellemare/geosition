@@ -80,7 +80,7 @@
       for (const name of Object.keys(access.guided_fixes)) { const option = document.createElement('option'); option.value = name; option.textContent = name === 'other' ? 'Other or unknown' : name; select.append(option); }
       select.value = 'other';
       const fix = document.createElement('p'); const update = () => { fix.textContent = access.guided_fixes[select.value]; }; select.addEventListener('change', update); update();
-      label.append(select); const link = document.createElement('a'); link.href = access.guidance_url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Open current OpenAI agent-access guidance ↗';
+      label.append(select); const link = document.createElement('a'); link.href = access.guidance_url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Open current OpenAI agent-access guidance';
       auditResult.append(title, explanation, evidence, hints, guideTitle, instructions, label, fix, link);
     }
   }
@@ -101,7 +101,7 @@
         const body = document.createElement('div');
         const name = document.createElement('h4'); name.textContent = step.title;
         const detail = document.createElement('p'); detail.textContent = step.detail;
-        const link = document.createElement('a'); link.href = step.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = `${step.link} ↗`;
+        const link = document.createElement('a'); link.href = step.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = `${step.link}`;
         const label = document.createElement('label'); label.textContent = `Team progress for ${step.title}`;
         const select = document.createElement('select');
         for (const [value, text] of Object.entries(stateLabels)) { const option = document.createElement('option'); option.value = value; option.textContent = text; select.append(option); }
@@ -130,8 +130,8 @@
       const state = document.createElement('span'); state.className = 'state'; state.textContent = stateLabels[statuses[step.id]] || stateLabels.todo;
       head.append(title, state); const detail = document.createElement('p'); detail.textContent = step.detail;
       const owner = document.createElement('p'); owner.textContent = `Who: ${step.owner}`; body.append(head, detail, owner);
-      if (step.url) { const link = document.createElement('a'); link.href = step.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = `${step.link} ↗`; body.append(link); }
-      if (step.id === 'accounts' && kind.value !== 'services') { const link = document.createElement('a'); link.href = 'https://dashboard.stripe.com/register'; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Create or open a Stripe account for test mode ↗'; body.append(document.createElement('br'), link); }
+      if (step.url) { const link = document.createElement('a'); link.href = step.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = `${step.link}`; body.append(link); }
+      if (step.id === 'accounts' && kind.value !== 'services') { const link = document.createElement('a'); link.href = 'https://dashboard.stripe.com/register'; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Create or open a Stripe account for test mode'; body.append(document.createElement('br'), link); }
       const label = document.createElement('label'); label.textContent = `Progress for ${step.title}`; const select = document.createElement('select');
       for (const [value, text] of Object.entries(stateLabels)) { const option = document.createElement('option'); option.value = value; option.textContent = text; select.append(option); }
       select.value = Object.hasOwn(stateLabels, statuses[step.id]) ? statuses[step.id] : 'todo';
