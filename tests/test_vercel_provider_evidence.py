@@ -15,7 +15,7 @@ from geo_optimizer.web.app import app
 
 
 def sample():
-    return json.loads(Path('docs/client-reports/moms-art-shop-vercel-evidence.json').read_text())
+    return json.loads(Path('tests/fixtures/commerce/shop-vercel-evidence.json').read_text())
 
 
 def report():
@@ -26,7 +26,7 @@ def report():
 
 def test_cli_attaches_correlated_evidence_without_claiming_direct_verification():
     with patch('geo_optimizer.core.commerce_site.run_site_audit', return_value=report()):
-        result=CliRunner().invoke(cli,['commerce-audit','--site','--url','https://www.robel-art.com/','--format','json','--browser-evidence','docs/client-reports/moms-art-shop-vercel-evidence.json'])
+        result=CliRunner().invoke(cli,['commerce-audit','--site','--url','https://www.robel-art.com/','--format','json','--browser-evidence','tests/fixtures/commerce/shop-vercel-evidence.json'])
     assert result.exit_code == 0, result.output
     access=json.loads(result.output)['browser_access']
     assert access['verified_access']=='unknown'
@@ -57,11 +57,11 @@ def test_workspace_evidence_is_scoped_and_rejects_mismatch(tmp_path, monkeypatch
     assert client.post('/api/v1/commerce/setup/browser-evidence',headers=headers,json={**payload,'evidence':bad}).status_code==400
 
 
-def test_both_pilots_show_historical_correlated_evidence():
+def test_shop_and_service_evidence_attach_without_claiming_verification():
     from geo_optimizer.core.commerce_provider_evidence import attach_vercel_evidence
-    for filename, audit in [('moms-art-shop-vercel-evidence.json','https://www.robel-art.com/'),
-                            ('gestion-velora-vercel-evidence.json','https://www.gestionvelora.com/')]:
-        evidence=json.loads((Path('docs/client-reports') / filename).read_text())
+    for filename, audit in [('shop-vercel-evidence.json','https://www.robel-art.com/'),
+                            ('service-vercel-evidence.json','https://www.gestionvelora.com/')]:
+        evidence=json.loads((Path('tests/fixtures/commerce') / filename).read_text())
         data={'url':audit,'browser_access':{'verified_access':'unknown'},'recommendations':[]}
         result=attach_vercel_evidence(data,evidence)
         assert result['browser_access']['provider_evidence']['page_url']==evidence['page_url']

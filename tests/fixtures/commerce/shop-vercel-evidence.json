@@ -1,0 +1,11 @@
+{
+  "page_url": "https://www.robel-art.com/shop.html",
+  "request_id": "test-shop-request-0001",
+  "request_time": "2026-01-15T10:01:30Z",
+  "window_start": "2026-01-15T10:01:00Z",
+  "window_end": "2026-01-15T10:03:00Z",
+  "total_requests": 3,
+  "verified_agent_requests": 3,
+  "dashboard_url": "https://vercel.com/example-team/example-shop/observability/cdn-requests",
+  "attested": true
+}
