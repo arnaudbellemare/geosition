@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from typing import Any
 from urllib.parse import urlsplit
 
 from geo_optimizer.models.results.commerce_preparation import CommercePreparation
@@ -109,7 +110,7 @@ def prepare_catalog(catalog: dict) -> CommercePreparation:
                 "issues": issues,
             }
         )
-        product = {"@type": "Product"}
+        product: dict[str, Any] = {"@type": "Product"}
         for source, target in (
             ("name", "name"),
             ("description", "description"),

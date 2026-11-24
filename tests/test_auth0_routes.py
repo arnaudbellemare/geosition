@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
-import jwt
 import pytest
 from cryptography.fernet import Fernet
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
+jwt = pytest.importorskip('jwt')
 
 from geo_optimizer.mcp import auth0_routes as module
 

@@ -10,6 +10,8 @@ from urllib.parse import urlsplit
 import pytest
 from fastapi.testclient import TestClient
 
+pytest.importorskip('mcp')
+
 from geo_optimizer.mcp import workspace_connector as connector
 from geo_optimizer.models.results.commerce_site import CommerceSiteReport
 from geo_optimizer.saas import commerce_guided

@@ -50,10 +50,11 @@ def _cell(value):
 )
 def commerce_prepare(audit: Path | None, catalog: Path | None, output_dir: Path) -> None:
     """Prepare review-only catalog, JSON-LD draft, and feed worksheet."""
-    if bool(audit) == bool(catalog):
+    source = audit or catalog
+    if source is None or (audit is not None and catalog is not None):
         raise click.UsageError("Provide exactly one of --audit or --catalog.")
     try:
-        data = json.loads((audit or catalog).read_text(encoding="utf-8"))
+        data = json.loads(source.read_text(encoding="utf-8"))
         review = catalog_from_audit(data) if audit else data
         prepared = prepare_catalog(review)
         output_dir.mkdir(parents=True, exist_ok=False)

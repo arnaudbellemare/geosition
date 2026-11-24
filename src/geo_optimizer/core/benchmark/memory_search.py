@@ -323,11 +323,11 @@ def compare_memory_search_waves(before: CollectedAnswerBatch, after: CollectedAn
         for condition, version in sorted({(key[2], key[3]) for key in shared}):
             keys = sorted(key for key in shared if key[2:] == (condition, version))
             rows = [[(index[key], observe_brand(index[key], brand)) for key in keys] for index in indices]
-            deltas = {}
+            deltas: dict[str, float | None] = {}
             counts = {}
             for metric in ("mentioned", "recommended", "owned_domain_cited", "search_backed"):
                 old_rate, new_rate = (_prompt_rate(wave, metric) for wave in rows)
-                deltas[metric + "_delta_pp"] = new_rate - old_rate
+                deltas[metric + "_delta_pp"] = None if old_rate is None or new_rate is None else new_rate - old_rate
                 counts[metric] = {
                     "before": sum(getattr(o, metric) for _, o in rows[0]),
                     "after": sum(getattr(o, metric) for _, o in rows[1]),

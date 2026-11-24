@@ -43,7 +43,7 @@ def _site_pages(start_url: str, tasks: set[str]) -> list[str]:
     try:
         candidates = []
         queue = [sitemap_url]
-        seen_sitemaps = set()
+        seen_sitemaps: set[str] = set()
         while queue and len(seen_sitemaps) < 4:
             current = queue.pop(0)
             if current in seen_sitemaps:

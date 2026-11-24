@@ -23,10 +23,11 @@ from geo_optimizer.core.commerce_services import prepare_services, review_from_a
 )
 def commerce_service_prepare(audit: Path | None, review: Path | None, output_dir: Path) -> None:
     """Prepare service JSON-LD drafts and enquiry-journey test plans."""
-    if bool(audit) == bool(review):
+    source = audit or review
+    if source is None or (audit is not None and review is not None):
         raise click.UsageError("Provide exactly one of --audit or --review.")
     try:
-        data = json.loads((audit or review).read_text(encoding="utf-8"))
+        data = json.loads(source.read_text(encoding="utf-8"))
         prepared = prepare_services(review_from_audit(data) if audit else data)
         output_dir.mkdir(parents=True, exist_ok=False)
         for name, content in (

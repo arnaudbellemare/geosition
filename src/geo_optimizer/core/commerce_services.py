@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from geo_optimizer.core.commerce_preparation import _web_url
 from geo_optimizer.models.results.commerce_services import ServicePreparation
 
@@ -10,7 +12,8 @@ def review_from_audit(audit: dict) -> dict:
     """Group identical observed names and controls while retaining evidence pages."""
     if not isinstance(audit, dict) or not isinstance(audit.get("pages"), list):
         raise ValueError("Expected a site-audit JSON with a pages list.")
-    services, journeys = {}, {}
+    services: dict[str, dict[str, Any]] = {}
+    journeys: dict[tuple[Any, ...], dict[str, Any]] = {}
     for page in audit["pages"]:
         source = page.get("url", "")
         for name in page.get("services", []):
@@ -85,7 +88,7 @@ def prepare_services(review: dict) -> ServicePreparation:
             issues.append("service_url must be an HTTP(S) URL")
         if service.get("owner_reviewed") is not True:
             issues.append("owner_reviewed must be confirmed by the owner")
-        node = {"@type": "Service"}
+        node: dict[str, Any] = {"@type": "Service"}
         for source, target in (
             ("name", "name"),
             ("description", "description"),

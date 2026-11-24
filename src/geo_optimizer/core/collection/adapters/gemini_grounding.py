@@ -91,6 +91,8 @@ class GeminiGroundingAdapter:
         )
         response.raise_for_status()
         raw = response.json()
+        if not isinstance(raw, dict):
+            raise ValueError("The model metadata response was not a JSON object")
         if "generateContent" not in raw.get("supportedGenerationMethods", []):
             raise ValueError("The selected model does not advertise generateContent support")
         return raw

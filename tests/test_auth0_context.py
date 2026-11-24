@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta, timezone
-import jwt
 import pytest
+
+jwt = pytest.importorskip('jwt')
+
 from geo_optimizer.mcp.auth0_context import verify_action_context
 
 SECRET = 'a-very-long-testing-key-that-is-not-a-production-secret'

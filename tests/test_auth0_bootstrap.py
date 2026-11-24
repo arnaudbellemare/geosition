@@ -3,6 +3,10 @@ from cryptography.fernet import Fernet
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import pytest
+
+pytest.importorskip('jwt')
+pytest.importorskip('mcp')
+
 from geo_optimizer.mcp.auth0_bootstrap import install_auth0_integration
 from geo_optimizer.saas.supabase_store import SupabasePlatformStore
 

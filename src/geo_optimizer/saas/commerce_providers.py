@@ -5,7 +5,9 @@ These are guidance, not evidence of a connection, provider approval, or eligibil
 
 from __future__ import annotations
 
-PROVIDERS = [
+from typing import Any
+
+PROVIDERS: list[dict[str, Any]] = [
     {
         "id": "chatgpt",
         "name": "ChatGPT",
