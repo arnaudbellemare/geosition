@@ -1,0 +1,41 @@
+{
+  "url": "https://www.robel-art.com/",
+  "pages": [
+    {
+      "url": "https://www.robel-art.com/",
+      "products": [],
+      "services": [],
+      "journey_signals": [],
+      "manual_checks": {},
+      "limitations": [],
+      "render_status": "not_requested",
+      "render_warnings": [],
+      "catalog_signals": []
+    }
+  ],
+  "failures": [],
+  "skipped": [],
+  "warnings": [],
+  "coverage": {
+    "pages_audited": 1,
+    "max_pages": 10,
+    "pending": 0,
+    "complete": true,
+    "scope": "Discovered same-origin pages only; query URLs and transactional paths excluded.",
+    "render_requested": false
+  },
+  "recommendations": [
+    {
+      "id": "verify-browser-access",
+      "priority": "medium",
+      "title": "Check AI browser access",
+      "evidence": "Browser access is unknown.",
+      "action": "Run the documented browser-access check.",
+      "verification": "Record the provider's result.",
+      "evidence_urls": [
+        "https://www.robel-art.com/"
+      ],
+      "guidance_url": "https://developers.openai.com/commerce/guides/enable-browser-access"
+    }
+  ]
+}

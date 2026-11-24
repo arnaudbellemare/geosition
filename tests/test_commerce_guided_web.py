@@ -28,7 +28,7 @@ def test_workspace_audit_and_shared_progress_are_scoped(tmp_path, monkeypatch):
     operator_token = service.login(email='operator@agency.test', password='password123')['session']['token']
     other = service.register(email='other@other.test', password='password123', org_name='Other')
     other_token = other['session']['token']
-    evidence = json.loads(Path('docs/client-reports/moms-art-shop-evidence.json').read_text())
+    evidence = json.loads(Path('tests/fixtures/commerce/shop-site-report.json').read_text())
     report = CommerceSiteReport(**{k: evidence[k] for k in ('url', 'pages', 'failures', 'skipped', 'warnings', 'coverage', 'recommendations')})
     monkeypatch.setattr(commerce_guided, 'run_site_audit', lambda url, max_pages, render: report)
     client = TestClient(app)

@@ -1,0 +1,11 @@
+{
+  "page_url": "https://www.gestionvelora.com/contact",
+  "request_id": "test-service-request-0001",
+  "request_time": "2026-01-15T10:01:30Z",
+  "window_start": "2026-01-15T10:01:00Z",
+  "window_end": "2026-01-15T10:03:00Z",
+  "total_requests": 2,
+  "verified_agent_requests": 2,
+  "dashboard_url": "https://vercel.com/example-team/example-service/observability/cdn-requests",
+  "attested": true
+}
