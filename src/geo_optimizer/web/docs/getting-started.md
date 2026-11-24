@@ -72,8 +72,8 @@ Each section shows what passed and what's missing:
 ```
 ▸ ROBOTS.TXT ─────────────────────────── 5 / 18
   ✅ robots.txt found
-  ❌ OAI-SearchBot   MISSING   ← critical
-  ❌ ClaudeBot        MISSING   ← critical
+  ❌ OAI-SearchBot   MISSING   (critical)
+  ❌ ClaudeBot        MISSING   (critical)
 
 ▸ LLMS.TXT ───────────────────────────── 0 / 18
   ❌ Not found at https://yoursite.com/llms.txt
@@ -114,12 +114,12 @@ Each section shows what passed and what's missing:
 
 Follow this priority order — each step has the highest ROI before moving to the next:
 
-1. **robots.txt** — Add all 27 AI bots. Takes 5 minutes. Affects whether bots can crawl you at all. → [AI Bots Reference](ai-bots-reference.md)
-2. **llms.txt** — Generate it from your sitemap. Takes 2 minutes. → [Generating llms.txt](llms-txt.md)
-3. **Schema** — Add WebSite, Organization, FAQPage, Article. → [Schema Injector](schema-injector.md)
-4. **Brand & Entity** — Add sameAs KG links, about/contact pages. → [Scoring Rubric](scoring-rubric.md#8-brand--entity-signals--max-10-pts-new-in-v3182)
+1. **robots.txt** — Add all 27 AI bots. Takes 5 minutes. Affects whether bots can crawl you at all. See [AI Bots Reference](ai-bots-reference.md).
+2. **llms.txt** — Generate it from your sitemap. Takes 2 minutes. See [Generating llms.txt](llms-txt.md).
+3. **Schema** — Add WebSite, Organization, FAQPage, Article. See [Schema Injector](schema-injector.md).
+4. **Brand & Entity** — Add sameAs KG links, about/contact pages. See [Scoring Rubric](scoring-rubric.md#8-brand--entity-signals--max-10-pts-new-in-v3182).
 5. **AI Discovery** — Generate ai.txt and /ai/*.json endpoints. Use `geo fix` to auto-generate.
-6. **Content** — Add statistics, external citations, expert quotes. → [47 GEO Methods](geo-methods.md)
+6. **Content** — Add statistics, external citations, expert quotes. See [47 GEO Methods](geo-methods.md).
 
 ---
 

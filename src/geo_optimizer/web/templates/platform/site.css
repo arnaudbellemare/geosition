@@ -3953,7 +3953,7 @@ h1, h2, h3, h4 {
 
 .velora-service-row {
   display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr) auto;
+  grid-template-columns: 3rem minmax(0, 1fr);
   align-items: center;
   gap: clamp(1rem, 4vw, 3rem);
   padding: clamp(1.5rem, 3vw, 2.4rem) 0;
@@ -3986,15 +3986,6 @@ h1, h2, h3, h4 {
   margin-top: 0.45rem;
   color: var(--velora-muted);
   font-size: 0.92rem;
-}
-
-.velora-arrow {
-  font-size: 1.5rem;
-  transition: transform 0.25s ease;
-}
-
-.velora-service-row:hover .velora-arrow {
-  transform: translate(0.2rem, -0.2rem);
 }
 
 .velora-region {
@@ -4169,7 +4160,7 @@ h1, h2, h3, h4 {
   }
 
   .velora-service-row {
-    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    grid-template-columns: 2rem minmax(0, 1fr);
   }
 
   .velora-footer .container {

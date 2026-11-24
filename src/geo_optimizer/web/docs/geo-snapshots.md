@@ -65,7 +65,7 @@ geo snapshots --quality --snapshot-id 12 --target-domain example.com
 
 The quality report assigns:
 
-- a tier (`T1` recommended → `T5` mentioned)
+- a tier (from `T1` recommended to `T5` mentioned)
 - a position score (first citations rank higher)
 - a context snippet around the citation
 - an overall score combining tier + position

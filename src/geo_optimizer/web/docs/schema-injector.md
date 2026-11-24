@@ -80,7 +80,7 @@ Example output:
 Analyzing: index.html
 ─────────────────────────────────
 ✅ WebSite schema found
-❌ FAQPage schema missing      ← high GEO impact
+❌ FAQPage schema missing      (high GEO impact)
 ❌ WebApplication schema missing
 ❌ Article schema missing
 

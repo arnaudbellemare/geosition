@@ -97,9 +97,9 @@ Each section in the output maps to one of the 8 scoring categories:
 ```diff
 ▸ ROBOTS.TXT
 + ✅ GPTBot          allowed  (OpenAI — ChatGPT training)
-+ ✅ OAI-SearchBot   allowed  (OpenAI — ChatGPT citations)  ← critical
-- ❌ ClaudeBot        MISSING                               ← critical
-- ❌ PerplexityBot    MISSING                               ← critical
++ ✅ OAI-SearchBot   allowed  (OpenAI — ChatGPT citations)  (critical)
+- ❌ ClaudeBot        MISSING                               (critical)
+- ❌ PerplexityBot    MISSING                               (critical)
 ```
 
 ```diff
@@ -207,9 +207,9 @@ The score is the sum of all points earned across **8 categories**, capped at 100
 
 ▸ ROBOTS.TXT ─────────────────────────── 5 / 18
   ✅ robots.txt found
-  ❌ OAI-SearchBot   MISSING   ← critical
-  ❌ ClaudeBot        MISSING   ← critical
-  ❌ PerplexityBot    MISSING   ← critical
+  ❌ OAI-SearchBot   MISSING   (critical)
+  ❌ ClaudeBot        MISSING   (critical)
+  ❌ PerplexityBot    MISSING   (critical)
 
 ▸ LLMS.TXT ───────────────────────────── 0 / 18
   ❌ Not found at https://example.com/llms.txt

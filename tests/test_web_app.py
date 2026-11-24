@@ -311,7 +311,7 @@ def test_platform_landing_has_honest_mobile_first_conversion_path(client):
     assert "domainForm.classList.add('is-invalid')" in html
     assert "event.key === 'Escape'" in html
     assert 'href="/demo">GEO audit</a>' in html
-    assert 'href="https://slopacc.com/">Product video ↗</a>' in html
+    assert 'href="https://slopacc.com/">Product video</a>' in html
     assert 'id="pricing"' not in html
     assert 'id="product"' in html
     assert 'class="reel-stage reel-stage-second"' in html
