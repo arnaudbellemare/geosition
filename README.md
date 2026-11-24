@@ -25,6 +25,53 @@ The report includes a readiness score, a breakdown of checks, and suggested next
 
 > Prefer to inspect the source first? Clone this repository and install with `python -m pip install -e ".[dev]"`.
 
+## AI commerce readiness
+
+Inspect one public product or service page for observable commerce signals:
+
+```bash
+geo commerce-audit --url https://example.com/product
+geo commerce-audit --url https://example.com/product --format json
+geo commerce-audit --url https://example.com --site --max-pages 25 --render --format json
+geo commerce-audit --url https://example.com --site --max-pages 25 --render --format markdown > commerce-report.md
+```
+
+The default is a single-page, presence-only assessment. Site mode follows discovered same-origin links and sitemaps, respects robots.txt, and reports coverage and limits. Optional rendering requires Node.js, the `playwright` npm package, and a Playwright Chromium browser (`npx playwright install chromium`); set `GEO_CHROMIUM_PATH` to use an existing compatible browser. Rendering loads only securely fetched same-origin scripts and blocks browser network requests, so sites that depend on other resources may render partially. Site reports include evidence-linked recommendations and verification steps. Review generated reports before sharing. Neither mode verifies feeds, partner eligibility, browser access, or completed transactions. See the [platform and managed-service plan](docs/AI_COMMERCE_PLATFORM_PLAN.md).
+
+### Guided commerce preparation
+
+```bash
+geo commerce-prepare --audit commerce-audit.json --output-dir commerce-draft
+# After the owner edits and reviews the catalog, regenerate into a new directory:
+geo commerce-prepare --catalog commerce-draft/catalog-review.json --output-dir commerce-reviewed
+```
+
+The command creates a review catalog, draft Product JSON-LD, a feed worksheet, and per-item completeness checks. Audit prices and cards are unverified; no website or provider account is changed. The worksheet is not a provider feed, and internal checks do not establish provider compliance. See the generated README for review and validation steps.
+
+### Guided service and enquiry preparation
+
+```bash
+geo commerce-service-prepare --audit commerce-audit.json --output-dir service-draft
+# After owner review, regenerate into a new directory:
+geo commerce-service-prepare --review service-draft/service-review.json --output-dir service-reviewed
+```
+
+The command generates reviewable service records, draft Service JSON-LD, validation issues, and a manual enquiry test plan. Identical labels are grouped as candidates and must be reviewed; service data and observed enquiry links are not independently verified. Existing structured data should be reviewed to avoid adding duplicates. The command never submits an enquiry or changes a website.
+
+### Recurring commerce monitoring
+
+```bash
+# First run establishes a baseline. Repeat manually, with a scheduler, or keep watch running.
+geo commerce-monitor --url https://example.com/ --max-pages 25 --render
+geo commerce-monitor --url https://example.com/ --max-pages 25 --render --watch --interval-seconds 86400
+```
+
+Each run saves a compact snapshot in `~/.geo-optimizer/commerce-monitor.db` (override with `--db`) and compares compatible runs. Optional `--baseline` imports a matching site-audit JSON on the first run; URL, page limit, and rendering setting must match. Monitor changes are observations, not verified sales or transaction failures. Missing pages and partial rendering are reported as unknowns; finding comparisons require complete matching coverage. Only clearly named same-origin contact links are fetched with GET. The monitor never submits a form. `--watch` runs only while its process is alive; it does not install a system schedule or notification channel.
+
+### Discovery feed pilot
+
+`geo commerce-feed --input candidates.json --output-dir feed-preview` checks a supported subset of the stable OpenAI discovery schema and writes JSONL with search eligibility disabled. Candidate inputs contain `items`, each with a `record` object using the required discovery fields and explicit `owner_reviewed` and `rights_confirmed` booleans; the input also has a `market_confirmed` boolean. Validation is offline and does not verify provider eligibility, field truth, links, inventory, rights or conformance to the entire schema. An enabled local export requires `--enable-search` and explicit review confirmations; no feed is uploaded by the command. Confirm Canadian market and currency support for the specific integration before relying on it.
+
 ## Common tasks
 
 ```bash

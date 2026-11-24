@@ -18,7 +18,7 @@ Primary user-facing surfaces:
 - `geo-web`
 - `geo benchmark` (domain benchmark + `geo benchmark collect` pipeline)
 - `/platform` on `geo-web` (SaaS MVP: work-email workspaces, domain verify, audit, benchmark)
-- Storage: `docs/STORAGE.md` — MVP `data/` + SQLite; production Supabase; blobs Fil One/S3 via `GEO_ARTIFACT_BACKEND=s3`
+- Storage: `docs/PLATFORM.md` and `src/geo_optimizer/storage/` describe and implement platform and artifact storage; verify configured targets before use.
 
 ## Repository Map
 
@@ -35,24 +35,24 @@ Top-level structure:
 - `tests/`: pytest suite, mostly mocked end-to-end and unit coverage
 
 Important file roles:
-- `models/config.py`: centralized constants, scoring weights, schema templates, bot lists
-- `models/results.py`: result dataclasses
-- `core/audit.py`: full audit orchestration
-- `utils/http.py`: secure fetching, anti-SSRF, response size protections
-- `utils/validators.py`: public URL and safe-path validation
+- `src/geo_optimizer/models/config.py`: centralized constants, scoring weights, schema templates, bot lists
+- `src/geo_optimizer/models/results/`: result dataclasses
+- `src/geo_optimizer/core/audit.py`: full audit orchestration
+- `src/geo_optimizer/utils/http.py`: secure fetching, anti-SSRF, response size protections
+- `src/geo_optimizer/utils/validators.py`: public URL and safe-path validation
 
 ## Architectural Rules
 
 These are hard constraints:
 
 1. `core/` must never print or directly format output.
-   Return dataclasses from `models/results.py`.
+   Return dataclasses from `src/geo_optimizer/models/results/`.
 
 2. Keep CLI and formatter logic in `cli/`.
    `cli/*` can call core and format results; core must not depend on CLI.
 
 3. Keep constants centralized.
-   Do not hardcode scoring weights, AI bot lists, or schema defaults outside `models/config.py`.
+   Do not hardcode scoring weights, AI bot lists, or schema defaults outside `src/geo_optimizer/models/config.py`.
 
 4. Preserve Python 3.9 compatibility.
    Every Python file under `src/` must include:
@@ -87,7 +87,7 @@ Security-sensitive behavior is non-negotiable:
    Large responses must still honor the configured `MAX_RESPONSE_SIZE`.
 
 6. Be careful with circular import boundaries.
-   `utils/http.py` intentionally imports validators inside functions.
+   `src/geo_optimizer/utils/http.py` intentionally imports validators inside functions.
 
 ## Audit and Scoring Model
 

@@ -23,6 +23,7 @@ import sqlite3
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -115,12 +116,25 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Use 'nonce-{value}' instead of 'unsafe-inline' for XSS protection (fix #75)
         # Note #287: style-src uses 'unsafe-inline' because all <style> tags are hardcoded
         # in templates (not user-controllable). Removing it would require nonce on every style tag.
+        form_action = "form-action 'self'"
+        if request.url.path == "/oauth/auth0/consent":
+            issuer = urlsplit(os.environ.get("GEOSITION_AUTH0_ISSUER", ""))
+            if (
+                issuer.scheme == "https"
+                and issuer.hostname
+                and not issuer.username
+                and not issuer.password
+                and issuer.path == "/"
+                and not issuer.query
+                and not issuer.fragment
+            ):
+                form_action += f" https://{issuer.netloc}"
         response.headers["Content-Security-Policy"] = (
             f"default-src 'self'; script-src 'self' 'nonce-{nonce}'; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data:; frame-ancestors 'none'; "
-            "object-src 'none'; base-uri 'self'; form-action 'self'"
+            "object-src 'none'; base-uri 'self'; " + form_action
         )
         # Fix #413: restrict browser API access
         response.headers["Permissions-Policy"] = (
@@ -1894,3 +1908,23 @@ def _render_homepage(nonce: str = "") -> str:
     # Without nonce: "<script__NONCE_ATTR__>" → "<script>"
     nonce_attr = f' nonce="{nonce}"' if nonce else ""
     return html.replace("__NONCE_ATTR__", nonce_attr)
+
+
+# The MCP mount is deliberately last: it is a root fallback for its endpoint
+# and protected-resource metadata. Enabling it requires the optional MCP SDK,
+# persistent storage, a configured OAuth issuer, and a resource-specific token
+# audience. Misconfiguration fails startup instead of exposing an open endpoint.
+if os.environ.get("GEOSITION_HOSTED_MCP_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}:
+    from geo_optimizer.web.platform_routes import _get_service
+
+    provider = os.environ.get("GEOSITION_MCP_IDENTITY_PROVIDER", "supabase").strip().lower()
+    if provider == "auth0":
+        from geo_optimizer.mcp.auth0_bootstrap import install_auth0_integration
+
+        install_auth0_integration(app, _get_service())
+    elif provider == "supabase":
+        from geo_optimizer.mcp.hosted_bootstrap import install_configured_hosted_integration
+
+        install_configured_hosted_integration(app, _get_service())
+    else:
+        raise ValueError("Unsupported hosted MCP identity provider.")

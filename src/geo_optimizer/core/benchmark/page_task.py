@@ -89,7 +89,7 @@ def build_task_gaps(
         coverage = covered.get(task, 0.0)
         if demand < demand_threshold:
             continue
-        if coverage >= demand:
+        if task in covered:
             continue
         severity = "high" if demand - coverage > 0.4 else "medium" if demand - coverage > 0.2 else "low"
         gaps.append(
@@ -99,8 +99,8 @@ def build_task_gaps(
                 page_coverage_score=round(coverage, 3),
                 gap_severity=severity,
                 recommendation=(
-                    f"Create or strengthen a page for '{task}' — AI demand is {demand:.0%} "
-                    f"but on-site coverage is only {coverage:.0%}."
+                    f"No '{task}' page was identified in the sampled pages; "
+                    "review the rest of the site before creating or changing content."
                 ),
             )
         )

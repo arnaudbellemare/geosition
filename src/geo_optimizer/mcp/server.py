@@ -4,8 +4,9 @@ MCP Server for GEOSITION.
 Exposes core functionality as MCP tools usable from
 Claude Code, Cursor, Windsurf and any MCP client.
 
-Available tools (13):
+Available tools (14):
     geo_audit            — Full GEO audit (score 0-100)
+    geo_commerce_audit   — Bounded read-only commerce readiness audit
     geo_fix              — Generate automatic fixes (robots, llms, schema, meta)
     geo_llms_generate    — Generate llms.txt content from sitemap
     geo_citability       — Citability score (48 research-backed methods)
@@ -126,6 +127,29 @@ def geo_audit(url: str) -> str:
         # Fix #314: do not expose str(e) to the client — log internally
         logger.error("Error in geo_audit for %s: %s", url, e)
         return json.dumps({"error": "Internal error during operation", "url": url})
+
+
+@mcp.tool()
+def geo_commerce_audit(url: str, max_pages: int = 10) -> str:
+    """Audit public commerce signals on up to 10 same-origin pages.
+
+    Returns observations and recommendations, not verified provider access, a
+    submitted feed, a working transaction, or partner approval.
+    """
+    from geo_optimizer.core.commerce_site import run_site_audit
+    from geo_optimizer.utils.validators import validate_public_url
+
+    if isinstance(max_pages, bool) or not isinstance(max_pages, int) or not 1 <= max_pages <= 10:
+        return json.dumps({"error": "max_pages must be an integer from 1 to 10"})
+    url = _normalize_url(url)
+    safe, reason = validate_public_url(url)
+    if not safe:
+        return json.dumps({"error": f"Unsafe URL: {reason}"})
+    try:
+        return _to_json(run_site_audit(url, max_pages=max_pages, render=False))
+    except (ValueError, TypeError, KeyError, AttributeError, OSError, RuntimeError):
+        logger.exception("Commerce audit failed")
+        return json.dumps({"error": "Commerce audit could not complete."})
 
 
 # ─── Tool 2: geo_fix ─────────────────────────────────────────────────────────

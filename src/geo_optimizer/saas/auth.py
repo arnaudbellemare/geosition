@@ -163,7 +163,11 @@ def resolve_session(store: PlatformStore, token: str) -> tuple[PlatformUser, Org
     user = store.get_user_by_id(session.user_id)
     if user is None:
         return None
-    org = store.get_primary_org_for_user(user.user_id)
+    org = (
+        store.get_member_org(user.user_id, session.org_id)
+        if session.org_id
+        else store.get_primary_org_for_user(user.user_id)
+    )
     if org is None:
         return None
     return user, org

@@ -418,6 +418,22 @@ class BenchmarkStore:
             recorded_at=timestamp,
         )
 
+    def get_evidence_artifacts(self, run_id: int) -> list[EvidenceArtifactRecord]:
+        """Read complete evidence payloads, including experiment manifests and failed attempts."""
+        with self._connect() as conn:
+            rows = conn.execute("SELECT * FROM evidence_artifacts WHERE run_id = ? ORDER BY id", (run_id,)).fetchall()
+        return [
+            EvidenceArtifactRecord(
+                artifact_id=int(row["id"]),
+                run_id=int(row["run_id"]),
+                artifact_type=row["artifact_type"],
+                label=row["label"],
+                payload=row["payload"],
+                recorded_at=row["recorded_at"],
+            )
+            for row in rows
+        ]
+
     def get_snapshots_for_run(self, run_id: int) -> list[CitationSnapshotRecord]:
         """Load citation snapshots and URLs for a run."""
         with self._connect() as conn:

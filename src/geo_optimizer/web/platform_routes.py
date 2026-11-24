@@ -90,6 +90,35 @@ class DomainBody(BaseModel):
     domain: str
 
 
+class SelectWorkspaceBody(BaseModel):
+    org_id: int
+
+
+class WorkspaceInviteBody(BaseModel):
+    email: str
+
+
+class WorkspaceInviteAcceptBody(BaseModel):
+    token: str
+
+
+class VercelConnectionBody(BaseModel):
+    domain: str
+    project: str
+    team_slug: str = ""
+
+
+class CommerceBrowserEvidenceBody(BaseModel):
+    domain: str
+    evidence: dict
+
+
+class CommerceStepBody(BaseModel):
+    domain: str
+    step: str
+    status: str
+
+
 class SitemapAuditBody(BaseModel):
     domain: str
     sitemap_url: str = ""
@@ -768,9 +797,7 @@ async def platform_dashboard_page(request: Request):
     html = html.replace("{{DOMAINS}}", domains_html)
     benchmarks_html = ""
     for run in dash.recent_benchmarks:
-        benchmarks_html += (
-            f"<li>#{run.benchmark_run_id} {_html(run.domain)} · {run.benchmark_score}/100 ({_html(run.band)})</li>"
-        )
+        benchmarks_html += f"<li>#{run.link_id} {_html(run.domain)} · {run.benchmark_score}/100 ({_html(run.band)}) · {_html(run.run_at)}</li>"
     if not benchmarks_html:
         benchmarks_html = "<li>No benchmark runs yet.</li>"
     html = html.replace("{{BENCHMARKS}}", benchmarks_html)
@@ -1049,6 +1076,239 @@ async def api_add_prompt(body: PromptBody, token: str = Depends(require_write_to
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise _platform_service_http_error(exc) from exc
+
+
+@router.get("/api/v1/workspaces")
+async def api_workspaces(token: str = Depends(require_token)):
+    service = _get_service()
+    user, org = service.require_session(token)
+    from dataclasses import asdict
+
+    return {
+        "current_org_id": org.org_id,
+        "workspaces": [asdict(item) for item in service.store.list_user_orgs(user.user_id)],
+    }
+
+
+@router.post("/api/v1/workspaces/select")
+async def api_select_workspace(body: SelectWorkspaceBody, token: str = Depends(require_write_token)):
+    service = _get_service()
+    user, _ = service.require_session(token)
+    if not service.store.select_session_org(user.user_id, token, body.org_id):
+        raise HTTPException(status_code=403, detail="You do not have access to this workspace.")
+    return {"selected": True}
+
+
+@router.post("/api/v1/workspace/invitations")
+async def api_create_workspace_invitation(body: WorkspaceInviteBody, token: str = Depends(require_write_token)):
+    from geo_optimizer.saas.workspace_invites import create_invitation
+
+    try:
+        return create_invitation(_get_service(), token, body.email)
+    except PermissionError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/workspace/invitations/accept")
+async def api_accept_workspace_invitation(body: WorkspaceInviteAcceptBody, token: str = Depends(require_write_token)):
+    from geo_optimizer.saas.workspace_invites import accept_invitation
+
+    try:
+        return accept_invitation(_get_service(), token, body.token)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/api/v1/commerce/setup")
+async def api_commerce_setup(domain: str, token: str = Depends(require_token)):
+    from geo_optimizer.saas.commerce_guided import get_setup
+
+    try:
+        return get_setup(_get_service(), token, domain)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/commerce/setup/step")
+async def api_commerce_setup_step(body: CommerceStepBody, token: str = Depends(require_write_token)):
+    from geo_optimizer.saas.commerce_guided import save_step
+
+    try:
+        return save_step(_get_service(), token, body.domain, body.step, body.status)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/commerce/vercel/start")
+async def api_commerce_vercel_start(
+    body: VercelConnectionBody, request: Request, token: str = Depends(require_write_token)
+):
+    from geo_optimizer.saas.vercel_connections import begin_connection
+
+    try:
+        service = _get_service()
+        domain = service.require_verified_domain(token, body.domain)
+        if os.getenv("VERCEL") and service.store.__class__.__name__ != "SupabasePlatformStore":
+            raise ValueError("Vercel connections require persistent hosted storage.")
+        _, org = service.require_session(token)
+        url, state = begin_connection(domain, body.project, org.org_id, token, body.team_slug)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    response = JSONResponse({"authorization_url": url}, headers={"Cache-Control": "no-store"})
+    response.set_cookie(
+        "geo_vercel_state",
+        state,
+        max_age=600,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        path="/api/v1/commerce/vercel/callback",
+    )
+    return response
+
+
+@router.get("/api/v1/commerce/vercel/callback")
+async def api_commerce_vercel_callback(request: Request, token: str = Depends(require_token)):
+    from geo_optimizer.saas.vercel_connections import exchange_and_verify, make_dashboard_pending, verify_state
+
+    pending = ""
+    try:
+        service = _get_service()
+        _, org = service.require_session(token)
+        cookie = request.cookies.get("geo_vercel_state", "")
+        state = request.query_params.get("state", "")
+        dashboard = not state and request.query_params.get("source") == "marketplace"
+        context = verify_state(cookie if dashboard else state, cookie, token, org.org_id)
+        domain = service.require_verified_domain(token, str(context["domain"]))
+        project_id, team_id, encrypted = await asyncio.to_thread(
+            exchange_and_verify, request.query_params.get("code", ""), domain, str(context["project"])
+        )
+        if dashboard:
+            pending = make_dashboard_pending(
+                cookie,
+                token,
+                org.org_id,
+                domain,
+                project_id,
+                team_id,
+                encrypted,
+                request.query_params.get("next", ""),
+                request.query_params.get("configurationId", ""),
+            )
+            status = "confirm"
+        else:
+            service.store.save_vercel_connection(org.org_id, domain, project_id, team_id, encrypted)
+            status = "connected"
+    except (ValueError, KeyError, RuntimeError):
+        status = "failed"
+    response = RedirectResponse(
+        "/platform/static/commerce-setup.html?vercel=" + status,
+        status_code=303,
+        headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"},
+    )
+    response.delete_cookie("geo_vercel_state", path="/api/v1/commerce/vercel/callback")
+    if pending:
+        response.set_cookie(
+            "geo_vercel_pending",
+            pending,
+            max_age=600,
+            httponly=True,
+            secure=True,
+            samesite="strict",
+            path="/api/v1/commerce/vercel",
+        )
+    return response
+
+
+@router.get("/api/v1/commerce/vercel/pending")
+async def api_commerce_vercel_pending(request: Request, token: str = Depends(require_token)):
+    from geo_optimizer.saas.vercel_connections import read_dashboard_pending
+
+    try:
+        service = _get_service()
+        _, org = service.require_session(token)
+        data = read_dashboard_pending(request.cookies.get("geo_vercel_pending", ""), token, org.org_id)
+        service.require_verified_domain(token, data["domain"])
+        return JSONResponse(
+            {"domain": data["domain"], "project_id": data["project_id"], "team_id": data["team_id"]},
+            headers={"Cache-Control": "no-store"},
+        )
+    except (ValueError, KeyError) as exc:
+        raise HTTPException(status_code=400, detail="The pending connection is unavailable.") from exc
+
+
+@router.post("/api/v1/commerce/vercel/confirm")
+async def api_commerce_vercel_confirm(request: Request, token: str = Depends(require_write_token)):
+    from geo_optimizer.saas.vercel_connections import read_dashboard_pending
+
+    try:
+        service = _get_service()
+        _, org = service.require_session(token)
+        data = read_dashboard_pending(request.cookies.get("geo_vercel_pending", ""), token, org.org_id)
+        domain = service.require_verified_domain(token, data["domain"])
+        service.store.save_vercel_connection(
+            org.org_id, domain, data["project_id"], data["team_id"], data["encrypted_token"]
+        )
+        response = JSONResponse(
+            {"connected": True, "domain": domain, "project_id": data["project_id"], "next_url": data["next_url"]},
+            headers={"Cache-Control": "no-store"},
+        )
+        response.delete_cookie("geo_vercel_pending", path="/api/v1/commerce/vercel")
+        return response
+    except (ValueError, KeyError) as exc:
+        raise HTTPException(status_code=400, detail="The pending connection is unavailable.") from exc
+
+
+@router.get("/api/v1/commerce/vercel")
+async def api_commerce_vercel_status(domain: str, token: str = Depends(require_token)):
+    try:
+        service = _get_service()
+        domain = service.require_verified_domain(token, domain)
+        _, org = service.require_session(token)
+        row = service.store.get_vercel_connection(org.org_id, domain)
+        return JSONResponse(
+            {"connected": bool(row), "project_id": row["project_id"] if row else None},
+            headers={"Cache-Control": "no-store"},
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/commerce/vercel/disconnect")
+async def api_commerce_vercel_disconnect(body: DomainBody, token: str = Depends(require_write_token)):
+    try:
+        service = _get_service()
+        domain = service.require_verified_domain(token, body.domain)
+        _, org = service.require_session(token)
+        service.store.delete_vercel_connection(org.org_id, domain)
+        return {"disconnected": True}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/commerce/setup/browser-evidence")
+async def api_commerce_browser_evidence(body: CommerceBrowserEvidenceBody, token: str = Depends(require_write_token)):
+    from geo_optimizer.saas.commerce_guided import save_browser_evidence
+
+    try:
+        return save_browser_evidence(_get_service(), token, body.domain, body.evidence)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/v1/commerce/setup/audit")
+async def api_commerce_setup_audit(body: DomainBody, token: str = Depends(require_expensive_write_token)):
+    from geo_optimizer.saas.commerce_guided import run_audit
+
+    try:
+        return await asyncio.to_thread(run_audit, _get_service(), token, body.domain)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        _logger.exception("Commerce audit failed")
+        raise HTTPException(status_code=502, detail="Commerce audit could not complete. Try again later.") from exc
 
 
 @router.post("/api/v1/audit")
@@ -1401,6 +1661,16 @@ async def api_index_crawler_log(body: IndexCrawlerLogBody, token: str = Depends(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise _platform_service_http_error(exc) from exc
+
+
+@router.get("/api/v1/benchmark/runs/{link_id}")
+async def api_benchmark_details(link_id: int, token: str = Depends(require_token)):
+    try:
+        return _get_service().benchmark_details(token, link_id=link_id)
+    except PermissionError as exc:
+        raise HTTPException(status_code=404, detail="Benchmark not found") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
 
 
 @router.post("/api/v1/benchmark/run")

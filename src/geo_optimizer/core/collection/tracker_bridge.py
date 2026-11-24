@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from geo_optimizer.core.collection.normalize import _citations_from_urls, _domain_from_url
+from geo_optimizer.core.collection.normalize import _citations_from_urls, _domain_from_url, provenance_from_dict
 from geo_optimizer.core.collection.store import PARSER_VERSION, _now_iso
 from geo_optimizer.models.results.collection import CollectedAnswer, CollectedCitation
 
@@ -30,6 +30,7 @@ def from_brightdata_scrape(raw: dict, *, prompt_id: str = "", query_class: str =
         parser_version=PARSER_VERSION,
         parse_confidence=0.85 if citations else 0.6,
         collected_at=str(raw.get("createdAt", _now_iso())),
+        provenance=provenance_from_dict(raw.get("provenance")),
     )
 
 
@@ -65,6 +66,7 @@ def from_platform_result(raw: dict, *, prompt_id: str = "", query_class: str = "
         parser_version=PARSER_VERSION,
         parse_confidence=0.9 if citations else 0.55,
         collected_at=_now_iso(),
+        provenance=provenance_from_dict(raw.get("provenance")),
     )
 
 
@@ -89,6 +91,7 @@ def from_grounding_result(raw: dict, *, prompt_id: str = "", query_class: str = 
         parser_version=PARSER_VERSION,
         parse_confidence=0.92,
         collected_at=_now_iso(),
+        provenance=provenance_from_dict(raw.get("provenance")),
     )
 
 

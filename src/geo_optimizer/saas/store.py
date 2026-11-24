@@ -39,6 +39,7 @@ _REQUIRED_SQLITE_TABLES = (
     "memberships",
     "sessions",
     "password_reset_tokens",
+    "workspace_invitations",
     "verified_domains",
     "org_competitors",
     "org_prompts",
@@ -93,6 +94,26 @@ class PlatformStore:
         self.db_path = db_path or (Path(env_path) if env_path else resolve_platform_db_path())
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
+
+    def save_vercel_connection(self, org_id, domain, project_id, team_id, encrypted):
+        with self._connect() as conn:
+            conn.execute(
+                """INSERT INTO vercel_connections (org_id, domain, project_id, team_id, encrypted_token)
+                VALUES (?, ?, ?, ?, ?) ON CONFLICT(org_id, domain) DO UPDATE SET
+                project_id=excluded.project_id, team_id=excluded.team_id, encrypted_token=excluded.encrypted_token""",
+                (org_id, domain, project_id, team_id, encrypted),
+            )
+
+    def get_vercel_connection(self, org_id, domain):
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM vercel_connections WHERE org_id=? AND domain=?", (org_id, domain)
+            ).fetchone()
+        return dict(row) if row else None
+
+    def delete_vercel_connection(self, org_id, domain):
+        with self._connect() as conn:
+            conn.execute("DELETE FROM vercel_connections WHERE org_id=? AND domain=?", (org_id, domain))
 
     def save_search_connection(self, org_id: int, domain: str, provider: str, property_id: str, encrypted: str) -> None:
         with self._connect() as conn:
@@ -174,6 +195,10 @@ class PlatformStore:
         with self._connect() as conn:
             conn.executescript(
                 """
+                CREATE TABLE IF NOT EXISTS vercel_connections (
+                    org_id INTEGER NOT NULL, domain TEXT NOT NULL, project_id TEXT NOT NULL,
+                    team_id TEXT NOT NULL, encrypted_token TEXT NOT NULL, PRIMARY KEY (org_id, domain)
+                );
                 CREATE TABLE IF NOT EXISTS search_connections (
                     org_id INTEGER NOT NULL,
                     domain TEXT NOT NULL,
@@ -217,6 +242,15 @@ class PlatformStore:
                     expires_at TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     FOREIGN KEY (user_id) REFERENCES platform_users(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS workspace_invitations (
+                    token_hash TEXT PRIMARY KEY,
+                    org_id INTEGER NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+                    email TEXT NOT NULL,
+                    expires_at TEXT NOT NULL,
+                    used_at TEXT,
+                    created_at TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -367,7 +401,14 @@ class PlatformStore:
                     ON agent_usage_events (org_id, domain, created_at);
                 """
             )
+            self._ensure_column(conn, "sessions", "org_id", "INTEGER")
+            self._ensure_column(conn, "org_benchmark_runs", "details_json", "TEXT")
             self._ensure_column(conn, "agent_usage_events", "evidence_artifact_id", "TEXT NOT NULL DEFAULT ''")
+            self._ensure_column(conn, "agent_usage_events", "observation_key", "TEXT")
+            conn.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_agent_usage_observation "
+                "ON agent_usage_events (org_id, domain, source_type, observation_key)"
+            )
 
     def _ensure_column(self, conn: sqlite3.Connection, table: str, column: str, definition: str) -> None:
         """Add a column for existing MVP SQLite databases when a migration is introduced."""
@@ -484,6 +525,61 @@ class PlatformStore:
             ).fetchone()
         return self._row_org(row) if row else None
 
+    def list_user_orgs(self, user_id: int) -> list[Organization]:
+        with self._connect() as conn:
+            rows = conn.execute(
+                "SELECT o.* FROM organizations o JOIN memberships m ON m.org_id=o.id WHERE m.user_id=? ORDER BY o.id",
+                (user_id,),
+            ).fetchall()
+        return [self._row_org(row) for row in rows]
+
+    def select_session_org(self, user_id: int, token: str, org_id: int) -> bool:
+        with self._connect() as conn:
+            cursor = conn.execute(
+                "UPDATE sessions SET org_id=? WHERE token=? AND user_id=? AND EXISTS (SELECT 1 FROM memberships WHERE user_id=? AND org_id=?)",
+                (org_id, token, user_id, user_id, org_id),
+            )
+        return cursor.rowcount == 1
+
+    def get_member_org(self, user_id: int, org_id: int) -> Organization | None:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT o.* FROM organizations o JOIN memberships m ON m.org_id=o.id WHERE m.user_id=? AND o.id=?",
+                (user_id, org_id),
+            ).fetchone()
+        return self._row_org(row) if row else None
+
+    def membership_role(self, user_id: int, org_id: int) -> str:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT role FROM memberships WHERE user_id=? AND org_id=?", (user_id, org_id)
+            ).fetchone()
+        return str(row["role"]) if row else ""
+
+    def create_workspace_invitation(self, org_id: int, email: str, token_hash: str, expires_at: str) -> None:
+        with self._connect() as conn:
+            conn.execute(
+                "INSERT INTO workspace_invitations (token_hash,org_id,email,expires_at,created_at) VALUES (?,?,?,?,?)",
+                (token_hash, org_id, email, expires_at, _now_iso()),
+            )
+
+    def accept_workspace_invitation(self, token_hash: str, user_id: int, session_token: str) -> bool:
+        with self._connect() as conn:
+            conn.execute("BEGIN IMMEDIATE")
+            row = conn.execute(
+                "SELECT i.org_id FROM workspace_invitations i JOIN platform_users u ON u.email=i.email JOIN sessions s ON s.user_id=u.id WHERE i.token_hash=? AND i.used_at IS NULL AND i.expires_at>? AND u.id=? AND s.token=?",
+                (token_hash, _now_iso(), user_id, session_token),
+            ).fetchone()
+            if row is None:
+                return False
+            org_id = int(row["org_id"])
+            conn.execute(
+                "INSERT OR IGNORE INTO memberships (user_id,org_id,role) VALUES (?,?,'member')", (user_id, org_id)
+            )
+            conn.execute("UPDATE workspace_invitations SET used_at=? WHERE token_hash=?", (_now_iso(), token_hash))
+            conn.execute("UPDATE sessions SET org_id=? WHERE token=? AND user_id=?", (org_id, session_token, user_id))
+            return True
+
     def create_session(self, user_id: int, token: str, expires_at: str) -> None:
         with self._connect() as conn:
             conn.execute(
@@ -519,7 +615,9 @@ class PlatformStore:
             row = conn.execute("SELECT * FROM sessions WHERE token = ?", (token,)).fetchone()
         if row is None:
             return None
-        return SessionInfo(token=row["token"], user_id=int(row["user_id"]), expires_at=row["expires_at"])
+        return SessionInfo(
+            token=row["token"], user_id=int(row["user_id"]), expires_at=row["expires_at"], org_id=row["org_id"]
+        )
 
     def delete_session(self, token: str) -> None:
         with self._connect() as conn:
@@ -668,15 +766,24 @@ class PlatformStore:
         benchmark_score: int,
         band: str,
         run_at: str,
+        details: dict | None = None,
     ) -> OrgBenchmarkLink:
         with self._connect() as conn:
             cursor = conn.execute(
                 """
                 INSERT INTO org_benchmark_runs (
-                    org_id, domain, benchmark_run_id, benchmark_score, band, run_at
-                ) VALUES (?, ?, ?, ?, ?, ?)
+                    org_id, domain, benchmark_run_id, benchmark_score, band, run_at, details_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
-                (org_id, _normalize_domain(domain), benchmark_run_id, benchmark_score, band, run_at),
+                (
+                    org_id,
+                    _normalize_domain(domain),
+                    benchmark_run_id,
+                    benchmark_score,
+                    band,
+                    run_at,
+                    json.dumps(details) if details is not None else None,
+                ),
             )
             link_id = int(cursor.lastrowid or 0)
         return OrgBenchmarkLink(
@@ -688,6 +795,26 @@ class PlatformStore:
             band=band,
             run_at=run_at,
         )
+
+    def get_benchmark_details(self, org_id: int, link_id: int) -> dict | None:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT domain, details_json FROM org_benchmark_runs WHERE org_id = ? AND id = ?", (org_id, link_id)
+            ).fetchone()
+        if row is None:
+            return None
+        return {"domain": row["domain"], "details": json.loads(row["details_json"]) if row["details_json"] else None}
+
+    def get_latest_benchmark_details(self, org_id: int, domain: str) -> dict | None:
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT details_json FROM org_benchmark_runs WHERE org_id = ? AND domain = ? "
+                "ORDER BY run_at DESC, id DESC LIMIT 1",
+                (org_id, _normalize_domain(domain)),
+            ).fetchone()
+        if row is None:
+            return None
+        return {"details": json.loads(row["details_json"]) if row["details_json"] else None}
 
     def list_benchmark_runs(self, org_id: int, limit: int = 12) -> list[OrgBenchmarkLink]:
         with self._connect() as conn:
@@ -836,19 +963,23 @@ class PlatformStore:
             row = conn.execute("SELECT * FROM platform_runs WHERE id = ? AND org_id = ?", (run_id, org_id)).fetchone()
         return self._row_run(row) if row else None
 
-    def list_runs(self, org_id: int, *, limit: int = 12, kind: str = "") -> list[PlatformRun]:
+    def list_runs(self, org_id: int, *, limit: int = 12, kind: str = "", domain: str = "") -> list[PlatformRun]:
         params: list[object] = [org_id]
         kind_filter = ""
         if kind:
             kind_filter = "AND kind = ?"
             params.append(kind)
+        domain_filter = ""
+        if domain:
+            domain_filter = "AND domain = ?"
+            params.append(_normalize_domain(domain))
         params.append(limit)
         with self._connect() as conn:
             rows = conn.execute(
                 f"""
                 SELECT * FROM platform_runs
                 WHERE org_id = ?
-                {kind_filter}
+                {kind_filter} {domain_filter}
                 ORDER BY created_at DESC, id DESC
                 LIMIT ?
                 """,
@@ -1115,7 +1246,9 @@ class PlatformStore:
         value_units: float = 0.0,
         evidence_artifact_id: str = "",
         evidence: dict[str, object] | None = None,
-    ) -> AgentUsageEvent:
+        observation_key: str = "",
+        skip_existing: bool = False,
+    ) -> AgentUsageEvent | None:
         """Persist one demand-side AI usage observation."""
         created_at = _now_iso()
         evidence_json = json.dumps(evidence or {}, ensure_ascii=False, default=str)[:4000]
@@ -1126,8 +1259,9 @@ class PlatformStore:
                     org_id, domain, page_url, source_type, agent, query_text,
                     answer_excerpt, cited_url, cited_rank, surfaced, cited,
                     top_recommendation, confidence, value_units, evidence_json,
-                    evidence_artifact_id, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    evidence_artifact_id, created_at, observation_key
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (org_id, domain, source_type, observation_key) DO NOTHING
                 """,
                 (
                     org_id,
@@ -1147,8 +1281,17 @@ class PlatformStore:
                     evidence_json,
                     evidence_artifact_id[:160],
                     created_at,
+                    observation_key or None,
                 ),
             )
+            if cursor.rowcount == 0:
+                if skip_existing:
+                    return None
+                row = conn.execute(
+                    "SELECT * FROM agent_usage_events WHERE org_id = ? AND domain = ? AND source_type = ? AND observation_key = ?",
+                    (org_id, _normalize_domain(domain), source_type[:64], observation_key),
+                ).fetchone()
+                return self._row_agent_usage_event(row)
             row = conn.execute(
                 "SELECT * FROM agent_usage_events WHERE id = ?",
                 (int(cursor.lastrowid or 0),),
